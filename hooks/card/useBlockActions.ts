@@ -9,6 +9,7 @@ type TextStylePatch = Partial<{
   fontSize: number;
   fontWeight: "normal" | "bold";
   align: "left" | "center" | "right";
+  width: number;
 }>;
 
 type HistoryApi = {

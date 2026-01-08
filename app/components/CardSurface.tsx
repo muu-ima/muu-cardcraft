@@ -119,6 +119,8 @@ export default function CardSurface({
               position: "absolute",
               top: block.y,
               left: block.x,
+              width: block.width ?? "auto",
+              textAlign: block.align ?? "left",
               cursor: interactive ? "move" : "default",
               // ✅ padding は外側から外す（リングのズレ原因）
               padding: 0,

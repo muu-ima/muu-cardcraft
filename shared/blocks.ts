@@ -11,6 +11,8 @@ export type Block = {
   fontSize: number;
   fontWeight: "normal" | "bold";
   fontKey: FontKey; // 実際の定義に合わせて
+  width?: number;
+  align?: "left" | "center" | "right";
   isBraille?: boolean;
 };
 
@@ -35,6 +37,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 18,
     fontWeight: "normal",
     fontKey: "sans",
+    width: 140,
   },
 
   // 👇 点字用に 1 個ブロックを予約（あとで位置・サイズは調整）

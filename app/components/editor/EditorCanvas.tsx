@@ -171,11 +171,11 @@ export default function EditorCanvas({
                       position: "absolute",
                       left: b.x,
                       top: b.y,
-
+                      width: b.width ?? "auto", 
                       fontSize: `${b.fontSize}px`,
                       fontWeight: b.fontWeight,
                       fontFamily: fontFamilyFromKey(b.fontKey),
-
+                      textAlign: b.align ?? "left",
                       padding: "2px 6px",
                       lineHeight: 1.2,
 
