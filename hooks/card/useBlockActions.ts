@@ -3,6 +3,7 @@
 
 import type { FontKey, FontSizeDelta } from "@/shared/fonts";
 import type { Block } from "@/shared/blocks";
+import { createRandomId } from "@/shared/randomId";
 
 type TextStylePatch = Partial<{
   fontSize: number;
@@ -51,7 +52,7 @@ export function useBlockActions(history: HistoryApi) {
     commit((prev) => [
       ...prev,
       {
-        id: crypto.randomUUID(),
+        id: createRandomId(),
         type: "text",
         text: "新しいテキスト",
         x: 100,
@@ -68,13 +69,15 @@ export function useBlockActions(history: HistoryApi) {
     commit(blocksRef.current); // 操作直前の状態を積む
 
     const next = clamp(Math.round(fontSize), 8, 72);
-    set((prev) => prev.map((b) => (b.id === id ? { ...b, fontSize: next } : b)));
+    set((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, fontSize: next } : b))
+    );
   };
 
-const bumpFontSize = (id: string, delta: FontSizeDelta) => {
-  const cur = blocksRef.current.find((b) => b.id === id)?.fontSize ?? 16;
-  updateFontSize(id, cur + delta);
-};
+  const bumpFontSize = (id: string, delta: FontSizeDelta) => {
+    const cur = blocksRef.current.find((b) => b.id === id)?.fontSize ?? 16;
+    updateFontSize(id, cur + delta);
+  };
 
   return {
     previewText,
