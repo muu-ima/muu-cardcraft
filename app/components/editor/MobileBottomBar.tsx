@@ -31,7 +31,7 @@ function MobileBottomBarItem({
       type="button"
       onClick={() => onChangeTab(tab)}
       className={[
-        "flex shrink-0 flex-col items-center justify-center gap-1 px-4 py-2 min-w-20",
+        "snap-start flex shrink-0 flex-col items-center justify-center gap-1 px-4 py-2 min-w-20",
         active ? "text-blue-700" : "text-zinc-600",
       ].join(" ")}
     >
@@ -45,7 +45,15 @@ function MobileBottomBarItem({
         <Icon size={16} strokeWidth={1.75} />
       </span>
 
-      <span className="text-[11px]">{label}</span>
+      <span
+        className={[
+          "text-[11px] leading-none",
+          active &&
+            "after:block after:h-0.5 after:w-3 after:mx-auto after:rounded-full after:bg-blue-600",
+        ].join(" ")}
+      >
+        {label}
+      </span>
     </button>
   );
 }
@@ -60,8 +68,8 @@ export default function MobileBottomBar({
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 xl:hidden">
       <div className="border-t bg-white/90 backdrop-blur pb-[env(safe-area-inset-bottom)]">
-        <div className="mx-auto max-w-[520px] overflow-x-auto scrollbar-none">
-          <div className="flex h-14 flex-nowrap gap-1">
+        <div className="mx-auto max-w-[520px] overflow-x-auto  snap-x snap-mandatory scrollbar-none">
+          <div className="flex h-14 flex-nowrap gap-1 pr-2">
             <MobileBottomBarItem
               tab="text"
               label="テキスト"
