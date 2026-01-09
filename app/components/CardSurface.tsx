@@ -125,17 +125,20 @@ export default function CardSurface({
               // ✅ padding は外側から外す（リングのズレ原因）
               padding: 0,
             }}
-            className="select-none text-zinc-900 dark:text-zinc-50"
+            // 「ブロック幅」を示す枠をここ（外側）に出す
+            className={[
+              "relative select-none text-zinc-900 dark:text-zinc-50",
+              showSelection
+                ? "ring-2 ring-sky-400/80 ring-offset-2 ring-offset-white rounded-md"
+                : "",
+            ].join(" ")}
           >
             {/* ✅ リング/実寸/計測は inner に寄せる */}
             <div
               ref={(el) => {
                 if (blockRefs) blockRefs.current[block.id] = el; // ✅ 幅計測もここ
               }}
-              className={[
-                "inline-block rounded px-1 py-0.5",
-                showSelection ? "outline-2 outline-pink-400/70" : "",
-              ].join(" ")}
+              className={["inline-block rounded px-1 py-0.5"].join(" ")}
               style={{
                 fontSize: `${block.fontSize}px`,
                 fontWeight: block.fontWeight,
@@ -147,12 +150,26 @@ export default function CardSurface({
                 maxWidth: "none",
                 overflowWrap: "normal",
                 wordBreak: "normal",
-                outlineOffset: 2,
               }}
             >
               {block.type === "text" &&
                 (editingBlockId === block.id ? null : block.text)}
             </div>
+            {/* 🆕 幅ラベル（showSelection 中だけ表示） */}
+            {showSelection && typeof block.width === "number" && (
+              <div
+                className="
+                  pointer-events-none
+                  absolute -top-4 right-0
+                  text-[10px]
+                  rounded-full border border-zinc-200
+                  bg-white/90 px-2 py-0.5
+                  text-zinc-500 shadow-sm
+                "
+              >
+                {Math.round(block.width)}px
+              </div>
+            )}
           </div>
         );
       })}
