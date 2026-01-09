@@ -26,8 +26,8 @@ type CardSurfaceProps = {
     blockId: string
   ) => void;
 
-  /** ダブルクリックで編集開始（text blockのみ） */
-  onBlockDoubleClick?: (blockId: string) => void;
+  /** 同じブロックを再タップで編集開始 */
+  onStartInlineEdit?: (blockId: string) => void;
 
   /** 外クリック（選択解除など） */
   onSurfacePointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
@@ -66,7 +66,7 @@ export default function CardSurface({
   editingBlockId,
   interactive = false,
   onBlockPointerDown,
-  onBlockDoubleClick,
+  onStartInlineEdit,
   onSurfacePointerDown,
   activeBlockId,
   cardRef,
@@ -110,11 +110,17 @@ export default function CardSurface({
               e.stopPropagation(); // ✅ 外クリック判定に伝播させない
               onBlockPointerDown?.(e, block.id); // ✅ フォーカス/ドラッグ開始
             }}
-            onDoubleClick={
-              interactive && onBlockDoubleClick && block.type === "text"
-                ? () => onBlockDoubleClick(block.id)
-                : undefined
-            }
+            onClick={() => {
+              if (!interactive) return;
+              if (!onStartInlineEdit) return;
+              if (block.type !== "text") return;
+
+              // ✅ すでにターゲットになっているブロックを
+              // もう一度タップしたらテキスト編集開始
+              if (activeBlockId === block.id && editingBlockId !== block.id) {
+                onStartInlineEdit(block.id);
+              }
+            }}
             style={{
               position: "absolute",
               top: block.y,
