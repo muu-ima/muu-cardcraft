@@ -48,6 +48,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     blockRefs,
     undo,
     redo,
+    onChangeWidth,
   } = props;
 
   return (
@@ -63,6 +64,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
           actions.setIsPreview(false);
           actions.setSide("front");
         }}
+        onChangeAlign={actions.onChangeAlign}
       />
 
       {/* BottomSheet */}
@@ -88,6 +90,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
           onCommitText={onCommitText}
           onChangeFont={updateFont}
           onBumpFontSize={bumpFontSize}
+          onChangeWidth={onChangeWidth}
           design={design}
           onChangeDesign={setDesign}
           fontFamily="default"

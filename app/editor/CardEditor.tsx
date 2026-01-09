@@ -258,6 +258,7 @@ export default function CardEditor() {
     bumpFontSize,
     design,
     setDesign,
+    onChangeWidth: handleChangeBlockWidth,
 
     // ---- export
     exportRef,

@@ -2,7 +2,18 @@
 "use client";
 
 import React from "react";
-import { Home, Eye, Pencil, Undo2, Redo2 } from "lucide-react";
+import {
+  Home,
+  Eye,
+  Pencil,
+  Undo2,
+  Redo2,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+} from "lucide-react";
+
+type Align = "left" | "center" | "right";
 
 type Props = {
   isPreview: boolean;
@@ -10,6 +21,7 @@ type Props = {
   onUndo: () => void;
   onRedo: () => void;
   onHome: () => void;
+  onChangeAlign?: (align: Align) => void;
 };
 
 function IconButton({
@@ -21,7 +33,7 @@ function IconButton({
   onClick: () => void;
   children: React.ReactNode;
 }) {
-    return (
+  return (
     <button
       type="button"
       aria-label={label}
@@ -43,6 +55,7 @@ export default function MobileHeader({
   onUndo,
   onRedo,
   onHome,
+  onChangeAlign,
 }: Props) {
   return (
     <header
@@ -85,6 +98,23 @@ export default function MobileHeader({
             </>
           )}
         </button>
+        {/* 仮置き : 整列 3 ボタン*/}
+        {onChangeAlign && (
+          <div className="ml-1 flex items-center gap-0.5 rounded-xl bg-zinc-50 px-1 py-0.5">
+            <IconButton label="左揃え" onClick={() => onChangeAlign("left")}>
+              <AlignLeft size={18} strokeWidth={1.75} />
+            </IconButton>
+            <IconButton
+              label="中央揃え"
+              onClick={() => onChangeAlign("center")}
+            >
+              <AlignCenter></AlignCenter>
+            </IconButton>
+            <IconButton label="右揃え" onClick={() => onChangeAlign("right")}>
+              <AlignRight></AlignRight>
+            </IconButton>
+          </div>
+        )}
 
         {/* Right: Undo/Redo */}
         <div className="flex items-center gap-1">
