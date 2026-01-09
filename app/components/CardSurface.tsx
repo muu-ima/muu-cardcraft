@@ -1,7 +1,7 @@
 // app/components/CardSurface.tsx
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import type { CSSProperties, RefObject } from "react";
 import type { Block } from "@/shared/blocks";
 import type { DesignKey } from "@/shared/design";
@@ -74,6 +74,25 @@ export default function CardSurface({
   className,
   style,
 }: CardSurfaceProps) {
+  const lastClickedBlockIdRef = useRef<string | null>(null);
+
+  const handleBlockClick = (block: Block) => {
+    if (!interactive) return;
+    if (!onStartInlineEdit) return;
+    if (block.type !== "text") return;
+
+    const last = lastClickedBlockIdRef.current;
+
+    if (last === block.id && editingBlockId !== block.id) {
+      // ✅ 同じブロックを 2 回連続でクリック → 編集開始
+      onStartInlineEdit(block.id);
+      lastClickedBlockIdRef.current = null; // 1回使ったらリセットしておく
+    } else {
+      // ✅ 1回目クリック（または別ブロックに切り替え）
+      lastClickedBlockIdRef.current = block.id;
+    }
+  };
+
   return (
     <div
       ref={cardRef}
@@ -110,17 +129,7 @@ export default function CardSurface({
               e.stopPropagation(); // ✅ 外クリック判定に伝播させない
               onBlockPointerDown?.(e, block.id); // ✅ フォーカス/ドラッグ開始
             }}
-            onClick={() => {
-              if (!interactive) return;
-              if (!onStartInlineEdit) return;
-              if (block.type !== "text") return;
-
-              // ✅ すでにターゲットになっているブロックを
-              // もう一度タップしたらテキスト編集開始
-              if (activeBlockId === block.id && editingBlockId !== block.id) {
-                onStartInlineEdit(block.id);
-              }
-            }}
+            onClick={() => handleBlockClick(block)}
             style={{
               position: "absolute",
               top: block.y,

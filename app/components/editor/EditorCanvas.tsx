@@ -21,7 +21,8 @@ type Props = {
     id: string,
     opts: { scale: number }
   ) => void;
-  onBlockDoubleClick?: (id: string) => void;
+  /** 同じブロックを再タップで編集開始 */
+  onStartInlineEdit?: (blockId: string) => void;
 
   // refs
   cardRef: React.RefObject<HTMLDivElement | null>;
@@ -46,7 +47,7 @@ export default function EditorCanvas({
   isPreview,
   showGuides,
   onPointerDown,
-  onBlockDoubleClick,
+  onStartInlineEdit,
   activeBlockId,
   cardRef,
   blockRefs,
@@ -118,7 +119,7 @@ export default function EditorCanvas({
               interactive={!isPreview}
               onSurfacePointerDown={() => onSurfacePointerDown?.()}
               onBlockPointerDown={(e, id) => onPointerDown?.(e, id, { scale })}
-              onBlockDoubleClick={isPreview ? undefined : onBlockDoubleClick}
+              onStartInlineEdit={onStartInlineEdit}
               activeBlockId={editingBlockId ? undefined : activeBlockId}
               editingBlockId={editingBlockId} // ✅ 二重文字防止
               blockRefs={blockRefs}
@@ -171,7 +172,7 @@ export default function EditorCanvas({
                       position: "absolute",
                       left: b.x,
                       top: b.y,
-                      width: b.width ?? "auto", 
+                      width: b.width ?? "auto",
                       fontSize: `${b.fontSize}px`,
                       fontWeight: b.fontWeight,
                       fontFamily: fontFamilyFromKey(b.fontKey),
