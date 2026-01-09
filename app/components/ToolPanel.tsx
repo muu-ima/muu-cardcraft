@@ -43,6 +43,7 @@ type Props = {
     design: DesignKey,
     options?: { quality?: number; pixelRatio?: number; fontFamily?: string }
   ) => void;
+  onChangeWidth?: (id: string, width: number) => void;
 };
 
 export default function ToolPanel({
@@ -64,6 +65,7 @@ export default function ToolPanel({
   onChangeDesign,
   onDownload,
   variant = "desktop",
+  onChangeWidth,
 }: Props) {
   // ✅ open と activeTab を一致させる（事故防止）
   if (!open || !activeTab) return null;
@@ -133,6 +135,8 @@ export default function ToolPanel({
             onChangeText={onChangeText}
             onCommitText={onCommitText}
             onBumpFontSize={onBumpFontSize}
+            onChangeWidth={onChangeWidth}
+            activeBlockId={activeBlockId}
           />
         )}
         {activeTab === "braille" && (
@@ -140,7 +144,7 @@ export default function ToolPanel({
             blocks={blocks}
             onChangeText={onChangeText}
             onCommitText={onCommitText}
-            onAddBrailleBlock={onAddBrailleBlock} 
+            onAddBrailleBlock={onAddBrailleBlock}
           />
         )}
         {activeTab === "font" && (

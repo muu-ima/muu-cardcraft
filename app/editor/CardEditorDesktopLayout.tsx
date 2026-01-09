@@ -21,7 +21,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     getBlocksFor,
     editableBlocks,
     addBlock,
-    addBrailleBlock, 
+    addBrailleBlock,
     onChangeText,
     onCommitText,
     updateFont,
@@ -43,11 +43,10 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     blockRefs,
     undo,
     redo,
+    onChangeWidth,
   } = props;
 
   const isPanelOpen = state.activeTab !== null;
-
-
 
   return (
     <div className="flex w-full h-[calc(100dvh-56px)]">
@@ -77,7 +76,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
             onChangeSide={actions.setSide}
             blocks={getBlocksFor(state.side)}
             onAddBlock={addBlock}
-            onAddBrailleBlock={addBrailleBlock}  
+            onAddBrailleBlock={addBrailleBlock}
             onChangeText={onChangeText}
             onCommitText={onCommitText}
             onBumpFontSize={bumpFontSize}
@@ -85,6 +84,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
             design={design}
             onChangeDesign={setDesign}
             fontFamily="default"
+            onChangeWidth={onChangeWidth}
             onDownload={(format) => {
               if (!exportRef.current) return;
               downloadImage(format, exportRef.current);

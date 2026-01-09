@@ -1,3 +1,4 @@
+// app/components/tabs/TextTab.tsx
 "use client";
 
 import type { Block } from "@/shared/blocks";
@@ -11,6 +12,11 @@ type Props = {
   onCommitText?: (id: string, value: string) => void;
   canEdit?: boolean; // あってもいい（なくてもOK）
   onBumpFontSize?: (id: string, delta: FontSizeDelta) => void;
+  onChangeWidth?: (id: string, width: number) => void;
+  
+  /** 👇 追加：選択中ブロック情報 */
+  activeBlockId?: string | null;
+  activeBlockWidth?: number | null;
 };
 
 export default function TextTab({

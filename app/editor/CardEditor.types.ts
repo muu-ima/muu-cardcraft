@@ -132,6 +132,7 @@ export type CardEditorDesktopProps = {
     blockId: string,
     opts: { scale: number }
   ) => void;
+  onChangeWidth?: (id: string, width: number) => void;
 
   // ---- インライン編集
   startEditing: (id: string, text: string) => void;

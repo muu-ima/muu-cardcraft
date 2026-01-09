@@ -13,6 +13,7 @@ export type Block = {
   fontKey: FontKey; // 実際の定義に合わせて
   width?: number;
   align?: "left" | "center" | "right";
+  side: "front" | "back";
   isBraille?: boolean;
 };
 
@@ -27,6 +28,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 24,
     fontWeight: "bold",
     fontKey: "serif",
+    side: "front",
   },
   {
     id: "title",
@@ -38,6 +40,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontWeight: "normal",
     fontKey: "sans",
     width: 140,
+    side: "front",
   },
 
   // 👇 点字用に 1 個ブロックを予約（あとで位置・サイズは調整）
@@ -50,6 +53,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontSize: 18,
     fontWeight: "normal",
     fontKey: "sans",
+    side: "front",
     isBraille: true, // ← 点字用
   },
 ];

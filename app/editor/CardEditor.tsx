@@ -67,6 +67,7 @@ export default function CardEditor() {
     stopEditing,
     editingText,
     setEditingText,
+    setBlockWidth,
   } = useCardBlocks();
 
   const editor = useCardEditorState({
@@ -159,6 +160,10 @@ export default function CardEditor() {
   const onCommitText = (id: string, value: string) => {
     if (state.side !== "front") return;
     commitText(id, value);
+  };
+
+  const handleChangeBlockWidth = (id: string, width: number) => {
+    setBlockWidth(id, width);
   };
 
   const handleBlockPointerDown = (
@@ -312,6 +317,7 @@ export default function CardEditor() {
           onCommitText={onCommitText}
           updateFont={updateFont}
           bumpFontSize={bumpFontSize}
+          onChangeWidth={handleChangeBlockWidth}
           design={design}
           setDesign={setDesign}
           exportRef={exportRef}
