@@ -19,7 +19,6 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     scaleWrapRefDesktop,
     scaleDesktop,
     getBlocksFor,
-    editableBlocks,
     addBlock,
     addBrailleBlock,
     onChangeText,
@@ -47,6 +46,8 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
   } = props;
 
   const isPanelOpen = state.activeTab !== null;
+
+  const blocksForSide = getBlocksFor(state.side);
 
   return (
     <div className="flex w-full h-[calc(100dvh-56px)]">
@@ -133,10 +134,11 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                   onPointerDown={
                     state.side === "front" ? handleBlockPointerDown : undefined
                   }
-                  onBlockDoubleClick={(id) => {
-                    const b = editableBlocks.find((block) => block.id === id);
-                    if (!b || b.type !== "text") return;
-                    startEditing(id, b.text);
+                  onStartInlineEdit={(blockId) => {
+                    const block = blocksForSide.find((b) => b.id === blockId);
+                    if (!block || block.type !== "text") return;
+                    // ✅ startEditing が (id, text) を受け取るのでここで変換
+                    startEditing(block.id, block.text);
                   }}
                   editingBlockId={editingBlockId}
                   editingText={editingText}

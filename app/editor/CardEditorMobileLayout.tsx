@@ -24,7 +24,6 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     scaleWrapRefMobile,
     scaleMobile,
     getBlocksFor,
-    editableBlocks,
     addBlock,
     addBrailleBlock,
     onChangeText,
@@ -50,6 +49,8 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     redo,
     onChangeWidth,
   } = props;
+
+  const blocksForSide = getBlocksFor(state.side);
 
   return (
     <div className="xl:hidden">
@@ -82,7 +83,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
           activeBlockId={state.activeBlockId}
           side={state.side}
           onChangeSide={actions.setSide}
-          blocks={getBlocksFor(state.side)}
+          blocks={blocksForSide}
           onAddBlock={addBlock}
           onAddBrailleBlock={addBrailleBlock}
           isPreview={state.isPreview}
@@ -134,10 +135,13 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                   onPointerDown={
                     state.side === "front" ? handleBlockPointerDown : undefined
                   }
-                  onBlockDoubleClick={(id) => {
-                    const b = editableBlocks.find((block) => block.id === id);
+                  onStartInlineEdit={(blockId) => {
+                    const b = blocksForSide.find(
+                      (block) => block.id === blockId
+                    );
                     if (!b || b.type !== "text") return;
-                    startEditing(id, b.text);
+                    // ✅ (id, text) を取る startEditing に変換
+                    startEditing(blockId, b.text);
                   }}
                   editingBlockId={editingBlockId}
                   editingText={editingText}
