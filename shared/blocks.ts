@@ -1,6 +1,6 @@
-import type { FontKey } from "@/shared/fonts";
-
 // shared/blocks.ts
+
+import type { FontKey } from "@/shared/fonts";
 
 export type Block = {
   id: string;
