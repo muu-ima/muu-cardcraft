@@ -1,6 +1,7 @@
 // shared/editorBlocks.ts
+import type { FontKey as FontKeyFromFonts } from "./fonts";
 
-export type FontKey = "sans" | "maru" | "serif";
+export type FontKey = FontKeyFromFonts;
 export type Align = "left" | "center" | "right";
 
 export type BaseBlock = {

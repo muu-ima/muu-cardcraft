@@ -7,6 +7,7 @@ import PrintGuides from "@/app/components/editor/PrintGuides";
 import type { Block } from "@/shared/blocks";
 import type { DesignKey } from "@/shared/design";
 import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
+import { FONT_DEFINITIONS, type FontKey } from "@/shared/fonts";
 
 type Props = {
   blocks: Block[];
@@ -133,14 +134,19 @@ export default function EditorCanvas({
                 const b = blocks.find((x) => x.id === editingBlockId);
                 if (!b || b.type !== "text") return null;
 
-                function fontFamilyFromKey(fontKey: string) {
+                function fontFamilyFromKey(fontKey: FontKey): string {
                   switch (fontKey) {
                     case "serif":
-                      return `"Noto Serif JP", serif`;
+                      return FONT_DEFINITIONS.serif.css;
                     case "maru":
-                      return `"Zen Maru Gothic", sans-serif`;
+                      return FONT_DEFINITIONS.maru.css;
+                    case "script1":
+                      return FONT_DEFINITIONS.script1.css;
+                    case "script2":
+                      return FONT_DEFINITIONS.script2.css;
+                    case "sans":
                     default:
-                      return `"Noto Sans JP", system-ui, sans-serif`;
+                      return FONT_DEFINITIONS.sans.css;
                   }
                 }
 

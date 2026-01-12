@@ -1,13 +1,28 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import {
+  notoSansJp,
+  zenMaruGothic,
+  notoSerifJp,
+  parisienne,
+  dancingScript,
+} from "@/app/fonts";
 
 export default function EditorLayout({ children }: { children: ReactNode }) {
+  // フォント用クラスをまとめておく
+  const fontClasses = [
+    notoSansJp.variable,
+    zenMaruGothic.variable,
+    notoSerifJp.variable,
+    parisienne.variable,
+    dancingScript.variable,
+  ].join(" ");
+
   return (
     <div
-      className="
+      className={`${fontClasses}
         fixed inset-0 overflow-hidden
-        flex flex-col
-              "
+        flex flex-col`}
       style={{
         background:
           "radial-gradient(circle at top, #eef5fb 0%, #f7f3f8 40%, #ffffff 75%)",
