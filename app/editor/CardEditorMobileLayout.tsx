@@ -8,6 +8,7 @@ import CanvasArea from "@/app/components/editor/CanvasArea";
 import CenterToolbar from "@/app/components/editor/CenterToolbar";
 import EditorCanvas from "@/app/components/editor/EditorCanvas";
 import ToolPanel from "@/app/components/ToolPanel";
+import { MobileTextEditorPanel } from "@/app/components/panels/MobileTextEditorPanel";
 import type { CardEditorMobileProps } from "./CardEditor.types";
 
 export function CardEditorMobileLayout(props: CardEditorMobileProps) {
@@ -157,6 +158,25 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
           </div>
         </CanvasArea>
       </div>
+
+      {/* ✅ モバイル用テキスト編集パネル（編集時だけ表示） */}
+      {editingBlockId && (
+        <div className="fixed inset-x-0 bottom-0 z-50">
+          <MobileTextEditorPanel
+            key={editingBlockId} // ← ここが「解決策1」のポイント！
+            blockId={editingBlockId}
+            initialValue={editingText ?? ""} // いまの編集中テキスト
+            title="テキスト編集"
+            description="Enterで改行、✓完了で反映されます。"
+            placeholder="テキストを入力"
+            preview={undefined} // あとで点字プレビューにしてもOK
+            onCommit={(id, value) => {
+              onCommitText(id, value); // 既存のテキスト確定ロジックを呼ぶ
+              stopEditing(); // 編集モード終了（パネルを閉じる）
+            }}
+          />
+        </div>
+      )}
 
       {/* Mobile bottom bar */}
       {!state.isPreview && (
