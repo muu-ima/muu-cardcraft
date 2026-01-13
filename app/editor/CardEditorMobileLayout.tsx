@@ -51,6 +51,9 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
   } = props;
 
   const blocksForSide = getBlocksFor(state.side);
+  const handleDeleteBlock = (id: string) => {
+    actions.removeBlock(id);
+  };
 
   return (
     <div className="xl:hidden">
@@ -99,6 +102,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
             if (!exportRef.current) return;
             downloadImage(format, exportRef.current);
           }}
+          onDeleteBlock={handleDeleteBlock}
         />
       </BottomSheet>
 
@@ -158,7 +162,6 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
         </CanvasArea>
       </div>
 
-      
       {/* Mobile bottom bar */}
       {!state.isPreview && (
         <MobileBottomBar activeTab={state.activeTab} onChangeTab={openTab} />
