@@ -21,6 +21,18 @@ export const FONT_DEFINITIONS = {
     label: "筆記体（Dancing Script）",
     css: "var(--font-dancing-script), cursive",
   },
+  pop1: {
+    label: "ポップ (Lemon / 英字)",
+    css: "var(--font-lemon), system-ui, sans-serif",
+  },
+  pop2: {
+    label: "ポップ (Chicle / 英字)",
+    css: "var(--font-chicle), system-ui, sans-serif",
+  },
+   pop3: {
+    label: "ポップ (Potta_One / 日本)",
+    css: "var(--font-potta_one), system-ui, sans-serif",
+  },
 } as const;
 
 export type FontKey = keyof typeof FONT_DEFINITIONS;

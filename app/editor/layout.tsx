@@ -6,6 +6,9 @@ import {
   notoSerifJp,
   parisienne,
   dancingScript,
+  lemon,
+  chicle,
+  potta_one,
 } from "@/app/fonts";
 
 export default function EditorLayout({ children }: { children: ReactNode }) {
@@ -16,6 +19,9 @@ export default function EditorLayout({ children }: { children: ReactNode }) {
     notoSerifJp.variable,
     parisienne.variable,
     dancingScript.variable,
+    lemon.variable,
+    chicle.variable,
+    potta_one.variable,
   ].join(" ");
 
   return (
