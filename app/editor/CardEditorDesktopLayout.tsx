@@ -132,7 +132,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
               />
             </div>
 
-            <div className="flex w-full justify-center">
+            <div className="flex w-full justify-center mt-6 md:mt-20 lg:mt-30">
               {/* ✅ タブ開閉で max-width を変える箱 */}
               <div
                 ref={scaleWrapRefDesktop}

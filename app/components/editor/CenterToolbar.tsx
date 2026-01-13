@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { useState, useEffect } from "react";
 import type { TabKey } from "@/shared/editor";
 import { FontKey } from "@/shared/fonts";
 import {
@@ -11,6 +11,7 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  MoreHorizontal,
 } from "lucide-react";
 
 export type Align = "left" | "center" | "right";
@@ -58,6 +59,55 @@ type Props = {
   sidePanelOpen: boolean;
 };
 
+function useIsNarrowScreen(maxWidth = 1280) {
+  const [isNarrow, setIsNarrow] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const mq = window.matchMedia(`(max-width: ${maxWidth}px)`);
+
+    const update = () => setIsNarrow(mq.matches);
+    update(); // 初回
+
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, [maxWidth]);
+
+  return isNarrow;
+}
+
+type MoreMenuProps = {
+  children: React.ReactNode;
+};
+
+function MoreMenu({ children }: MoreMenuProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex items-center justify-center rounded-full 
+        px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-900/5"
+      >
+        <MoreHorizontal className="w-4 h-4" />
+      </button>
+      {open && (
+        <div
+          className="absolute right-0 mt-2 rounded-2xl bg-white shadow-lg
+          border border-zinc-200 z-50
+          px-2 py-2 text-xs text-zinc-700
+          flex flex-col gap-1"
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function CenterToolbar({
   value,
   activeTab,
@@ -80,14 +130,37 @@ export default function CenterToolbar({
 }: Props) {
   const isFontOpen = activeTab === "font";
   const isTextOpen = activeTab === "text";
-  const compact = sidePanelOpen;
+  const isNarrow = useIsNarrowScreen(1280); // xl 未満で true
+  const compact = sidePanelOpen && isNarrow;
+
+  // ✅ 右側に出したい「表裏トグル＋ガイド」をまとめておく
+  const secondaryControls = (
+    <>
+      <Segmented
+        disabled={disabled}
+        value={side}
+        options={[
+          { value: "front", label: "表面" },
+          { value: "back", label: "裏面" },
+        ]}
+        onChange={onChangeSide}
+      />
+
+      <GhostButton
+        disabled={disabled}
+        pressed={showGuides}
+        onClick={onToggleGuides}
+      >
+        ガイド {showGuides ? "ON" : "OFF"}
+      </GhostButton>
+    </>
+  );
 
   return (
     // ① stickyの席（高さ固定）
     <div
       className={[
-        "sticky z-40 flex justify-center h-15",
-        compact ? "max-w-[640px]" : "max-w-[820px]",
+        "sticky z-40 flex justify-center h-15 w-full",
         className ?? "",
       ].join(" ")}
       style={{ top: topPx }}
@@ -106,6 +179,7 @@ export default function CenterToolbar({
             "flex h-11 items-center gap-2 rounded-2xl border bg-white/85 px-3 py-2 backdrop-blur",
             "shadow-[0_1px_0_rgba(0,0,0,0.06),0_10px_22px_rgba(0,0,0,0.10)]",
             "min-w-[720px] justify-between whitespace-nowrap",
+            compact ? "max-w-[640px]" : "max-w-[820px]",
             value === null ? "opacity-70" : "",
           ].join(" ")}
         >
@@ -197,27 +271,14 @@ export default function CenterToolbar({
             </>
           )}
 
-          {/* ✅ Dividerは value がある時だけにするのが自然 */}
-          {value && <Divider />}
-
-          {/* ✅ ② 右側：常に出す */}
-          <Segmented
-            disabled={disabled}
-            value={side}
-            options={[
-              { value: "front", label: "表面" },
-              { value: "back", label: "裏面" },
-            ]}
-            onChange={onChangeSide}
-          />
-
-          <GhostButton
-            disabled={disabled}
-            pressed={showGuides}
-            onClick={onToggleGuides}
-          >
-            ガイド {showGuides ? "ON" : "OFF"}
-          </GhostButton>
+          {/* ✅ 右側：表裏 & ガイド → compactのときだけ More に入れる */}
+          <div className="flex items-center gap-1">
+            {compact ? (
+              <MoreMenu>{secondaryControls}</MoreMenu>
+            ) : (
+              secondaryControls
+            )}
+          </div>
         </div>
       </div>
     </div>
