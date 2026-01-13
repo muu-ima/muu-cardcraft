@@ -55,6 +55,7 @@ type Props = {
 
   /** 表示するか（透明にするだけで高さは確保） */
   visible?: boolean;
+  sidePanelOpen: boolean;
 };
 
 export default function CenterToolbar({
@@ -75,16 +76,20 @@ export default function CenterToolbar({
   className,
   visible = true,
   topPx = 76,
+  sidePanelOpen,
 }: Props) {
   const isFontOpen = activeTab === "font";
   const isTextOpen = activeTab === "text";
+  const compact = sidePanelOpen;
 
   return (
     // ① stickyの席（高さ固定）
     <div
-      className={["sticky z-40 flex justify-center h-15", className ?? ""].join(
-        " "
-      )}
+      className={[
+        "sticky z-40 flex justify-center h-15",
+        compact ? "max-w-[640px]" : "max-w-[820px]",
+        className ?? "",
+      ].join(" ")}
       style={{ top: topPx }}
     >
       {/* ② 透明化レイヤー */}
@@ -268,7 +273,6 @@ function GhostButton({
   );
 }
 
-
 function Segmented<T extends string>({
   value,
   options,
@@ -306,4 +310,3 @@ function Segmented<T extends string>({
     </div>
   );
 }
-

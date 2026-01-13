@@ -125,6 +125,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                 onToggleGuides={() => actions.setShowGuides((v) => !v)}
                 disabled={state.isPreview || state.side !== "front"}
                 visible={centerVisible}
+                sidePanelOpen={false}
               />
             </div>
 

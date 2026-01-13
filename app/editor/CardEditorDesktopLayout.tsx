@@ -82,7 +82,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
         >
           <ToolPanel
             variant="desktop"
-            open={true}
+            open={isPanelOpen}
             onClose={() => actions.setActiveTab(null)}
             activeTab={state.activeTab}
             activeBlockId={state.activeBlockId}
@@ -128,6 +128,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                 onToggleGuides={() => actions.setShowGuides((v) => !v)}
                 disabled={state.isPreview || state.side !== "front"}
                 visible={centerVisible}
+                sidePanelOpen={isPanelOpen}
               />
             </div>
 
