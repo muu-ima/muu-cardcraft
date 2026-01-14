@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import type { TabKey } from "@/shared/editor";
 import { FontKey } from "@/shared/fonts";
 import {
@@ -12,6 +11,13 @@ import {
   AlignCenter,
   AlignRight,
 } from "lucide-react";
+import { useIsNarrowScreen } from "@/hooks/useIsNarrowScreen";
+import {
+  GhostButton,
+  Segmented,
+  MoreMenu,
+  Divider,
+} from "@/app/components/editor/ToolbarPrimitives";
 
 export type Align = "left" | "center" | "right";
 
@@ -55,6 +61,7 @@ type Props = {
 
   /** 表示するか（透明にするだけで高さは確保） */
   visible?: boolean;
+  sidePanelOpen: boolean;
 };
 
 export default function CenterToolbar({
@@ -75,16 +82,43 @@ export default function CenterToolbar({
   className,
   visible = true,
   topPx = 76,
+  sidePanelOpen,
 }: Props) {
   const isFontOpen = activeTab === "font";
   const isTextOpen = activeTab === "text";
+  const isNarrow = useIsNarrowScreen(1280); // xl 未満で true
+  const compact = sidePanelOpen && isNarrow;
+
+  // ✅ 右側に出したい「表裏トグル＋ガイド」をまとめておく
+  const secondaryControls = (
+    <>
+      <Segmented
+        disabled={disabled}
+        value={side}
+        options={[
+          { value: "front", label: "表面" },
+          { value: "back", label: "裏面" },
+        ]}
+        onChange={onChangeSide}
+      />
+
+      <GhostButton
+        disabled={disabled}
+        pressed={showGuides}
+        onClick={onToggleGuides}
+      >
+        ガイド {showGuides ? "ON" : "OFF"}
+      </GhostButton>
+    </>
+  );
 
   return (
     // ① stickyの席（高さ固定）
     <div
-      className={["sticky z-40 flex justify-center h-15", className ?? ""].join(
-        " "
-      )}
+      className={[
+        "sticky z-40 flex justify-center h-15 w-full",
+        className ?? "",
+      ].join(" ")}
       style={{ top: topPx }}
     >
       {/* ② 透明化レイヤー */}
@@ -98,9 +132,10 @@ export default function CenterToolbar({
         {/* ③ ツールバー本体（見た目はここ1回） */}
         <div
           className={[
-            "flex h-11 items-center gap-2 rounded-2xl border bg-white/85 px-3 py-2 backdrop-blur",
-            "shadow-[0_1px_0_rgba(0,0,0,0.06),0_10px_22px_rgba(0,0,0,0.10)]",
-            "min-w-[720px] justify-between whitespace-nowrap",
+            "flex items-center gap-1 rounded-2xl bg-white/85 px-2 py-2 backdrop-blur",
+            "shadow-[0_1px_2px_rgba(0,0,0,0.08),0_4px_12px_rgba(0,0,0,0.12)]",
+            "justify-between whitespace-nowrap",
+            compact ? "max-w-[640px]" : "max-w-[820px]",
             value === null ? "opacity-70" : "",
           ].join(" ")}
         >
@@ -114,7 +149,9 @@ export default function CenterToolbar({
                 className="max-w-[220px]"
                 title="フォントを開く"
               >
-                <span className="max-w-[180px] truncate">{value.fontKey}</span>
+                <span className="max-w-[200px] truncate font-medium text-sm">
+                  {value.fontKey}
+                </span>
                 <ChevronDown className="h-4 w-4 text-zinc-400" />
               </GhostButton>
 
@@ -192,27 +229,14 @@ export default function CenterToolbar({
             </>
           )}
 
-          {/* ✅ Dividerは value がある時だけにするのが自然 */}
-          {value && <Divider />}
-
-          {/* ✅ ② 右側：常に出す */}
-          <Segmented
-            disabled={disabled}
-            value={side}
-            options={[
-              { value: "front", label: "表面" },
-              { value: "back", label: "裏面" },
-            ]}
-            onChange={onChangeSide}
-          />
-
-          <GhostButton
-            disabled={disabled}
-            pressed={showGuides}
-            onClick={onToggleGuides}
-          >
-            ガイド {showGuides ? "ON" : "OFF"}
-          </GhostButton>
+          {/* ✅ 右側：表裏 & ガイド → compactのときだけ More に入れる */}
+          <div className="flex items-center gap-1">
+            {compact ? (
+              <MoreMenu>{secondaryControls}</MoreMenu>
+            ) : (
+              secondaryControls
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -220,90 +244,6 @@ export default function CenterToolbar({
 }
 
 /* ---------------- helpers ---------------- */
-
-function Divider() {
-  return <div className="mx-1 h-6 w-px bg-black/10" />;
-}
-
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
-
-function GhostButton({
-  children,
-  onClick,
-  pressed,
-  disabled,
-  className,
-  title,
-  ariaLabel,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  pressed?: boolean;
-  disabled?: boolean;
-  className?: string;
-  title?: string;
-  ariaLabel?: string;
-}) {
-  return (
-    <button
-      type="button"
-      title={title}
-      aria-label={ariaLabel}
-      aria-pressed={!!pressed}
-      disabled={disabled}
-      onClick={() => !disabled && onClick()}
-      className={[
-        "inline-flex h-9 items-center gap-2 rounded-xl px-2.5 text-sm",
-        "select-none",
-        "hover:bg-black/5 active:bg-black/10",
-        pressed ? "bg-pink-50 ring-1 ring-inset ring-pink-200" : "",
-        disabled ? "opacity-60 cursor-not-allowed" : "",
-        className ?? "",
-      ].join(" ")}
-    >
-      {children}
-    </button>
-  );
-}
-
-
-function Segmented<T extends string>({
-  value,
-  options,
-  onChange,
-  disabled,
-}: {
-  value: T;
-  options: { value: T; label: string }[];
-  onChange: (v: T) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <div className="inline-flex overflow-hidden rounded-xl border bg-white">
-      {options.map((opt) => {
-        const active = opt.value === value;
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            disabled={disabled}
-            aria-pressed={active}
-            onClick={() => !disabled && onChange(opt.value)}
-            className={[
-              "h-9 px-3 text-sm",
-              active
-                ? "bg-pink-50 ring-1 ring-inset ring-pink-200"
-                : "hover:bg-zinc-50",
-              disabled ? "cursor-not-allowed opacity-70" : "",
-            ].join(" ")}
-          >
-            {opt.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
