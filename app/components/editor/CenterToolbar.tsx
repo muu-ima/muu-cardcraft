@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import type { TabKey } from "@/shared/editor";
 import { FontKey } from "@/shared/fonts";
 import {
@@ -11,8 +10,14 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  MoreHorizontal,
 } from "lucide-react";
+import { useIsNarrowScreen } from "@/hooks/useIsNarrowScreen";
+import {
+  GhostButton,
+  Segmented,
+  MoreMenu,
+  Divider,
+} from "@/app/components/editor/ToolbarPrimitives";
 
 export type Align = "left" | "center" | "right";
 
@@ -58,55 +63,6 @@ type Props = {
   visible?: boolean;
   sidePanelOpen: boolean;
 };
-
-function useIsNarrowScreen(maxWidth = 1280) {
-  const [isNarrow, setIsNarrow] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const mq = window.matchMedia(`(max-width: ${maxWidth}px)`);
-
-    const update = () => setIsNarrow(mq.matches);
-    update(); // 初回
-
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, [maxWidth]);
-
-  return isNarrow;
-}
-
-type MoreMenuProps = {
-  children: React.ReactNode;
-};
-
-function MoreMenu({ children }: MoreMenuProps) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center justify-center rounded-full 
-        px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-900/5"
-      >
-        <MoreHorizontal className="w-4 h-4" />
-      </button>
-      {open && (
-        <div
-          className="absolute right-0 mt-2 rounded-2xl bg-white shadow-lg
-          border border-zinc-200 z-50
-          px-2 py-2 text-xs text-zinc-700
-          flex flex-col gap-1"
-        >
-          {children}
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function CenterToolbar({
   value,
@@ -176,7 +132,7 @@ export default function CenterToolbar({
         {/* ③ ツールバー本体（見た目はここ1回） */}
         <div
           className={[
-            "flex items-center gap-1 rounded-lg bg-white/85 px-2 py-2 backdrop-blur",
+            "flex items-center gap-1 rounded-2xl bg-white/85 px-2 py-2 backdrop-blur",
             "shadow-[0_1px_2px_rgba(0,0,0,0.08),0_4px_12px_rgba(0,0,0,0.12)]",
             "justify-between whitespace-nowrap",
             compact ? "max-w-[640px]" : "max-w-[820px]",
@@ -288,88 +244,6 @@ export default function CenterToolbar({
 }
 
 /* ---------------- helpers ---------------- */
-
-function Divider() {
-  return <div className="mx-1 h-6 w-px bg-black/10" />;
-}
-
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
-}
-
-function GhostButton({
-  children,
-  onClick,
-  pressed,
-  disabled,
-  className,
-  title,
-  ariaLabel,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  pressed?: boolean;
-  disabled?: boolean;
-  className?: string;
-  title?: string;
-  ariaLabel?: string;
-}) {
-  return (
-    <button
-      type="button"
-      title={title}
-      aria-label={ariaLabel}
-      aria-pressed={!!pressed}
-      disabled={disabled}
-      onClick={() => !disabled && onClick()}
-      className={[
-        "inline-flex h-8 items-center gap-1 rounded-full px-2 text-sm  font-medium leading-none",
-        "select-none",
-        "hover:bg-black/5 active:bg-black/10",
-        pressed ? "bg-pink-50 ring-1 ring-inset ring-pink-200" : "",
-        disabled ? "opacity-60 cursor-not-allowed" : "",
-        className ?? "",
-      ].join(" ")}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Segmented<T extends string>({
-  value,
-  options,
-  onChange,
-  disabled,
-}: {
-  value: T;
-  options: { value: T; label: string }[];
-  onChange: (v: T) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <div className="inline-flex h-6 items-center rounded-full bg-white border px-0.5">
-      {options.map((opt) => {
-        const active = opt.value === value;
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            disabled={disabled}
-            aria-pressed={active}
-            onClick={() => !disabled && onChange(opt.value)}
-            className={[
-              "inline-flex h-5 items-center rounded-full px-2 text-sm font-medium leading-none",
-              active
-                ? "bg-pink-50 text-pink-700 ring-1 ring-inset ring-pink-200"
-                : "text-zinc-700 hover:bg-zinc-50",
-              disabled ? "cursor-not-allowed opacity-70" : "",
-            ].join(" ")}
-          >
-            {opt.label}
-          </button>
-        );
-      })}
-    </div>
-  );
 }
