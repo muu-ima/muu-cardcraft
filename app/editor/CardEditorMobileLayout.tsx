@@ -48,6 +48,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     undo,
     redo,
     onChangeWidth,
+    setTextColor,
   } = props;
 
   const blocksForSide = getBlocksFor(state.side);
@@ -103,6 +104,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
             downloadImage(format, exportRef.current);
           }}
           onDeleteBlock={handleDeleteBlock}
+          onChangeColor={setTextColor}
         />
       </BottomSheet>
 

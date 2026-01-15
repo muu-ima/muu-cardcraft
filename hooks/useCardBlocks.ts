@@ -50,6 +50,7 @@ export function useCardBlocks() {
     bumpFontSize,
     setBlockWidth,
     removeBlock,
+    setTextColor,
   } = useBlockActions({ set, commit, blocksRef });
 
   const {
@@ -126,5 +127,6 @@ export function useCardBlocks() {
     stopEditing,
     setBlockWidth,
     removeBlock,
+    setTextColor,
   };
 }

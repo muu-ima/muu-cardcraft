@@ -125,6 +125,11 @@ export default function CardSurface({
           activeBlockId === block.id &&
           editingBlockId !== block.id;
 
+        const textColor = 
+        block.type === "text" 
+          ? block.color ?? "#111827"
+          : undefined;
+
         return (
           <div
             key={block.id}
@@ -144,10 +149,11 @@ export default function CardSurface({
               cursor: interactive ? "move" : "default",
               // ✅ padding は外側から外す（リングのズレ原因）
               padding: 0,
+              color: textColor,
             }}
             // 「ブロック幅」を示す枠をここ（外側）に出す
             className={[
-              "relative select-none text-zinc-900 dark:text-zinc-50",
+              "relative select-none",
               showSelection
                 ? "ring-2 ring-sky-400/80 ring-offset-2 ring-offset-white rounded-md"
                 : "",

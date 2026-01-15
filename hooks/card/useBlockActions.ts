@@ -125,6 +125,13 @@ export function useBlockActions(history: HistoryApi) {
     commit((prev) => prev.filter((b) => b.id !== id));
   };
 
+  // ✅ 追加：テキストカラー変更（1クリック = 1 履歴）
+  const setTextColor = (id: string, color: string) => {
+    commit((prev) =>
+      prev.map((b) => (b.id === id && b.type === "text" ? { ...b, color } : b))
+    );
+  };
+
   return {
     previewText,
     commitText,
@@ -135,5 +142,6 @@ export function useBlockActions(history: HistoryApi) {
     bumpFontSize,
     setBlockWidth,
     removeBlock,
+    setTextColor,
   };
 }

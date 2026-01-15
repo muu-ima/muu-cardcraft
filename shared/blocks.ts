@@ -15,6 +15,7 @@ export type Block = {
   align?: "left" | "center" | "right";
   side: "front" | "back";
   isBraille?: boolean;
+  color?: string;
 };
 
 // ✅ カードの初期状態をここに集約
@@ -29,6 +30,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontWeight: "bold",
     fontKey: "serif",
     side: "front",
+    color: "#111827", 
   },
   {
     id: "title",
@@ -41,6 +43,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontKey: "sans",
     width: 140,
     side: "front",
+    color: "#111827", 
   },
 
   // 👇 点字用に 1 個ブロックを予約（あとで位置・サイズは調整）

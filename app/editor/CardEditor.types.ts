@@ -69,6 +69,7 @@ export type CardEditorMobileProps = {
   design: DesignKey;
   setDesign: (d: DesignKey) => void;
   onChangeWidth?: (id: string, width: number) => void;
+  setTextColor: (id: string, color: string) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;
@@ -121,6 +122,7 @@ export type CardEditorDesktopProps = {
   bumpFontSize: (id: string, delta: FontSizeDelta) => void;
   design: DesignKey;
   setDesign: (d: DesignKey) => void;
+  setTextColor: (id: string, color: string) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;

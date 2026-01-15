@@ -43,6 +43,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     undo,
     redo,
     onChangeWidth,
+    setTextColor,
   } = props;
 
   const isPanelOpen = state.activeTab !== null;
@@ -110,6 +111,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
               downloadImage(format, exportRef.current);
             }}
             onDeleteBlock={handleDeleteBlock}
+            onChangeColor={setTextColor}
           />
         </aside>
       )}

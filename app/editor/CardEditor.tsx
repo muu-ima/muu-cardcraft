@@ -69,6 +69,7 @@ export default function CardEditor() {
     setEditingText,
     setBlockWidth,
     removeBlock,
+    setTextColor,
   } = useCardBlocks();
 
   const editor = useCardEditorState({
@@ -261,6 +262,7 @@ export default function CardEditor() {
     design,
     setDesign,
     onChangeWidth: handleChangeBlockWidth,
+    setTextColor,
 
     // ---- export
     exportRef,
@@ -338,6 +340,7 @@ export default function CardEditor() {
           blockRefs={blockRefs}
           undo={undo}
           redo={redo}
+          setTextColor={setTextColor}
         />
       </div>
       {/* ---------- Preview / Export / Inline Editor ---------- */}
