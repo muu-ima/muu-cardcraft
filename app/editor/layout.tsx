@@ -53,8 +53,8 @@ export default function EditorLayout({ children }: { children: ReactNode }) {
             <Link href="/editor" className="hover:underline">
               エディタ
             </Link>
-            <Link href="/snapshots" className="hover:underline">
-              スナップショット一覧（予定）
+            <Link href="https://muu-braille-tool.vercel.app/braille/translate" className="hover:underline">
+              点字ツール
             </Link>
           </nav>
         </div>
