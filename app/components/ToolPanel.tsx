@@ -7,7 +7,6 @@ import type { DesignKey } from "@/shared/design";
 import type { FontKey } from "@/shared/fonts";
 
 import TextPanel from "@/app/components/panels/TextPanel";
-import BraillePanel from "@/app/components/panels/BraillePanel";
 import FontPanel from "@/app/components/panels/FontPanel";
 import DesignPanel from "@/app/components/panels/DesignPanel";
 import ExportPanel from "@/app/components/panels/ExportPanel";
@@ -31,7 +30,6 @@ type Props = {
   onChangeText: (id: string, value: string) => void;
   onCommitText: (id: string, value: string) => void;
   onBumpFontSize?: (id: string, delta: FontSizeDelta) => void;
-  onAddBrailleBlock: () => void;
   onChangeFont: (id: string, fontKey: FontKey) => void;
   onChangeColor: (id: string, color: string) => void;
   design: DesignKey;
@@ -61,7 +59,6 @@ export default function ToolPanel({
   onChangeFont,
   onCommitText,
   onBumpFontSize,
-  onAddBrailleBlock,
   design,
   onChangeDesign,
   onDownload,
@@ -80,8 +77,6 @@ export default function ToolPanel({
       ? "デザイン"
       : activeTab === "text"
       ? "テキスト"
-      : activeTab === "braille"
-      ? "点字"
       : activeTab === "export"
       ? "書き出し"
       : "編集";
@@ -149,14 +144,7 @@ export default function ToolPanel({
             onDeleteBlock={onDeleteBlock}
           />
         )}
-        {activeTab === "braille" && (
-          <BraillePanel
-            blocks={blocks}
-            onChangeText={onChangeText}
-            onCommitText={onCommitText}
-            onAddBrailleBlock={onAddBrailleBlock}
-          />
-        )}
+
         {activeTab === "font" && (
           <FontPanel
             blocks={blocks}

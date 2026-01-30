@@ -4,7 +4,7 @@ import type { FontKey } from "@/shared/fonts";
 
 export type Block = {
   id: string;
-  type: "text"; // いずれ "braille" も足すかも
+  type: "text"; 
   text: string;
   x: number;
   y: number;
@@ -46,17 +46,5 @@ export const INITIAL_BLOCKS: Block[] = [
     color: "#111827", 
   },
 
-  // 👇 点字用に 1 個ブロックを予約（あとで位置・サイズは調整）
-  {
-    id: "braille-main",
-    type: "text",
-    text: "⠃⠗⠁⠊⠇⠇⠑", // ダミー。起動後はパネルから上書きされる想定
-    x: 100,
-    y: 200,
-    fontSize: 18,
-    fontWeight: "normal",
-    fontKey: "sans",
-    side: "front",
-    isBraille: true, // ← 点字用
-  },
+
 ];

@@ -76,14 +76,12 @@ export default function TextPanel(props: TextPanelProps) {
     onDeleteBlock, // ✅ ここで受け取る
   } = props;
 
-  // ✅ この面＆通常テキストだけ（点字ブロック除外）
-  const normalBlocks = blocks.filter(
-    (b) => !b.isBraille && (b.side ? b.side === side : true)
-  );
+  // この面のブロックだけ
+  const normalBlocks = blocks.filter((b) => (b.side ? b.side === side : true));
 
   const activeBlock =
     activeBlockId != null
-      ? normalBlocks.find((b) => b.id === activeBlockId) ?? null
+      ? (normalBlocks.find((b) => b.id === activeBlockId) ?? null)
       : null;
 
   const target = activeBlock ?? normalBlocks[0] ?? null;
@@ -136,7 +134,7 @@ export default function TextPanel(props: TextPanelProps) {
                           onClick={() => {
                             const ok =
                               window.confirm(
-                                "このテキストブロックを削除しますか？"
+                                "このテキストブロックを削除しますか？",
                               );
                             if (!ok) return;
                             onDeleteBlock(b.id);

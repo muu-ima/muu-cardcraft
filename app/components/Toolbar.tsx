@@ -10,7 +10,6 @@ import {
   Redo2,
   Eye,
   Pencil,
-  Grid3X3,
 } from "lucide-react";
 import type { TabKey } from "@/shared/editor";
 
@@ -26,7 +25,6 @@ type Props = {
 
 const tools: { key: TabKey; label: string; Icon: React.ElementType }[] = [
   { key: "text", label: "文字", Icon: Type },
-  { key: "braille", label: "点字", Icon: Grid3X3 },
   { key: "font", label: "フォント", Icon: TextCursor },
   { key: "design", label: "背景", Icon: ImageIcon },
   { key: "export", label: "書き出し", Icon: Download },
