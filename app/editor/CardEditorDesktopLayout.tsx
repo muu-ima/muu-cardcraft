@@ -20,7 +20,6 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     scaleDesktop,
     getBlocksFor,
     addBlock,
-    addBrailleBlock,
     onChangeText,
     onCommitText,
     updateFont,
@@ -97,7 +96,6 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
             onChangeSide={actions.setSide}
             blocks={getBlocksFor(state.side)}
             onAddBlock={addBlock}
-            onAddBrailleBlock={addBrailleBlock}
             onChangeText={onChangeText}
             onCommitText={onCommitText}
             onBumpFontSize={bumpFontSize}

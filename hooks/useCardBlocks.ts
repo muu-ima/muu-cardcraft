@@ -79,35 +79,9 @@ export function useCardBlocks() {
 
   const { downloadImage } = useExportImage();
 
-  // ✅ 点字ブロックを追加（最後に追加されたブロックを点字用に変形）
-  const addBrailleBlock = () => {
-    // まずは通常のブロック追加ロジックを使う
-    addBlock();
-
-    // そのあとで「一番最後のブロック」を点字用に上書き
-    set((prev) => {
-      if (prev.length === 0) return prev;
-
-      const next = [...prev];
-      const lastIndex = next.length - 1;
-      const last = next[lastIndex];
-
-      next[lastIndex] = {
-        ...last,
-        text: "⠃⠗⠁⠊⠇⠇⠑", // 初期の点字（braille のつもり）
-        // Block 型に isBraille?: boolean が入っている前提
-        isBraille: true,
-      } as Block;
-      // ここでcommit(next)を実行
-      commit(next);
-      return next;
-    });
-  };
-
   return {
     blocks,
     addBlock,
-    addBrailleBlock,
     previewText,
     commitText,
     updateFont,

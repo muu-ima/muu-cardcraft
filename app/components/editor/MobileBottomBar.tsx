@@ -8,7 +8,6 @@ import {
   TextCursor,
   Image as ImageIcon,
   Download,
-  Grid3X3,
 } from "lucide-react";
 
 function MobileBottomBarItem({
@@ -77,13 +76,7 @@ export default function MobileBottomBar({
               activeTab={activeTab}
               onChangeTab={onChangeTab}
             />
-            <MobileBottomBarItem
-              tab="braille"
-              label="点字"
-              Icon={Grid3X3}
-              activeTab={activeTab}
-              onChangeTab={onChangeTab}
-            />
+           
             <MobileBottomBarItem
               tab="font"
               label="フォント"
