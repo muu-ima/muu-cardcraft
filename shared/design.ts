@@ -2,12 +2,13 @@
 export type DesignCategory = "simple" | "illustration" | "texture";
 
 export type DesignKey =
-  | "simpleBeige"
-  | "simpleCream"
-  | "simpleWhite"
-  | "simplePink"
-  | "simpleBlue"
-  | "simpleGreen"
+  | "mint"
+  | "peach"
+  | "sky"
+  | "milk"
+  | "paper"
+  | "snow"
+  | "ultramarine"
   | "girl"
   | "kinmokusei"
   | "usaCarrot";
@@ -20,30 +21,60 @@ export type CardDesign = {
 };
 
 export const CARD_DESIGNS: Record<DesignKey, CardDesign> = {
-  // ===== シンプル（単色） =====
-  simpleBeige: { category: "simple", bgColor: "#e2c7a3" },
-  simpleCream: { category: "simple", bgColor: "#f7efe5" },
-  simpleWhite: { category: "simple", bgColor: "#ffffff" },
-  simplePink: { category: "simple", bgColor: "#ffe3ec" },
-  simpleBlue: { category: "simple", bgColor: "#e0f0ff" },
-  simpleGreen: { category: "simple", bgColor: "#e6f4e6" },
+  // ===== シンプル（Pastelテーマ） =====
+  mint: {
+    category: "simple",
+    bgColor: "#DFF6F0", // ⭐ ブランド基準（デフォルト推し）
+  },
+
+  peach: {
+    category: "simple",
+    bgColor: "#FFEAF1", // やさしいコーラル
+  },
+
+  sky: {
+    category: "simple",
+    bgColor: "#EAF6FF", // パステルブルー
+  },
+
+  milk: {
+    category: "simple",
+    bgColor: "#FFF8EE", // ふわクリーム
+  },
+
+  paper: {
+    category: "simple",
+    bgColor: "#F6EFE7", // 上品紙ベージュ
+  },
+
+  snow: {
+    category: "simple",
+    bgColor: "#FFFFFF", // 純白
+  },
+
+  ultramarine: {
+    category: "simple",
+    bgColor: "#6C7BFF", // ⭐ アクセント（締め色）
+  },
+
   // ===== イラスト =====
   girl: {
     category: "illustration",
-    bgColor: "#e9edf5",
+    bgColor: "#F3F5FA",
     image: "/girl.png",
     mode: "cover",
   },
   usaCarrot: {
     category: "illustration",
-    bgColor: "#ffffff",
+    bgColor: "#FFFFFF",
     image: "/usa-carrot.png",
     mode: "contain",
   },
+
   // ===== 素材・柄 =====
   kinmokusei: {
     category: "texture",
-    bgColor: "#fff5e5",
+    bgColor: "#FFF4E8",
     image: "/kinmokusei.png",
     mode: "cover",
   },

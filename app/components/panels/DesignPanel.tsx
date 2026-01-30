@@ -14,14 +14,7 @@ const DESIGN_CATEGORIES: Record<
 > = {
   simple: {
     label: "シンプル",
-    keys: [
-      "simpleBeige",
-      "simpleCream",
-      "simpleWhite",
-      "simplePink",
-      "simpleBlue",
-      "simpleGreen",
-    ],
+    keys: ["mint", "peach", "sky", "milk", "paper", "snow", "ultramarine"],
   },
   illustration: {
     label: "イラスト",
@@ -35,17 +28,18 @@ const DESIGN_CATEGORIES: Record<
 
 // ⭐ デザイン名（表示用）
 const DESIGN_LABELS: Record<DesignKey, string> = {
-  simpleBeige: "シンプル（ベージュ）",
-  simpleCream: "シンプル（クリーム）",
-  simpleWhite: "シンプル（ホワイト）",
-  simplePink: "シンプル（ピンク）",
-  simpleBlue: "シンプル（ブルー）",
-  simpleGreen: "シンプル（グリーン）",
-  girl: "女の子イラスト",
-  kinmokusei: "金木犀",
-  usaCarrot: "うさぎ＆にんじん",
-};
+  mint: "ミント",
+  peach: "ピーチ",
+  sky: "スカイ",
+  milk: "ミルク",
+  paper: "ペーパー",
+  snow: "スノー",
+  ultramarine: "ウルトラマリン",
 
+  girl: "ガール",
+  kinmokusei: "金木犀",
+  usaCarrot: "うさぎ&にんじん",
+};
 export default function DesignPanel({
   design,
   onChangeDesign,
@@ -77,7 +71,7 @@ export default function DesignPanel({
           {(
             Object.entries(DESIGN_CATEGORIES) as [
               DesignCategory,
-              (typeof DESIGN_CATEGORIES)[DesignCategory]
+              (typeof DESIGN_CATEGORIES)[DesignCategory],
             ][]
           ).map(([catKey, cat]) => (
             <button

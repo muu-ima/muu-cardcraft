@@ -31,7 +31,7 @@ export default function CardEditor() {
   // 🧠 1. コア状態 & ロジック
   // =========================
   const [editing, setEditing] = useState<EditingState>(null);
-  const [design, setDesign] = useState<DesignKey>("simpleBeige");
+  const [design, setDesign] = useState<DesignKey>("mint");
   const exportRef = useRef<HTMLDivElement | null>(null);
 
   // ✅ CanvasArea 自体の ref（スクロール/レイアウト用）

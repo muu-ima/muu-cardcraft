@@ -46,7 +46,7 @@ type CardSurfaceProps = {
 
 function getCardStyle(design: DesignKey): CSSProperties {
   // どれか必ず存在するキー（自分の環境に合わせて）
-  const fallbackKey: DesignKey = "simpleBeige"; // ← 実際に存在するキー名にする
+  const fallbackKey: DesignKey = "mint"; // ← 実際に存在するキー名にする
 
   const full = CARD_FULL_DESIGNS[design] ?? CARD_FULL_DESIGNS[fallbackKey];
   const bg = full.bg;

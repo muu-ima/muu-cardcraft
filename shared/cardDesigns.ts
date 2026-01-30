@@ -98,16 +98,21 @@ function makeDesign(key: DesignKey): cardDesign {
 
 /**
  * ここを DesignKey に合わせて全部定義する
- * （例：simpleBeige / simpleCream / ... / girl / kinmokusei / usaCarrot）
+ * （例：mint / urtraMarin / ... / girl / kinmokusei / usaCarrot）
  */
 export const CARD_FULL_DESIGNS: Record<DesignKey, cardDesign> = {
-  simpleBeige: makeDesign("simpleBeige"),
-  simpleCream: makeDesign("simpleCream"),
-  simpleWhite: makeDesign("simpleWhite"),
-  simplePink: makeDesign("simplePink"),
-  simpleBlue: makeDesign("simpleBlue"),
-  simpleGreen: makeDesign("simpleGreen"),
+  // simple（Pastel）
+  mint: makeDesign("mint"),
+  peach: makeDesign("peach"),
+  sky: makeDesign("sky"),
+  milk: makeDesign("milk"),
+  paper: makeDesign("paper"),
+  snow: makeDesign("snow"),
+  ultramarine: makeDesign("ultramarine"),
+
+  // illustration / texture
   girl: makeDesign("girl"),
   kinmokusei: makeDesign("kinmokusei"),
   usaCarrot: makeDesign("usaCarrot"),
 };
+
