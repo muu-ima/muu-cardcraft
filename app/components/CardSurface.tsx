@@ -17,13 +17,12 @@ type CardSurfaceProps = {
 
   /** 編集可能か (ドラッグ有無) */
   interactive?: boolean;
-
   editingBlockId?: string | null;
 
   /** ブロック押下（選択/ドラッグ開始） */
   onBlockPointerDown?: (
     e: React.PointerEvent<HTMLDivElement>,
-    blockId: string
+    blockId: string,
   ) => void;
 
   /** 同じブロックを再タップで編集開始 */
@@ -38,6 +37,9 @@ type CardSurfaceProps = {
   /** editor / export 用 ref */
   cardRef?: RefObject<HTMLDivElement | null>;
   blockRefs?: React.MutableRefObject<Record<string, HTMLDivElement | null>>;
+
+  // ✅ 追加：テキスト実寸用（インライン編集の targetEl に使う）
+  textSpanRefs?: React.MutableRefObject<Record<string, HTMLSpanElement | null>>;
 
   /** class / style 拡張 */
   className?: string;
@@ -62,7 +64,6 @@ function getCardStyle(design: DesignKey): CSSProperties {
   };
 }
 
-
 export default function CardSurface({
   blocks,
   design,
@@ -76,6 +77,7 @@ export default function CardSurface({
   activeBlockId,
   cardRef,
   blockRefs,
+  textSpanRefs,
   className,
   style,
 }: CardSurfaceProps) {
@@ -125,10 +127,8 @@ export default function CardSurface({
           activeBlockId === block.id &&
           editingBlockId !== block.id;
 
-        const textColor = 
-        block.type === "text" 
-          ? block.color ?? "#111827"
-          : undefined;
+        const textColor =
+          block.type === "text" ? (block.color ?? "#111827") : undefined;
 
         return (
           <div
@@ -162,7 +162,7 @@ export default function CardSurface({
             {/* ✅ リング/実寸/計測は inner に寄せる */}
             <div
               ref={(el) => {
-                if (blockRefs) blockRefs.current[block.id] = el; // ✅ 幅計測もここ
+                if (blockRefs) blockRefs.current[block.id] = el; // ✅ 従来通り（計測/ドラッグ）
               }}
               className={["inline-block rounded px-1 py-0.5"].join(" ")}
               style={{
@@ -178,8 +178,21 @@ export default function CardSurface({
                 wordBreak: "normal",
               }}
             >
-              {block.type === "text" &&
-                (editingBlockId === block.id ? null : block.text)}
+              {block.type === "text" && (
+                <span
+                  ref={(el) => {
+                    if (textSpanRefs) textSpanRefs.current[block.id] = el; // ✅ 実寸テキストref
+                  }}
+                  className="inline-block w-fit"
+                  style={{
+                    // ✅ 編集中もDOMは残す（rect計測のため）
+                    visibility:
+                      editingBlockId === block.id ? "hidden" : "visible",
+                  }}
+                >
+                  {block.text}
+                </span>
+              )}
             </div>
             {/* 🆕 幅ラベル（showSelection 中だけ表示） */}
             {showSelection && typeof block.width === "number" && (

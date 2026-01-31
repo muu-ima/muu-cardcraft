@@ -34,9 +34,6 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     handleBlockPointerDown,
     startEditing,
     editingBlockId,
-    editingText,
-    setEditingText,
-    stopEditing,
     cardRef,
     blockRefs,
     undo,
@@ -162,11 +159,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                     startEditing(block.id, block.text);
                   }}
                   editingBlockId={editingBlockId}
-                  editingText={editingText}
-                  onChangeEditingText={setEditingText}
-                  onStopEditing={stopEditing}
-                  onCommitText={onCommitText}
-                  activeBlockId={state.activeBlockId}
+                 activeBlockId={state.activeBlockId}
                   cardRef={cardRef}
                   blockRefs={blockRefs}
                 />
