@@ -143,7 +143,7 @@ export default function InlineTextEditor({
     <>
       {/* 外クリックで確定 */}
       <div
-        className="fixed inset-0 z-[9998]"
+        className="fixed inset-0 z-9998"
         onPointerDown={(e) => {
           e.preventDefault();
           onCommit();
@@ -152,7 +152,7 @@ export default function InlineTextEditor({
 
       {/* 入力本体 */}
       <div
-        className="fixed z-[9999]"
+        className="fixed z-9999"
         style={{
           left: rect.left - 2,
           top: rect.top - 2,
