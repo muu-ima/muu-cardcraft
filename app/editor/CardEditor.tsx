@@ -24,13 +24,11 @@ import type {
 
 type Side = "front" | "back";
 
-type EditingState = { id: string; initialText: string } | null;
-
 export default function CardEditor() {
   // =========================
   // 🧠 1. コア状態 & ロジック
   // =========================
-  const [editing, setEditing] = useState<EditingState>(null);
+  // const [editing, setEditing] = useState<EditingState>(null);
   const [design, setDesign] = useState<DesignKey>("mint");
   const exportRef = useRef<HTMLDivElement | null>(null);
 
@@ -39,12 +37,12 @@ export default function CardEditor() {
   // scale（mobile / desktop）
   const { ref: scaleWrapRefMobile, scale: scaleMobile } = useScaleToFit(
     CARD_BASE_W,
-    true
+    true,
   );
 
   const { ref: scaleWrapRefDesktop, scale: scaleDesktop } = useScaleToFit(
     CARD_BASE_W,
-    true
+    true,
   );
 
   const {
@@ -58,6 +56,7 @@ export default function CardEditor() {
     handlePointerDown: dragPointerDown,
     cardRef,
     blockRefs,
+    textSpanRefs,
     downloadImage,
     undo,
     redo,
@@ -126,12 +125,11 @@ export default function CardEditor() {
 
     // ✅ カード外を押した → 全解除
     if (!cardEl.contains(target)) {
-      if (editing) {
-        const b = currentBlocks.find((x) => x.id === editing.id);
-        if (b && b.type === "text") commitText(editing.id, b.text);
-        setEditing(null);
-
-        // ✅ 編集中の“外クリック”は編集終了だけで止める（選択は維持）
+      // ✅ インライン編集中なら：確定して編集終了（選択は維持）
+      if (editingBlockId) {
+        const b = currentBlocks.find((x) => x.id === editingBlockId);
+        if (b && b.type === "text") commitText(editingBlockId, b.text);
+        stopEditing();
         return;
       }
 
@@ -139,17 +137,18 @@ export default function CardEditor() {
       actions.setActiveTab(null);
     }
   };
+
   // CardEditor 内に追加
   const resetEditingState = (mode: "commit" | "cancel" = "commit") => {
-    if (editing) {
-      const b = currentBlocks.find((x) => x.id === editing.id);
+    if (editingBlockId) {
+      const b = currentBlocks.find((x) => x.id === editingBlockId);
       if (b && b.type === "text") {
-        if (mode === "commit") commitText(editing.id, b.text);
-        if (mode === "cancel") previewText(editing.id, editing.initialText);
+        if (mode === "commit") commitText(editingBlockId, b.text);
+        // cancel は “初期テキスト” をどこに持つか決めてから
       }
+      stopEditing();
     }
-    setEditing(null);
-    actions.setActiveBlockId(""); // もしくは undefined にしたいなら state 型を変える
+    actions.setActiveBlockId("");
     actions.setActiveTab(null);
   };
 
@@ -170,30 +169,23 @@ export default function CardEditor() {
   const handleBlockPointerDown = (
     e: React.PointerEvent<Element>,
     blockId: string,
-    opts: { scale: number }
+    opts: { scale: number },
   ) => {
     // ✅ 編集中でも「切り替え」は許可する
-    if (editing) {
+    if (editingBlockId) {
       e.preventDefault();
       e.stopPropagation();
 
-      // ① 現在の編集中テキストを確定（previewTextで更新済みの b.text を commit）
-      const cur = currentBlocks.find((x) => x.id === editing.id);
-      if (cur && cur.type === "text") {
-        commitText(editing.id, cur.text);
-      }
+      const cur = currentBlocks.find((x) => x.id === editingBlockId);
+      if (cur && cur.type === "text") commitText(editingBlockId, cur.text);
 
-      // ② クリックしたブロックへ選択移動
       actions.setActiveBlockId(blockId);
 
-      // ③ クリック先が text なら編集を切り替える。違うなら編集終了
       const next = currentBlocks.find((x) => x.id === blockId);
-      if (next && next.type === "text") {
-        setEditing({ id: blockId, initialText: next.text });
-      } else {
-        setEditing(null);
-      }
-      return; // ✅ 編集中はドラッグ開始しない
+      if (next && next.type === "text") startEditing(blockId, next.text);
+      else stopEditing();
+
+      return;
     }
 
     // 通常時はこれまで通り
@@ -285,6 +277,13 @@ export default function CardEditor() {
     undo,
     redo,
   };
+
+  // return の直前
+  console.log("CardEditor render", {
+    editingBlockId,
+    hasSpan: !!(editingBlockId && textSpanRefs.current[editingBlockId]),
+    hasBlock: !!(editingBlockId && blockRefs.current[editingBlockId]),
+  });
 
   // =========================
   // 🎨 2. レイアウト描画
@@ -381,22 +380,27 @@ export default function CardEditor() {
         blocks={getBlocksFor(state.side)}
         design={design}
       />
-      {editing && (
+
+      {!state.isPreview && editingBlockId && (
         <InlineTextEditor
-          targetEl={blockRefs.current[editing.id]}
-          text={
-            (currentBlocks.find((b) => b.id === editing.id && b.type === "text")
-              ?.text as string) ?? ""
+          targetEl={
+            textSpanRefs.current[editingBlockId] ??
+            blockRefs.current[editingBlockId]
           }
-          onChangeText={(next) => previewText(editing.id, next)}
+          text={
+            (currentBlocks.find(
+              (b) => b.id === editingBlockId && b.type === "text",
+            )?.text as string) ?? ""
+          }
+          onChangeText={(next) => previewText(editingBlockId, next)}
           onCommit={() => {
-            const b = currentBlocks.find((x) => x.id === editing.id);
-            if (b && b.type === "text") commitText(editing.id, b.text);
-            setEditing(null);
+            const b = currentBlocks.find((x) => x.id === editingBlockId);
+            if (b && b.type === "text") commitText(editingBlockId, b.text);
+            stopEditing();
           }}
           onCancel={() => {
-            previewText(editing.id, editing.initialText);
-            setEditing(null);
+            // 初期値に戻すのを入れたいなら、useInlineEditingに initialText を持たせる
+            stopEditing();
           }}
         />
       )}
