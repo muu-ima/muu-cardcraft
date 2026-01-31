@@ -39,6 +39,9 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     handleBlockPointerDown,
     startEditing,
     editingBlockId,
+    editingText,
+    setEditingText,
+    stopEditing,
     cardRef,
     blockRefs,
     undo,
@@ -139,13 +142,17 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                   }
                   onStartInlineEdit={(blockId) => {
                     const b = blocksForSide.find(
-                      (block) => block.id === blockId,
+                      (block) => block.id === blockId
                     );
                     if (!b || b.type !== "text") return;
                     // ✅ (id, text) を取る startEditing に変換
                     startEditing(blockId, b.text);
                   }}
                   editingBlockId={editingBlockId}
+                  editingText={editingText}
+                  onChangeEditingText={setEditingText}
+                  onStopEditing={stopEditing}
+                  onCommitText={onCommitText}
                   activeBlockId={state.activeBlockId}
                   cardRef={cardRef}
                   blockRefs={blockRefs}

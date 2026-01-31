@@ -66,7 +66,6 @@ export function useCardBlocks() {
   // カードと各ブロックの DOM
   const cardRef = useRef<HTMLDivElement | null>(null);
   const blockRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const textSpanRefs = useRef<Record<string, HTMLSpanElement | null>>({});
 
   const { handlePointerDown } = useBlockDrag({
     blocks,
@@ -85,7 +84,6 @@ export function useCardBlocks() {
     addBlock,
     previewText,
     commitText,
-    textSpanRefs,
     updateFont,
     updateFontSize,
     updateTextStyle,
