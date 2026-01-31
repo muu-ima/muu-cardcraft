@@ -84,6 +84,13 @@ export default function CardEditor() {
   });
 
   const { state, actions, selectors } = editor;
+const editingId = editingBlockId ?? undefined;
+
+const spanEl =
+  editingId ? (textSpanRefs.current[editingId] ?? null) : null;
+
+const blockEl =
+  editingId ? (blockRefs.current[editingId] ?? null) : null;
 
   const { sheetTitle } = useEditorLayout({
     activeTab: state.activeTab,
@@ -383,10 +390,9 @@ export default function CardEditor() {
 
       {!state.isPreview && editingBlockId && (
         <InlineTextEditor
-          targetEl={
-            textSpanRefs.current[editingBlockId] ??
-            blockRefs.current[editingBlockId]
-          }
+            scale={scaleDesktop} 
+          targetEl={spanEl ?? blockEl}
+          rectEl={blockEl ?? null}
           text={
             (currentBlocks.find(
               (b) => b.id === editingBlockId && b.type === "text",
