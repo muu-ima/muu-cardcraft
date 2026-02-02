@@ -1,7 +1,7 @@
 // app/components/editor/EditorCanvas.tsx
 "use client";
 
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import CardSurface from "@/app/components/CardSurface";
 import PrintGuides from "@/app/components/editor/PrintGuides";
 import type { Block } from "@/shared/blocks";
@@ -68,6 +68,20 @@ export default function EditorCanvas({
 
   const taRef = useRef<HTMLTextAreaElement | null>(null);
 
+  const justClosedRef = useRef(false);
+
+  const closeInline = () => {
+    if (justClosedRef.current) return;
+    justClosedRef.current = true;
+
+    const ta = taRef.current;
+    ta?.blur(); // onBlur(commit+stop) 発火
+
+    setTimeout(() => {
+      justClosedRef.current = false;
+    }, 0);
+  };
+
   useLayoutEffect(() => {
     if (isPreview) return;
 
@@ -109,6 +123,31 @@ export default function EditorCanvas({
     });
   }, [isPreview, editingBlockId, editingText]);
 
+  useEffect(() => {
+    if (isPreview) return;
+    if (!editingBlockId) return;
+
+    const onDown = (ev: Event) => {
+      const ta = taRef.current;
+      if (!ta) return;
+
+      const target = ev.target as Node | null;
+      if (target && ta.contains(target)) return;
+
+      closeInline();
+    };
+
+    document.addEventListener("pointerdown", onDown, true);
+    document.addEventListener("mousedown", onDown, true);
+    document.addEventListener("touchstart", onDown, true);
+
+    return () => {
+      document.removeEventListener("pointerdown", onDown, true);
+      document.removeEventListener("mousedown", onDown, true);
+      document.removeEventListener("touchstart", onDown, true);
+    };
+  }, [isPreview, editingBlockId]);
+
   return (
     <section className="flex flex-col items-center gap-3">
       <div className="w-full flex justify-center">
@@ -121,7 +160,7 @@ export default function EditorCanvas({
         >
           {/* ✅ scaleする箱（ここが Card + textarea の共通親） */}
           <div
-            ref={cardRef} // ✅ ここに付けるのが重要
+            ref={cardRef}
             className={[
               "relative",
               isPreview ? "overflow-hidden" : "overflow-visible",
@@ -139,8 +178,26 @@ export default function EditorCanvas({
               w={CARD_BASE_W}
               h={CARD_BASE_H}
               interactive={!isPreview}
-              onSurfacePointerDown={() => onSurfacePointerDown?.()}
-              onBlockPointerDown={(e, id) => onPointerDown?.(e, id, { scale })}
+              onSurfacePointerDown={() => {
+                if (editingBlockId) {
+                  closeInline();
+                  // ✅ クリックで選択解除したいならこれも呼ぶ
+                  onSurfacePointerDown?.();
+                  return;
+                }
+                onSurfacePointerDown?.();
+              }}
+              onBlockPointerDown={(e, id) => {
+                // 編集中ならまず閉じる
+                if (editingBlockId) {
+                  closeInline();
+                  // ✅ そのまま「クリックしたブロックを選択」まで通す（Canva挙動）
+                  onPointerDown?.(e, id, { scale });
+                  return;
+                }
+
+                onPointerDown?.(e, id, { scale });
+              }}
               onStartInlineEdit={onStartInlineEdit}
               activeBlockId={editingBlockId ? undefined : activeBlockId}
               editingBlockId={editingBlockId} // ✅ 二重文字防止
