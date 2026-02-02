@@ -20,7 +20,7 @@ type Props = {
   onPointerDown?: (
     e: React.PointerEvent,
     id: string,
-    opts: { scale: number }
+    opts: { scale: number },
   ) => void;
   /** 同じブロックを再タップで編集開始 */
   onStartInlineEdit?: (blockId: string) => void;
@@ -59,34 +59,55 @@ export default function EditorCanvas({
   editingText,
   onChangeEditingText,
 }: Props) {
+  console.log("[EditorCanvas render]", {
+    isPreview,
+    editingBlockId,
+    editingText,
+    scale,
+  });
+
   const taRef = useRef<HTMLTextAreaElement | null>(null);
+
   useLayoutEffect(() => {
     if (isPreview) return;
 
     const ta = taRef.current;
+    console.log("[autosize] start", {
+      editingBlockId,
+      hasTa: !!ta,
+      valueLen: (ta?.value ?? "").length,
+    });
     if (!ta) return;
+    if (!editingBlockId) return;
 
-    if (!editingBlockId) {
-      // 編集終了時：サイズ指定を外す（任意）
-      ta.style.width = "";
-      ta.style.height = "";
-      return;
-    }
+    // 一旦 1px にして測る（0px はやめる）
+    ta.style.width = "1px";
+    ta.style.height = "1px";
 
-    const b = blocks.find((x) => x.id === editingBlockId);
-    if (!b || b.type !== "text") return;
+    // 重要：wrap off（Canva系 1行伸び）
+    ta.wrap = "off";
 
-    const el = blockRefs.current[b.id];
-    if (!el) return;
+    const sw = ta.scrollWidth;
+    const sh = ta.scrollHeight;
 
-    const r = el.getBoundingClientRect();
+    console.log("[autosize] measured", {
+      sw,
+      sh,
+      cw: ta.clientWidth,
+      ch: ta.clientHeight,
+    });
 
-    const w = r.width / scale;
-    const h = r.height / scale;
+    const padX = 12; // 2px 6px の左右合計
+    const padY = 4;
 
-    ta.style.width = `${Math.max(20, w)}px`;
-    ta.style.height = `${Math.max(20, h)}px`;
-  }, [isPreview, editingBlockId, blocks, scale, blockRefs]);
+    ta.style.width = `${Math.max(20, sw + padX)}px`;
+    ta.style.height = `${Math.max(20, sh + padY)}px`;
+
+    console.log("[autosize] applied", {
+      width: ta.style.width,
+      height: ta.style.height,
+    });
+  }, [isPreview, editingBlockId, editingText]);
 
   return (
     <section className="flex flex-col items-center gap-3">
@@ -152,8 +173,11 @@ export default function EditorCanvas({
 
                 return (
                   <textarea
+                    ref={taRef}
                     key={b.id}
                     autoFocus
+                    wrap="off"
+                    rows={1}
                     value={editingText ?? ""}
                     onPointerDown={(e) => e.stopPropagation()}
                     onChange={(e) =>
@@ -173,13 +197,16 @@ export default function EditorCanvas({
                       position: "absolute",
                       left: b.x,
                       top: b.y,
-                      width: b.width ?? "auto",
                       fontSize: `${b.fontSize}px`,
                       fontWeight: b.fontWeight,
                       fontFamily: fontFamilyFromKey(b.fontKey),
                       textAlign: b.align ?? "left",
                       padding: "2px 6px",
                       lineHeight: 1.2,
+
+                      whiteSpace: "pre", // 折り返し無し（Canvaっぽい）
+                      overflow: "hidden",
+                      boxSizing: "border-box",
 
                       background: "transparent",
                       borderRadius: 6,
