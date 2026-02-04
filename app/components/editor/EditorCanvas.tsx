@@ -17,6 +17,11 @@ type Props = {
   isPreview: boolean;
   showGuides: boolean;
 
+  snapGuide?: {
+    type: "centerX" | "centerY" | "left" | "top";
+    pos: number;
+  } | null;
+
   onPointerDown?: (
     e: React.PointerEvent,
     id: string,
@@ -47,6 +52,7 @@ export default function EditorCanvas({
   scale,
   isPreview,
   showGuides,
+  snapGuide,
   onPointerDown,
   onStartInlineEdit,
   activeBlockId,
@@ -59,12 +65,12 @@ export default function EditorCanvas({
   editingText,
   onChangeEditingText,
 }: Props) {
-  console.log("[EditorCanvas render]", {
-    isPreview,
-    editingBlockId,
-    editingText,
-    scale,
-  });
+  // console.log("[EditorCanvas render]", {
+  //   isPreview,
+  //   editingBlockId,
+  //   editingText,
+  //   scale,
+  // });
 
   const taRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -145,6 +151,7 @@ export default function EditorCanvas({
               activeBlockId={editingBlockId ? undefined : activeBlockId}
               editingBlockId={editingBlockId} // ✅ 二重文字防止
               blockRefs={blockRefs}
+              snapGuide={snapGuide}
               className={isPreview ? "shadow-lg" : ""}
             />
 

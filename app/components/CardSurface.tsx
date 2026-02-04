@@ -15,6 +15,11 @@ type CardSurfaceProps = {
   w: number;
   h: number;
 
+  snapGuide?: {
+    type: "centerX" | "centerY" | "left" | "top";
+    pos: number;
+  } | null;
+
   /** 編集可能か (ドラッグ有無) */
   interactive?: boolean;
 
@@ -23,7 +28,7 @@ type CardSurfaceProps = {
   /** ブロック押下（選択/ドラッグ開始） */
   onBlockPointerDown?: (
     e: React.PointerEvent<HTMLDivElement>,
-    blockId: string
+    blockId: string,
   ) => void;
 
   /** 同じブロックを再タップで編集開始 */
@@ -62,7 +67,6 @@ function getCardStyle(design: DesignKey): CSSProperties {
   };
 }
 
-
 export default function CardSurface({
   blocks,
   design,
@@ -77,6 +81,7 @@ export default function CardSurface({
   cardRef,
   blockRefs,
   className,
+  snapGuide,
   style,
 }: CardSurfaceProps) {
   const lastClickedBlockIdRef = useRef<string | null>(null);
@@ -125,10 +130,8 @@ export default function CardSurface({
           activeBlockId === block.id &&
           editingBlockId !== block.id;
 
-        const textColor = 
-        block.type === "text" 
-          ? block.color ?? "#111827"
-          : undefined;
+        const textColor =
+          block.type === "text" ? (block.color ?? "#111827") : undefined;
 
         return (
           <div
@@ -199,6 +202,31 @@ export default function CardSurface({
           </div>
         );
       })}
+      {/* ===== Snap Guide Line ===== */}
+      {snapGuide && (
+        <div
+          style={{
+            position: "absolute",
+            pointerEvents: "none",
+            background: "rgba(0,0,0,0.4)",
+            zIndex: 50,
+
+            ...(snapGuide.type === "centerX" || snapGuide.type === "left"
+              ? {
+                  left: snapGuide.pos,
+                  top: 0,
+                  width: 1,
+                  height: "100%",
+                }
+              : {
+                  top: snapGuide.pos,
+                  left: 0,
+                  height: 1,
+                  width: "100%",
+                }),
+          }}
+        />
+      )}
     </div>
   );
 }

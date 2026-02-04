@@ -37,6 +37,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     editingText,
     setEditingText,
     stopEditing,
+    snapGuide,
     cardRef,
     blockRefs,
     undo,
@@ -167,6 +168,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                   onStopEditing={stopEditing}
                   onCommitText={onCommitText}
                   activeBlockId={state.activeBlockId}
+                  snapGuide={snapGuide}
                   cardRef={cardRef}
                   blockRefs={blockRefs}
                 />

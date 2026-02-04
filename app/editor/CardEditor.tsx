@@ -56,6 +56,7 @@ export default function CardEditor() {
     updateTextStyle,
     bumpFontSize,
     handlePointerDown: dragPointerDown,
+    snapGuide,
     cardRef,
     blockRefs,
     downloadImage,
@@ -280,6 +281,7 @@ export default function CardEditor() {
     stopEditing,
     cardRef,
     blockRefs,
+    snapGuide,
 
     // ---- Undo / Redo
     undo,
@@ -338,6 +340,7 @@ export default function CardEditor() {
           undo={undo}
           redo={redo}
           setTextColor={setTextColor}
+          snapGuide={snapGuide}
         />
       </div>
       {/* ---------- Preview / Export / Inline Editor ---------- */}

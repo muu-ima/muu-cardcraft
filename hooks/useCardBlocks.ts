@@ -67,7 +67,7 @@ export function useCardBlocks() {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const blockRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const { handlePointerDown } = useBlockDrag({
+  const { handlePointerDown, snapGuide}  = useBlockDrag({
     blocks,
     blocksRef,
     setRef,
@@ -89,6 +89,7 @@ export function useCardBlocks() {
     updateTextStyle,
     bumpFontSize,
     handlePointerDown,
+    snapGuide,
     cardRef,
     blockRefs,
     downloadImage,
