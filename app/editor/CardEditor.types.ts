@@ -92,6 +92,7 @@ export type CardEditorMobileProps = {
   setEditingText: (value: string) => void;
   stopEditing: () => void;
 
+  snapGuide: SnapGuide | null
   cardRef: RefObject<HTMLDivElement | null>;
   blockRefs: MutableRefObject<Record<string, HTMLDivElement | null>>;
 
