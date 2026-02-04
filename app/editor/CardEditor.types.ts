@@ -10,6 +10,7 @@ import type { TabKey } from "@/shared/editor";
 import type { DesignKey } from "@/shared/design";
 import type { Block } from "@/shared/blocks";
 import type { FontKey, FontSizeDelta } from "@/shared/fonts";
+import type { SnapGuide } from "@/hooks/card/useSnap";
 
 // CenterToolbar 内で宣言している align と同じにしておく
 export type Align = "left" | "center" | "right";
@@ -81,7 +82,7 @@ export type CardEditorMobileProps = {
   handleBlockPointerDown: (
     e: ReactPointerEvent<Element>,
     blockId: string,
-    opts: { scale: number }
+    opts: { scale: number },
   ) => void;
 
   // ---- インライン編集
@@ -90,6 +91,7 @@ export type CardEditorMobileProps = {
   editingText: string;
   setEditingText: (value: string) => void;
   stopEditing: () => void;
+
   cardRef: RefObject<HTMLDivElement | null>;
   blockRefs: MutableRefObject<Record<string, HTMLDivElement | null>>;
 
@@ -133,7 +135,7 @@ export type CardEditorDesktopProps = {
   handleBlockPointerDown: (
     e: ReactPointerEvent<Element>,
     blockId: string,
-    opts: { scale: number }
+    opts: { scale: number },
   ) => void;
   onChangeWidth?: (id: string, width: number) => void;
 
@@ -143,6 +145,9 @@ export type CardEditorDesktopProps = {
   editingText: string;
   setEditingText: (value: string) => void;
   stopEditing: () => void;
+
+  // ---- canvas / refs / guides
+  snapGuide: SnapGuide | null;
   cardRef: RefObject<HTMLDivElement | null>;
   blockRefs: MutableRefObject<Record<string, HTMLDivElement | null>>;
 

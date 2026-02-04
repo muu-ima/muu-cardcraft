@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
 import type { Block } from "@/shared/blocks";
+import { SnapGuide, snapXY } from "@/hooks/card/useSnap";
 
 type DragOptions = {
   disabled?: boolean;
@@ -47,11 +48,13 @@ export function useBlockDrag(args: Args) {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
   const dragScaleRef = useRef(1);
+  const snapLockRef = useRef<{ x?: number; y?: number }>({});
+  const [snapGuide, setSnapGuide] = useState<SnapGuide | null>(null);
 
   const handlePointerDown = (
     e: React.PointerEvent,
     id: string,
-    options?: DragOptions
+    options?: DragOptions,
   ) => {
     if (options?.disabled) return;
     if (editingBlockId) return;
@@ -118,10 +121,70 @@ export function useBlockDrag(args: Args) {
       const newX = Math.max(0, Math.min(maxX, rawX));
       const newY = Math.max(0, Math.min(maxY, rawY));
 
+      // 例：閾値
+      const SNAP_IN = 10; // 近づいたら吸着
+      const SNAP_OUT = 3; // これ以上離れたら解除
+
+      let sx = newX;
+      let sy = newY;
+
+      // ★ まず「候補ライン」を作る（例：中央だけでもOK）
+      const centerX = BASE_W / 2 - textWidth / 2;
+      const centerY = BASE_H / 2 - approxTextHeight / 2;
+
+      // ===== X方向 =====
+      if (snapLockRef.current.x != null) {
+        // いま吸着中 → 少し離れても維持
+        if (Math.abs(sx - snapLockRef.current.x) > SNAP_OUT) {
+          snapLockRef.current.x = undefined; // 解除
+        } else {
+          sx = snapLockRef.current.x; // 維持
+        }
+      }
+      if (snapLockRef.current.x == null) {
+        // 未吸着 → 近づいたら吸着開始
+        if (Math.abs(sx - centerX) <= SNAP_IN) {
+          snapLockRef.current.x = centerX;
+          sx = centerX;
+        }
+      }
+
+      // ===== Y方向 =====
+      if (snapLockRef.current.y != null) {
+        if (Math.abs(sy - snapLockRef.current.y) > SNAP_OUT) {
+          snapLockRef.current.y = undefined;
+        } else {
+          sy = snapLockRef.current.y;
+        }
+      }
+      if (snapLockRef.current.y == null) {
+        if (Math.abs(sy - centerY) <= SNAP_IN) {
+          snapLockRef.current.y = centerY;
+          sy = centerY;
+        }
+      }
+
+      // ★ここでスナップ！
+      const snapped = snapXY({
+        id: dragTargetId,
+        x: sx,
+        y: sy,
+        w: textWidth,
+        h: approxTextHeight,
+        blocks: blocksRef.current,
+        baseW: BASE_W,
+        baseH: BASE_H,
+      });
+
+      if (snapped.guide) {
+        setSnapGuide(snapped.guide);
+        setTimeout(() => setSnapGuide(null), 150);
+      }
+
       setRef.current((prev) =>
         prev.map((b) =>
-          b.id === dragTargetId ? { ...b, x: newX, y: newY } : b
-        )
+          b.id === dragTargetId ? { ...b, x: snapped.x, y: snapped.y } : b,
+        ),
       );
     };
 
@@ -135,6 +198,7 @@ export function useBlockDrag(args: Args) {
 
       movedRef.current = false;
       beforeDragRef.current = null;
+      snapLockRef.current = {};
     };
 
     window.addEventListener("pointermove", handleMove);
@@ -146,7 +210,16 @@ export function useBlockDrag(args: Args) {
       window.removeEventListener("pointerup", handleUp);
       window.removeEventListener("pointercancel", handleUp);
     };
-  }, [isDragging, dragTargetId, offset, blocksRef, setRef, commitRef, cardRef, blockRefs]);
+  }, [
+    isDragging,
+    dragTargetId,
+    offset,
+    blocksRef,
+    setRef,
+    commitRef,
+    cardRef,
+    blockRefs,
+  ]);
 
-  return { handlePointerDown };
+  return { handlePointerDown, snapGuide };
 }
