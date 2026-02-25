@@ -39,7 +39,7 @@ type Props = {
   onDownload: (
     format: "png" | "jpeg",
     design: DesignKey,
-    options?: { quality?: number; pixelRatio?: number; fontFamily?: string }
+    options?: { quality?: number; pixelRatio?: number; fontFamily?: string },
   ) => void;
   onChangeWidth?: (id: string, width: number) => void;
   onDeleteBlock?: (id: string) => void;
@@ -76,10 +76,10 @@ export default function ToolPanel({
     activeTab === "design"
       ? "デザイン"
       : activeTab === "text"
-      ? "テキスト"
-      : activeTab === "export"
-      ? "書き出し"
-      : "編集";
+        ? "テキスト"
+        : activeTab === "export"
+          ? "書き出し"
+          : "編集";
 
   return (
     // ✅ xl以上だけ「左固定パネル」、xl未満は「普通のコンテンツ」
@@ -95,9 +95,10 @@ export default function ToolPanel({
       {/* ✅ 見出し：BottomSheetでも上に残る */}
       <div
         className={[
-          "sticky top-0 z-10 mb-3 bg-white/90 backdrop-blur",
-          "px-3 py-2", // ← 横は一段階だけ絞る
-          "xl:mb-0 xl:bg-transparent", // xl だけ背景・余白切り替え
+          "hidden xl:block", // ← これだけで解決
+          "sticky top-0 z-10 mb-3",
+          "bg-white/70 backdrop-blur",
+          "rounded-xl px-3 py-2",
         ].join(" ")}
       >
         {/* ✅ showHeader のときだけ描画する */}
@@ -144,7 +145,6 @@ export default function ToolPanel({
             onDeleteBlock={onDeleteBlock}
           />
         )}
-
         {activeTab === "font" && (
           <FontPanel
             blocks={blocks}
