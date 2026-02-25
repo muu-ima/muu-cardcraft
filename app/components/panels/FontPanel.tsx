@@ -198,7 +198,7 @@ export default function FontPanel({
           {showColorPicker && activeBlock && (
             <div
               ref={pickerRef}
-              className="absolute z-50 mt-3 w-[220px] rounded-xl border border-zinc-200 bg-white p-3 shadow-lg"
+              className="absolute z-50 mt-5 w-[300px] rounded-xl border border-zinc-200 bg-white p-3 shadow-lg"
             >
               <div className="mb-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
