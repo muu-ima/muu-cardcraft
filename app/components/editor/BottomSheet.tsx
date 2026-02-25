@@ -79,7 +79,7 @@ export default function BottomSheet({
           paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
-        <div className="sticky top-0 z-10 rounded-t-2xl bg-white/90 backdrop-blur">
+        <div className="sticky top-0 z-10 rounded-t-2xl bg-transparent">
           <button
             type="button"
             aria-label="Resize bottom sheet"
