@@ -56,6 +56,18 @@ const TEXT_COLORS = [
 
 type PanelTab = "font" | "color";
 
+const normalizeHex = (raw: string) => {
+  const s = raw.trim().replace(/^#/, "").toLowerCase();
+  const cleaned = s.replace(/[^0-9a-f]/g, "").slice(0, 6);
+  const ok = cleaned.length === 3 || cleaned.length === 6;
+  return { cleaned, ok, withHash: ok ? `#${cleaned}` : null };
+};
+
+const normalizePickerColor = (raw: string) => {
+  const { withHash } = normalizeHex(raw);
+  return withHash ?? "#111827";
+};
+
 export default function FontPanel({
   blocks,
   activeBlockId,
@@ -73,6 +85,15 @@ export default function FontPanel({
   const currentColor = useMemo(() => {
     return activeBlock?.color ?? "#111827";
   }, [activeBlock?.color]);
+
+  const [hexInput, setHexInput] = useState(
+    () => normalizeHex(currentColor).cleaned,
+  );
+
+  // ブロック側の色が変わったら入力欄も同期（プリセット/リセットなど）
+  useEffect(() => {
+    setHexInput(normalizeHex(currentColor).cleaned);
+  }, [currentColor]);
 
   const keys = FONT_CATEGORIES[activeCategory].keys;
   const fonts = keys.map((key) => {
@@ -281,23 +302,53 @@ export default function FontPanel({
               onPointerCancel={commitPickedColor}
             >
               <HexColorPicker
-                color={currentColor}
+                color={normalizePickerColor(currentColor)}
                 onChange={(hex) => {
                   if (!activeBlock) return;
                   draggingRef.current = true;
-                  // ✅ 最終色だけ保持
-                  lastPickedRef.current = hex;
 
-                  // ✅ ここでpreviewを“間引いて送る”
-                  schedulePreview(hex);
+                  // react-colorful は #付きで来る
+                  const { cleaned, ok, withHash } = normalizeHex(hex);
+                  setHexInput(cleaned);
+
+                  if (!withHash) return;
+                  lastPickedRef.current = withHash;
+                  schedulePreview(withHash);
                 }}
               />
 
               <input
-                value={currentColor}
+                value={hexInput}
                 onChange={(e) => {
                   if (!activeBlock) return;
-                  onChangeColor(activeBlock.id, e.target.value);
+
+                  const { cleaned, withHash } = normalizeHex(e.target.value);
+                  setHexInput(cleaned);
+
+                  // ✅ valid(3 or 6) になった瞬間だけ preview（履歴なし）
+                  if (withHash) {
+                    lastPickedRef.current = withHash;
+                    schedulePreview(withHash);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (!activeBlock) return;
+                  if (e.key !== "Enter") return;
+
+                  const { withHash } = normalizeHex(hexInput);
+                  if (!withHash) return;
+
+                  // ✅ Enter で確定（履歴あり）
+                  onChangeColor(activeBlock.id, withHash);
+                }}
+                onBlur={() => {
+                  if (!activeBlock) return;
+
+                  const { withHash } = normalizeHex(hexInput);
+                  if (!withHash) return;
+
+                  // ✅ フォーカス外れで確定（履歴あり）
+                  onChangeColor(activeBlock.id, withHash);
                 }}
                 className="mt-2 w-full rounded-md border border-zinc-200 px-2 py-1 text-xs"
                 spellCheck={false}
