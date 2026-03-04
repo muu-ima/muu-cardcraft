@@ -5,9 +5,11 @@ import type { Block } from "@/shared/blocks";
 import type { TabKey } from "@/shared/editor";
 import type { DesignKey } from "@/shared/design";
 import type { FontKey } from "@/shared/fonts";
+import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
 
 import TextPanel from "@/app/components/panels/TextPanel";
 import FontPanel from "@/app/components/panels/FontPanel";
+import ImagePanel from "@/app/components/panels/ImagePanel";
 import DesignPanel from "@/app/components/panels/DesignPanel";
 import ExportPanel from "@/app/components/panels/ExportPanel";
 import type { FontSizeDelta } from "@/shared/fonts";
@@ -21,10 +23,10 @@ type Props = {
   activeBlockId: string;
   onAddBlock: () => void;
   variant?: "desktop" | "sheet";
-
+  code: string;
   side: Side;
   onChangeSide: (side: Side) => void;
-
+  onUploadedImage: (asset: UploadImageAsset) => void;
   blocks: Block[];
   isPreview: boolean;
   onChangeText: (id: string, value: string) => void;
@@ -49,6 +51,7 @@ type Props = {
 export default function ToolPanel({
   open,
   onClose,
+  code,
   activeTab,
   activeBlockId,
   side,
@@ -60,6 +63,7 @@ export default function ToolPanel({
   onChangeFont,
   onCommitText,
   onBumpFontSize,
+  onUploadedImage,
   design,
   onChangeDesign,
   onDownload,
@@ -158,6 +162,14 @@ export default function ToolPanel({
         )}
         {activeTab === "design" && (
           <DesignPanel design={design} onChangeDesign={onChangeDesign} />
+        )}
+        {activeTab === "image" && (
+          <ImagePanel
+            code={code}
+            onUploaded={(asset) => {
+              onUploadedImage(asset); // ✅ ここでは触らない
+            }}
+          />
         )}
         {activeTab === "export" && (
           <ExportPanel design={design} onDownload={onDownload} />

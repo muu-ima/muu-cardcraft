@@ -11,6 +11,7 @@ import clsx from "clsx"; // 使ってなかったら追加（なくても三項�
 
 export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
   const {
+    code,
     state,
     actions,
     openTab,
@@ -20,6 +21,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     scaleDesktop,
     getBlocksFor,
     addBlock,
+    onUploadedImage,
     onChangeText,
     onCommitText,
     previewTextColor,
@@ -88,6 +90,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
           )}
         >
           <ToolPanel
+            code={code}
             variant="desktop"
             open={isPanelOpen}
             onClose={() => actions.setActiveTab(null)}
@@ -96,6 +99,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
             side={state.side}
             isPreview={state.isPreview}
             onChangeSide={actions.setSide}
+            onUploadedImage={onUploadedImage}
             blocks={getBlocksFor(state.side)}
             onAddBlock={addBlock}
             onChangeText={onChangeText}

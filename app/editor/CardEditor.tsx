@@ -8,6 +8,8 @@ import InlineTextEditor from "@/app/components/editor/InlineTextEditor";
 
 import { useScaleToFit } from "@/hooks/useScaleToFit";
 import { useCardBlocks } from "@/hooks/useCardBlocks";
+import { useCardImages } from "@/hooks/card/useCardImages";
+import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
 import { useEditorLayout } from "@/hooks/useEditorLayout";
 import { useCardEditorState } from "@/hooks/useCardEditorState";
 import { type DesignKey } from "@/shared/design";
@@ -24,9 +26,13 @@ import type {
 
 type Side = "front" | "back";
 
+type Props = {
+  code: string;
+};
+
 type EditingState = { id: string; initialText: string } | null;
 
-export default function CardEditor() {
+export default function CardEditor({ code }: Props) {
   // =========================
   // 🧠 1. コア状態 & ロジック
   // =========================
@@ -72,6 +78,19 @@ export default function CardEditor() {
     setTextColor,
     previewTextColor,
   } = useCardBlocks();
+
+  const { images, addFromUpload, getImagesFor } = useCardImages();
+  // ✅ ImagePanel から来た upload 結果を、画像ステートに反映する
+  const onUploadedImage = (asset: UploadImageAsset) => {
+    // asset の中身は useUploadImage 側の型に合わせる（最低限これでOK）
+    const onUploadedImage = (asset: UploadImageAsset) => {
+      addFromUpload({
+        assetId: asset.id,
+        url: asset.signedUrl,
+        side: state.side,
+      });
+    };
+  };
 
   const editor = useCardEditorState({
     editableBlocks,
@@ -234,6 +253,7 @@ export default function CardEditor() {
 
   // ③ Mobile レイアウトに渡す全部入り props
   const mobileProps: CardEditorMobileProps = {
+    code,
     // ---- 状態 & アクション
     state: layoutState,
     actions: layoutActions,
@@ -264,6 +284,7 @@ export default function CardEditor() {
     onChangeWidth: handleChangeBlockWidth,
     setTextColor,
     previewTextColor,
+    onUploadedImage,
 
     // ---- export
     exportRef,
@@ -311,7 +332,9 @@ export default function CardEditor() {
         <CardEditorDesktopLayout
           state={state}
           actions={layoutActions}
+          code={code}
           openTab={openTab}
+          onUploadedImage={onUploadedImage}
           canvasAreaRef={canvasAreaRef}
           centerWrapRef={centerWrapRef}
           scaleWrapRefDesktop={scaleWrapRefDesktop}

@@ -11,6 +11,7 @@ import type { DesignKey } from "@/shared/design";
 import type { Block } from "@/shared/blocks";
 import type { FontKey, FontSizeDelta } from "@/shared/fonts";
 import type { SnapGuide } from "@/hooks/card/useSnap";
+import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
 
 // CenterToolbar 内で宣言している align と同じにしておく
 export type Align = "left" | "center" | "right";
@@ -41,6 +42,8 @@ export type EditorActionsForLayout = {
 export type SheetSnap = "collapsed" | "half" | "full";
 
 export type CardEditorMobileProps = {
+  // 画像アップロード
+  code: string;
   // ---- 状態 & アクション
   state: EditorStateForLayout;
   actions: EditorActionsForLayout;
@@ -71,6 +74,7 @@ export type CardEditorMobileProps = {
   onChangeWidth?: (id: string, width: number) => void;
   setTextColor: (id: string, color: string) => void;
   previewTextColor: (id: string, color: string) => void;
+  onUploadedImage: (asset: UploadImageAsset) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;
@@ -103,6 +107,8 @@ export type CardEditorMobileProps = {
 };
 
 export type CardEditorDesktopProps = {
+  // 画像アップロード
+  code: string;
   // ---- 状態 & アクション
   state: EditorStateForLayout;
   actions: EditorActionsForLayout;
@@ -126,6 +132,7 @@ export type CardEditorDesktopProps = {
   setDesign: (d: DesignKey) => void;
   setTextColor: (id: string, color: string) => void;
   previewTextColor: (id: string, color: string) => void;
+  onUploadedImage: (asset: UploadImageAsset) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;

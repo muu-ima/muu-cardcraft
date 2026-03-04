@@ -12,6 +12,7 @@ import type { CardEditorMobileProps } from "./CardEditor.types";
 
 export function CardEditorMobileLayout(props: CardEditorMobileProps) {
   const {
+    code,
     state,
     actions,
     sheetTitle,
@@ -49,6 +50,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     redo,
     onChangeWidth,
     setTextColor,
+    onUploadedImage,
   } = props;
 
   const blocksForSide = getBlocksFor(state.side);
@@ -80,6 +82,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
         title={sheetTitle}
       >
         <ToolPanel
+          code={code}
           variant="sheet"
           open={sheetSnap !== "collapsed"}
           onClose={closeSheet}
@@ -105,6 +108,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
           }}
           onDeleteBlock={handleDeleteBlock}
           onChangeColor={setTextColor}
+          onUploadedImage={onUploadedImage}
         />
       </BottomSheet>
 
