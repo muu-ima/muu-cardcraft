@@ -97,6 +97,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
           onChangeWidth={onChangeWidth}
           design={design}
           onChangeDesign={setDesign}
+          onPreviewColor={props.previewTextColor}
           fontFamily="default"
           onDownload={(format) => {
             if (!exportRef.current) return;

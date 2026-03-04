@@ -22,6 +22,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     addBlock,
     onChangeText,
     onCommitText,
+    previewTextColor,
     updateFont,
     bumpFontSize,
     design,
@@ -83,7 +84,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
             // 1024~1279px:普通のPC幅
             "lg:w-[320px]",
             // 1280px~:余裕があるときだけ 416px まで広げる
-            "xl:w-[416px]"
+            "xl:w-[416px]",
           )}
         >
           <ToolPanel
@@ -101,6 +102,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
             onCommitText={onCommitText}
             onBumpFontSize={bumpFontSize}
             onChangeFont={updateFont}
+            onPreviewColor={previewTextColor}
             design={design}
             onChangeDesign={setDesign}
             fontFamily="default"
@@ -144,7 +146,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                 ref={scaleWrapRefDesktop}
                 className={clsx(
                   "w-full min-w-0 px-3 transition-[max-width] duration-200",
-                  isPanelOpen ? "max-w-[960px]" : "max-w-7xl"
+                  isPanelOpen ? "max-w-[960px]" : "max-w-7xl",
                 )}
               >
                 <EditorCanvas

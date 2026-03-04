@@ -32,6 +32,7 @@ type Props = {
   onBumpFontSize?: (id: string, delta: FontSizeDelta) => void;
   onChangeFont: (id: string, fontKey: FontKey) => void;
   onChangeColor: (id: string, color: string) => void;
+  onPreviewColor: (id: string, color: string) => void;
   design: DesignKey;
   onChangeDesign: (design: DesignKey) => void;
 
@@ -66,6 +67,7 @@ export default function ToolPanel({
   onChangeWidth,
   onDeleteBlock,
   onChangeColor,
+  onPreviewColor,
 }: Props) {
   // ✅ open と activeTab を一致させる（事故防止）
   if (!open || !activeTab) return null;
@@ -151,6 +153,7 @@ export default function ToolPanel({
             activeBlockId={activeBlockId}
             onChangeFont={onChangeFont}
             onChangeColor={onChangeColor}
+            onPreviewColor={onPreviewColor}
           />
         )}
         {activeTab === "design" && (

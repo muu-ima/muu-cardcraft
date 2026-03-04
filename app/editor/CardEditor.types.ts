@@ -70,6 +70,7 @@ export type CardEditorMobileProps = {
   setDesign: (d: DesignKey) => void;
   onChangeWidth?: (id: string, width: number) => void;
   setTextColor: (id: string, color: string) => void;
+  previewTextColor: (id: string, color: string) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;
@@ -92,7 +93,7 @@ export type CardEditorMobileProps = {
   setEditingText: (value: string) => void;
   stopEditing: () => void;
 
-  snapGuide: SnapGuide | null
+  snapGuide: SnapGuide | null;
   cardRef: RefObject<HTMLDivElement | null>;
   blockRefs: MutableRefObject<Record<string, HTMLDivElement | null>>;
 
@@ -124,6 +125,7 @@ export type CardEditorDesktopProps = {
   design: DesignKey;
   setDesign: (d: DesignKey) => void;
   setTextColor: (id: string, color: string) => void;
+  previewTextColor: (id: string, color: string) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;

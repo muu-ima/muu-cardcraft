@@ -64,7 +64,7 @@ export function useBlockActions(history: HistoryApi) {
           width: w,
           x: nextX,
         };
-      })
+      }),
     );
   };
 
@@ -111,7 +111,7 @@ export function useBlockActions(history: HistoryApi) {
 
     const next = clamp(Math.round(fontSize), 8, 72);
     set((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, fontSize: next } : b))
+      prev.map((b) => (b.id === id ? { ...b, fontSize: next } : b)),
     );
   };
 
@@ -125,11 +125,37 @@ export function useBlockActions(history: HistoryApi) {
     commit((prev) => prev.filter((b) => b.id !== id));
   };
 
-  // ✅ 追加：テキストカラー変更（1クリック = 1 履歴）
+  // ✅ 追加：テキストカラー プレビュー（履歴なし）
+  const normalizeHex = (v: string) => v.trim().toLowerCase();
+
+  const previewTextColor = (id: string, color: string) => {
+    const next = normalizeHex(color);
+    set((prev) => {
+      const cur = prev.find((b) => b.id === id && b.type === "text");
+      if (!cur) return prev;
+
+      const curColor = normalizeHex((cur as any).color ?? "");
+      if (curColor === next) return prev;
+
+      return prev.map((b) =>
+        b.id === id && b.type === "text" ? { ...b, color: next } : b,
+      );
+    });
+  };
+
   const setTextColor = (id: string, color: string) => {
-    commit((prev) =>
-      prev.map((b) => (b.id === id && b.type === "text" ? { ...b, color } : b))
-    );
+    const next = normalizeHex(color);
+    commit((prev) => {
+      const cur = prev.find((b) => b.id === id && b.type === "text");
+      if (!cur) return prev;
+
+      const curColor = normalizeHex((cur as any).color ?? "");
+      if (curColor === next) return prev;
+
+      return prev.map((b) =>
+        b.id === id && b.type === "text" ? { ...b, color: next } : b,
+      );
+    });
   };
 
   return {
@@ -142,6 +168,7 @@ export function useBlockActions(history: HistoryApi) {
     bumpFontSize,
     setBlockWidth,
     removeBlock,
+    previewTextColor,
     setTextColor,
   };
 }
