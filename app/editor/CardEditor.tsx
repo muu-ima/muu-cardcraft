@@ -39,12 +39,12 @@ export default function CardEditor() {
   // scale（mobile / desktop）
   const { ref: scaleWrapRefMobile, scale: scaleMobile } = useScaleToFit(
     CARD_BASE_W,
-    true
+    true,
   );
 
   const { ref: scaleWrapRefDesktop, scale: scaleDesktop } = useScaleToFit(
     CARD_BASE_W,
-    true
+    true,
   );
 
   const {
@@ -70,6 +70,7 @@ export default function CardEditor() {
     setBlockWidth,
     removeBlock,
     setTextColor,
+    previewTextColor,
   } = useCardBlocks();
 
   const editor = useCardEditorState({
@@ -171,7 +172,7 @@ export default function CardEditor() {
   const handleBlockPointerDown = (
     e: React.PointerEvent<Element>,
     blockId: string,
-    opts: { scale: number }
+    opts: { scale: number },
   ) => {
     // ✅ 編集中でも「切り替え」は許可する
     if (editing) {
@@ -262,6 +263,7 @@ export default function CardEditor() {
     setDesign,
     onChangeWidth: handleChangeBlockWidth,
     setTextColor,
+    previewTextColor,
 
     // ---- export
     exportRef,
@@ -340,6 +342,7 @@ export default function CardEditor() {
           undo={undo}
           redo={redo}
           setTextColor={setTextColor}
+          previewTextColor={previewTextColor}
           snapGuide={snapGuide}
         />
       </div>
