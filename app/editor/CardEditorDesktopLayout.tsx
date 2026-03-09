@@ -20,6 +20,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     scaleWrapRefDesktop,
     scaleDesktop,
     getBlocksFor,
+    getImagesFor,
     addBlock,
     onUploadedImage,
     onChangeText,
@@ -155,6 +156,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
               >
                 <EditorCanvas
                   blocks={getBlocksFor(state.side)}
+                  images={getImagesFor(state.side)}
                   design={design}
                   scale={scaleDesktop}
                   isPreview={state.isPreview}

@@ -4,12 +4,14 @@
 import React, { useRef } from "react";
 import type { CSSProperties, RefObject } from "react";
 import type { Block } from "@/shared/blocks";
+import type { CardImage } from "@/shared/images";
 import type { DesignKey } from "@/shared/design";
 import { CARD_FULL_DESIGNS } from "@/shared/cardDesigns";
 import { FONT_DEFINITIONS } from "@/shared/fonts";
 
 type CardSurfaceProps = {
   blocks: Block[];
+  images?: CardImage[];
   design: DesignKey;
 
   w: number;
@@ -69,6 +71,7 @@ function getCardStyle(design: DesignKey): CSSProperties {
 
 export default function CardSurface({
   blocks,
+  images = [],
   design,
   w,
   h,
@@ -103,6 +106,8 @@ export default function CardSurface({
     }
   };
 
+  console.log("[CardSurface] images", images);
+
   return (
     <div
       ref={cardRef}
@@ -124,6 +129,35 @@ export default function CardSurface({
       }}
       className={`rounded-xl border shadow-md ${className ?? ""}`}
     >
+      {/* 画像レイヤー */}
+      {images.map((img: CardImage) => (
+        <div
+          key={img.id}
+          style={{
+            position: "absolute",
+            left: img.x,
+            top: img.y,
+            width: img.w,
+            height: img.h,
+            transform: `rotate(${img.rotate ?? 0}deg)`,
+            transformOrigin: "center",
+            pointerEvents: "none",
+          }}
+        >
+          <img
+            src={img.url}
+            alt=""
+            draggable={false}
+            style={{
+              display: "block",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              userSelect: "none",
+            }}
+          />
+        </div>
+      ))}
       {blocks.map((block) => {
         const showSelection =
           interactive &&

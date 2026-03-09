@@ -12,6 +12,7 @@ import type { Block } from "@/shared/blocks";
 import type { FontKey, FontSizeDelta } from "@/shared/fonts";
 import type { SnapGuide } from "@/hooks/card/useSnap";
 import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
+import type { CardImage } from "@/shared/images";
 
 // CenterToolbar 内で宣言している align と同じにしておく
 export type Align = "left" | "center" | "right";
@@ -63,6 +64,7 @@ export type CardEditorMobileProps = {
 
   // ---- blocks / デザイン
   getBlocksFor: (side: Side) => Block[];
+  getImagesFor: (side: "front" | "back") => CardImage[];
   editableBlocks: Block[];
   addBlock: () => void;
   onChangeText: (id: string, value: string) => void;
@@ -122,6 +124,7 @@ export type CardEditorDesktopProps = {
 
   // ---- blocks / デザイン
   getBlocksFor: (side: Side) => Block[];
+  getImagesFor: (side: "front" | "back") => CardImage[];
   editableBlocks: Block[];
   addBlock: () => void;
   onChangeText: (id: string, value: string) => void;

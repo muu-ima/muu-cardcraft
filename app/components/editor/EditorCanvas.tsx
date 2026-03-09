@@ -8,9 +8,11 @@ import type { Block } from "@/shared/blocks";
 import type { DesignKey } from "@/shared/design";
 import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
 import { FONT_DEFINITIONS, type FontKey } from "@/shared/fonts";
+import type { CardImage } from "@/shared/images";
 
 type Props = {
   blocks: Block[];
+  images: CardImage[];
   design: DesignKey;
   scale: number;
   activeBlockId?: string;
@@ -48,6 +50,7 @@ type Props = {
 
 export default function EditorCanvas({
   blocks,
+  images,
   design,
   scale,
   isPreview,
@@ -115,6 +118,8 @@ export default function EditorCanvas({
     });
   }, [isPreview, editingBlockId, editingText]);
 
+  console.log("[EditorCanvas] images", images);
+
   return (
     <section className="flex flex-col items-center gap-3">
       <div className="w-full flex justify-center">
@@ -141,6 +146,7 @@ export default function EditorCanvas({
           >
             <CardSurface
               blocks={blocks}
+              images={images}
               design={design}
               w={CARD_BASE_W}
               h={CARD_BASE_H}

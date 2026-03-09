@@ -82,16 +82,17 @@ export default function CardEditor({ code }: Props) {
   const { images, addFromUpload, getImagesFor } = useCardImages();
   // ✅ ImagePanel から来た upload 結果を、画像ステートに反映する
   const onUploadedImage = (asset: UploadImageAsset) => {
-    // asset の中身は useUploadImage 側の型に合わせる（最低限これでOK）
-    const onUploadedImage = (asset: UploadImageAsset) => {
-      addFromUpload({
-        assetId: asset.id,
-        url: asset.signedUrl,
-        side: state.side,
-      });
-    };
-  };
+    console.log("[onUploadedImage] asset", asset);
+    console.log("[onUploadedImage] side before add", state.side);
 
+    const added = addFromUpload({
+      assetId: asset.id,
+      url: asset.signedUrl,
+      side: state.side,
+    });
+
+    console.log("[onUploadedImage] added", added);
+  };
   const editor = useCardEditorState({
     editableBlocks,
     design,
@@ -273,6 +274,7 @@ export default function CardEditor({ code }: Props) {
 
     // ---- blocks / デザイン
     getBlocksFor,
+    getImagesFor,
     editableBlocks,
     addBlock,
     onChangeText,
@@ -311,6 +313,10 @@ export default function CardEditor({ code }: Props) {
     redo,
   };
 
+  console.log("[CardEditor] side", state.side);
+  console.log("[CardEditor] images", images);
+  console.log("[CardEditor] filtered", getImagesFor(state.side));
+
   // =========================
   // 🎨 2. レイアウト描画
   // =========================
@@ -340,6 +346,7 @@ export default function CardEditor({ code }: Props) {
           scaleWrapRefDesktop={scaleWrapRefDesktop}
           scaleDesktop={scaleDesktop}
           getBlocksFor={getBlocksFor}
+          getImagesFor={getImagesFor}
           editableBlocks={editableBlocks}
           addBlock={addBlock}
           onChangeText={onChangeText}
@@ -391,6 +398,7 @@ export default function CardEditor({ code }: Props) {
             >
               <CardSurface
                 blocks={getBlocksFor(state.side)}
+                images={getImagesFor(state.side)}
                 design={design}
                 w={CARD_BASE_W}
                 h={CARD_BASE_H}
