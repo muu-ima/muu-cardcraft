@@ -1,7 +1,7 @@
 // app/components/CardSurface.tsx
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import type { CSSProperties, RefObject } from "react";
 import type { Block } from "@/shared/blocks";
 import type { CardImage } from "@/shared/images";
@@ -12,6 +12,7 @@ import { FONT_DEFINITIONS } from "@/shared/fonts";
 type CardSurfaceProps = {
   blocks: Block[];
   images?: CardImage[];
+  onMoveImage?: (id: string, x: number, y: number) => void;
   design: DesignKey;
 
   w: number;
@@ -51,6 +52,15 @@ type CardSurfaceProps = {
   style?: CSSProperties;
 };
 
+type DragImageState = {
+  id: string;
+  pointerId: number;
+  startClientX: number;
+  startClientY: number;
+  startX: number;
+  startY: number;
+} | null;
+
 function getCardStyle(design: DesignKey): CSSProperties {
   // どれか必ず存在するキー（自分の環境に合わせて）
   const fallbackKey: DesignKey = "mint"; // ← 実際に存在するキー名にする
@@ -72,6 +82,7 @@ function getCardStyle(design: DesignKey): CSSProperties {
 export default function CardSurface({
   blocks,
   images = [],
+  onMoveImage,
   design,
   w,
   h,
@@ -88,6 +99,7 @@ export default function CardSurface({
   style,
 }: CardSurfaceProps) {
   const lastClickedBlockIdRef = useRef<string | null>(null);
+  const [dragImage, setDragImage] = useState<DragImageState>(null);
 
   const handleBlockClick = (block: Block) => {
     if (!interactive) return;
@@ -106,18 +118,68 @@ export default function CardSurface({
     }
   };
 
+  const handleImagePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>, img: CardImage) => {
+      if (!interactive) return;
+      if (!onMoveImage) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      setDragImage({
+        id: img.id,
+        pointerId: e.pointerId,
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+        startX: img.x,
+        startY: img.y,
+      });
+    },
+    [interactive, onMoveImage],
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!dragImage) return;
+      if (!onMoveImage) return;
+      if (e.pointerId !== dragImage.pointerId) return;
+
+      const dx = e.clientX - dragImage.startClientX;
+      const dy = e.clientY - dragImage.startClientY;
+
+      const nextX = dragImage.startX + dx;
+      const nextY = dragImage.startY + dy;
+
+      onMoveImage(dragImage.id, nextX, nextY);
+    },
+    [dragImage, onMoveImage],
+  );
+
+  const endImageDrag = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!dragImage) return;
+      if (e.pointerId !== dragImage.pointerId) return;
+      setDragImage(null);
+    },
+    [dragImage],
+  );
+
   console.log("[CardSurface] images", images);
 
   return (
     <div
       ref={cardRef}
+      onPointerMove={handlePointerMove}
+      onPointerUp={endImageDrag}
+      onPointerCancel={endImageDrag}
       onPointerDown={(e) => {
         if (!interactive) return;
 
-        // ✅ ルートで外クリック判定（ブロック以外を押した）
         const target = e.target as HTMLElement;
         const hitBlock = target.closest("[data-block-id]");
-        if (!hitBlock) onSurfacePointerDown?.(e);
+        const hitImage = target.closest("[data-image-id]");
+
+        if (!hitBlock && !hitImage) onSurfacePointerDown?.(e);
       }}
       style={{
         width: w,
@@ -130,34 +192,45 @@ export default function CardSurface({
       className={`rounded-xl border shadow-md ${className ?? ""}`}
     >
       {/* 画像レイヤー */}
-      {images.map((img: CardImage) => (
-        <div
-          key={img.id}
-          style={{
-            position: "absolute",
-            left: img.x,
-            top: img.y,
-            width: img.w,
-            height: img.h,
-            transform: `rotate(${img.rotate ?? 0}deg)`,
-            transformOrigin: "center",
-            pointerEvents: "none",
-          }}
-        >
-          <img
-            src={img.url}
-            alt=""
-            draggable={false}
+      {images.map((img: CardImage) => {
+        const isDragging = dragImage?.id === img.id;
+        return (
+          <div
+            key={img.id}
+            data-image-id={img.id}
+            onPointerDown={(e) => handleImagePointerDown(e, img)}
             style={{
-              display: "block",
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
+              position: "absolute",
+              left: img.x,
+              top: img.y,
+              width: img.w,
+              height: img.h,
+              transform: `rotate(${img.rotate ?? 0}deg)`,
+              transformOrigin: "center",
+              cursor: interactive
+                ? isDragging
+                  ? "grabbing"
+                  : "grab"
+                : "default",
               userSelect: "none",
             }}
-          />
-        </div>
-      ))}
+          >
+            <img
+              src={img.url}
+              alt=""
+              draggable={false}
+              style={{
+                display: "block",
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                userSelect: "none",
+              }}
+            />
+          </div>
+        );
+      })}
+
       {blocks.map((block) => {
         const showSelection =
           interactive &&

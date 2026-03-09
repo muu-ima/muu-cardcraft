@@ -79,7 +79,8 @@ export default function CardEditor({ code }: Props) {
     previewTextColor,
   } = useCardBlocks();
 
-  const { images, addFromUpload, getImagesFor } = useCardImages();
+  const { images, addFromUpload, getImagesFor, moveImage } = useCardImages();
+
   // ✅ ImagePanel から来た upload 結果を、画像ステートに反映する
   const onUploadedImage = (asset: UploadImageAsset) => {
     console.log("[onUploadedImage] asset", asset);
@@ -287,6 +288,7 @@ export default function CardEditor({ code }: Props) {
     setTextColor,
     previewTextColor,
     onUploadedImage,
+    moveImage,
 
     // ---- export
     exportRef,
@@ -347,6 +349,7 @@ export default function CardEditor({ code }: Props) {
           scaleDesktop={scaleDesktop}
           getBlocksFor={getBlocksFor}
           getImagesFor={getImagesFor}
+          moveImage={moveImage}
           editableBlocks={editableBlocks}
           addBlock={addBlock}
           onChangeText={onChangeText}
@@ -399,6 +402,7 @@ export default function CardEditor({ code }: Props) {
               <CardSurface
                 blocks={getBlocksFor(state.side)}
                 images={getImagesFor(state.side)}
+                onMoveImage={moveImage}
                 design={design}
                 w={CARD_BASE_W}
                 h={CARD_BASE_H}

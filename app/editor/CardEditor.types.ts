@@ -77,6 +77,7 @@ export type CardEditorMobileProps = {
   setTextColor: (id: string, color: string) => void;
   previewTextColor: (id: string, color: string) => void;
   onUploadedImage: (asset: UploadImageAsset) => void;
+  moveImage: (id: string, x: number, y: number) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;
@@ -136,6 +137,7 @@ export type CardEditorDesktopProps = {
   setTextColor: (id: string, color: string) => void;
   previewTextColor: (id: string, color: string) => void;
   onUploadedImage: (asset: UploadImageAsset) => void;
+  moveImage: (id: string, x: number, y: number) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;

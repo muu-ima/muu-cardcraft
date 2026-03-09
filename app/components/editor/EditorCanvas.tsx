@@ -14,6 +14,7 @@ type Props = {
   blocks: Block[];
   images: CardImage[];
   design: DesignKey;
+  moveImage: (id: string, x: number, y: number) => void;
   scale: number;
   activeBlockId?: string;
   isPreview: boolean;
@@ -51,6 +52,7 @@ type Props = {
 export default function EditorCanvas({
   blocks,
   images,
+  moveImage,
   design,
   scale,
   isPreview,
@@ -147,6 +149,7 @@ export default function EditorCanvas({
             <CardSurface
               blocks={blocks}
               images={images}
+              onMoveImage={moveImage}
               design={design}
               w={CARD_BASE_W}
               h={CARD_BASE_H}
