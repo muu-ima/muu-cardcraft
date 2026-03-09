@@ -1,7 +1,16 @@
 // shared/lib/storage/images.ts
 import { supabaseAdmin } from "@/shared/lib/supabase/admin";
 
-const BUCKET = "cardcraft";
+// 例：S3/R2/Supabase 等、何であれ「初期化時」に requireEnv を通す
+const BUCKET = requireEnv("IMAGES_BUCKET");
+// const ENDPOINT = requireEnv("IMAGES_ENDPOINT");
+// const ACCESS_KEY = requireEnv("IMAGES_ACCESS_KEY");
+// const SECRET_KEY = requireEnv("IMAGES_SECRET_KEY");
+function requireEnv(name: string) {
+  const v = process.env[name];
+  if (!v) throw new Error(`missing_env:${name}`);
+  return v;
+}
 
 export function tmpPath(code: string, assetId: string) {
   return `tmp/${code}/${assetId}.webp`;
