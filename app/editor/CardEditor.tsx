@@ -420,6 +420,7 @@ export default function CardEditor({ code }: Props) {
       <ExportSurface
         ref={exportRef}
         blocks={getBlocksFor(state.side)}
+        images={getImagesFor(state.side)}
         design={design}
       />
       {editing && (

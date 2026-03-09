@@ -14,6 +14,10 @@ type AddFromUploadArgs = {
   url: string;
   side: Side;
 
+  // 元画像サイズ
+  naturalWidth?: number;
+  naturalHeight?: number;
+
   // 追加時の初期配置（省略時は中央っぽく）
   x?: number;
   y?: number;
@@ -25,6 +29,23 @@ export function useCardImages(initial: CardImage[] = []) {
   const [images, setImages] = useState<CardImage[]>(initial);
 
   const addFromUpload = useCallback((args: AddFromUploadArgs) => {
+    const MAX_W = 140;
+    const MAX_H = 100;
+
+    let initialW = args.w ?? MAX_W;
+    let initialH = args.h ?? MAX_H;
+
+    if (!args.w && !args.h && args.naturalWidth && args.naturalHeight) {
+      const scale = Math.min(
+        MAX_W / args.naturalWidth,
+        MAX_H / args.naturalHeight,
+        1,
+      );
+
+      initialW = Math.round(args.naturalWidth * scale);
+      initialH = Math.round(args.naturalHeight * scale);
+    }
+
     const img: CardImage = {
       id: makeId(),
       assetId: args.assetId,
@@ -32,10 +53,11 @@ export function useCardImages(initial: CardImage[] = []) {
       side: args.side,
       x: args.x ?? 80,
       y: args.y ?? 80,
-      w: args.w ?? 220,
-      h: args.h ?? 140,
+      w: initialW,
+      h: initialH,
       rotate: 0,
     };
+
     setImages((prev) => [...prev, img]);
     return img;
   }, []);

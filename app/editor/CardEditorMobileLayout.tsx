@@ -24,6 +24,8 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     centerWrapRef,
     scaleWrapRefMobile,
     scaleMobile,
+    getImagesFor,
+    moveImage,
     getBlocksFor,
     addBlock,
     onChangeText,
@@ -139,6 +141,8 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
               <div ref={scaleWrapRefMobile} className="w-full min-w-0 px-3">
                 <EditorCanvas
                   blocks={getBlocksFor(state.side)}
+                  images={getImagesFor(state.side)}
+                  moveImage={moveImage}
                   design={design}
                   scale={scaleMobile}
                   isPreview={state.isPreview}

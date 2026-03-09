@@ -65,6 +65,7 @@ export type CardEditorMobileProps = {
   // ---- blocks / デザイン
   getBlocksFor: (side: Side) => Block[];
   getImagesFor: (side: "front" | "back") => CardImage[];
+  moveImage: (id: string, x: number, y: number) => void;
   editableBlocks: Block[];
   addBlock: () => void;
   onChangeText: (id: string, value: string) => void;
@@ -77,7 +78,6 @@ export type CardEditorMobileProps = {
   setTextColor: (id: string, color: string) => void;
   previewTextColor: (id: string, color: string) => void;
   onUploadedImage: (asset: UploadImageAsset) => void;
-  moveImage: (id: string, x: number, y: number) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;
