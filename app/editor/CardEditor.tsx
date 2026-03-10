@@ -79,20 +79,33 @@ export default function CardEditor({ code }: Props) {
     previewTextColor,
   } = useCardBlocks();
 
-  const { images, addFromUpload, getImagesFor, moveImage } = useCardImages();
+  const {
+    images,
+    addFromUpload,
+    getImagesFor,
+    moveImage,
+    removeImage,
+    countImagesFor,
+    maxImagesPerSide,
+  } = useCardImages();
 
   // ✅ ImagePanel から来た upload 結果を、画像ステートに反映する
   const onUploadedImage = (asset: UploadImageAsset) => {
     console.log("[onUploadedImage] asset", asset);
     console.log("[onUploadedImage] side before add", state.side);
 
-    const added = addFromUpload({
+    const result = addFromUpload({
       assetId: asset.id,
       url: asset.signedUrl,
       side: state.side,
     });
 
-    console.log("[onUploadedImage] added", added);
+    if (!result.ok) {
+      console.warn("この面には画像を最大3枚まで追加できます");
+      return;
+    }
+
+    console.log("[onUploadedImage] added", result.image);
   };
   const editor = useCardEditorState({
     editableBlocks,
@@ -290,6 +303,10 @@ export default function CardEditor({ code }: Props) {
     onUploadedImage,
     moveImage,
 
+    currentImageCount: countImagesFor(state.side),
+    maxImageCount: maxImagesPerSide,
+    onDeleteImage: removeImage,
+
     // ---- export
     exportRef,
     downloadImage,
@@ -343,6 +360,9 @@ export default function CardEditor({ code }: Props) {
           code={code}
           openTab={openTab}
           onUploadedImage={onUploadedImage}
+          currentImageCount={countImagesFor(state.side)}
+          maxImageCount={maxImagesPerSide}
+          onDeleteImage={removeImage}
           canvasAreaRef={canvasAreaRef}
           centerWrapRef={centerWrapRef}
           scaleWrapRefDesktop={scaleWrapRefDesktop}

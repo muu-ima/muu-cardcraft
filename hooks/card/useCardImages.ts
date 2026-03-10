@@ -9,6 +9,8 @@ function makeId() {
   return `img_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
 }
 
+const MAX_IMAGES_PER_SIDE = 3;
+
 type AddFromUploadArgs = {
   assetId: string;
   url: string;
@@ -28,39 +30,60 @@ type AddFromUploadArgs = {
 export function useCardImages(initial: CardImage[] = []) {
   const [images, setImages] = useState<CardImage[]>(initial);
 
-  const addFromUpload = useCallback((args: AddFromUploadArgs) => {
-    const MAX_W = 140;
-    const MAX_H = 100;
+  const countImagesFor = useCallback(
+    (side: Side) => images.filter((it) => it.side === side).length,
+    [images],
+  );
 
-    let initialW = args.w ?? MAX_W;
-    let initialH = args.h ?? MAX_H;
+  const addFromUpload = useCallback(
+    (args: AddFromUploadArgs) => {
+      const currentCount = images.filter((it) => it.side === args.side).length;
 
-    if (!args.w && !args.h && args.naturalWidth && args.naturalHeight) {
-      const scale = Math.min(
-        MAX_W / args.naturalWidth,
-        MAX_H / args.naturalHeight,
-        1,
-      );
+      if (currentCount >= MAX_IMAGES_PER_SIDE) {
+        return {
+          ok: false as const,
+          reason: "limit" as const,
+        };
+      }
 
-      initialW = Math.round(args.naturalWidth * scale);
-      initialH = Math.round(args.naturalHeight * scale);
-    }
+      const MAX_W = 140;
+      const MAX_H = 100;
 
-    const img: CardImage = {
-      id: makeId(),
-      assetId: args.assetId,
-      url: args.url,
-      side: args.side,
-      x: args.x ?? 80,
-      y: args.y ?? 80,
-      w: initialW,
-      h: initialH,
-      rotate: 0,
-    };
+      let initialW = args.w ?? MAX_W;
+      let initialH = args.h ?? MAX_H;
 
-    setImages((prev) => [...prev, img]);
-    return img;
-  }, []);
+      if (!args.w && !args.h && args.naturalWidth && args.naturalHeight) {
+        const scale = Math.min(
+          MAX_W / args.naturalWidth,
+          MAX_H / args.naturalHeight,
+          1,
+        );
+
+        initialW = Math.round(args.naturalWidth * scale);
+        initialH = Math.round(args.naturalHeight * scale);
+      }
+
+      const img: CardImage = {
+        id: makeId(),
+        assetId: args.assetId,
+        url: args.url,
+        side: args.side,
+        x: args.x ?? 80,
+        y: args.y ?? 80,
+        w: initialW,
+        h: initialH,
+        rotate: 0,
+      };
+
+      setImages((prev) => [...prev, img]);
+
+      return {
+        ok: true as const,
+        image: img,
+      };
+    },
+    [images],
+  );
 
   const updateImage = useCallback(
     (id: string, patch: Partial<Omit<CardImage, "id">>) => {
@@ -107,6 +130,8 @@ export function useCardImages(initial: CardImage[] = []) {
       removeImage,
       clearSide,
       getImagesFor,
+      countImagesFor,
+      maxImagesPerSide: MAX_IMAGES_PER_SIDE,
     }),
     [
       images,
@@ -117,6 +142,7 @@ export function useCardImages(initial: CardImage[] = []) {
       removeImage,
       clearSide,
       getImagesFor,
+      countImagesFor,
     ],
   );
 

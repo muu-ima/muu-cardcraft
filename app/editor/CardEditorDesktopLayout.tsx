@@ -33,6 +33,9 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     setDesign,
     exportRef,
     downloadImage,
+    currentImageCount,
+    maxImageCount,
+    onDeleteImage,
     onAnyPointerDownCapture,
     centerToolbarValue,
     centerVisible,
@@ -102,6 +105,10 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
             isPreview={state.isPreview}
             onChangeSide={actions.setSide}
             onUploadedImage={onUploadedImage}
+            images={getImagesFor(state.side)}
+            currentImageCount={currentImageCount}
+            maxImageCount={maxImageCount}
+            onDeleteImage={onDeleteImage}
             blocks={getBlocksFor(state.side)}
             onAddBlock={addBlock}
             onChangeText={onChangeText}

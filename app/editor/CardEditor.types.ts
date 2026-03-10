@@ -45,6 +45,7 @@ export type SheetSnap = "collapsed" | "half" | "full";
 export type CardEditorMobileProps = {
   // 画像アップロード
   code: string;
+
   // ---- 状態 & アクション
   state: EditorStateForLayout;
   actions: EditorActionsForLayout;
@@ -66,6 +67,9 @@ export type CardEditorMobileProps = {
   getBlocksFor: (side: Side) => Block[];
   getImagesFor: (side: "front" | "back") => CardImage[];
   moveImage: (id: string, x: number, y: number) => void;
+  currentImageCount: number;
+  maxImageCount: number;
+  onDeleteImage: (id: string) => void;
   editableBlocks: Block[];
   addBlock: () => void;
   onChangeText: (id: string, value: string) => void;
@@ -138,6 +142,9 @@ export type CardEditorDesktopProps = {
   previewTextColor: (id: string, color: string) => void;
   onUploadedImage: (asset: UploadImageAsset) => void;
   moveImage: (id: string, x: number, y: number) => void;
+  currentImageCount: number;
+  maxImageCount: number;
+  onDeleteImage: (id: string) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;

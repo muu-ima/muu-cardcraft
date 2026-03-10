@@ -4,21 +4,32 @@
 import { useRef, useState } from "react";
 import PanelSection from "@/app/components/panels/PanelSection";
 import clsx from "clsx";
+import type { CardImage } from "@/shared/images";
 import {
   uploadImage,
   type UploadImageAsset,
 } from "@/hooks/card/useUploadImage";
 
 type Props = {
-  code: string; // ✅ 名刺コード（アップロードに必須）
-  onUploaded?: (asset: UploadImageAsset) => void; // ✅ アップロード後、親がblock追加するため
+  code: string;
+  onUploaded?: (asset: UploadImageAsset) => void;
+  images: CardImage[];
+  currentCount: number;
+  maxCount: number;
+  onDeleteImage: (id: string) => void;
 };
 
-export default function ImagePanel({ code, onUploaded }: Props) {
+export default function ImagePanel({
+  code,
+  onUploaded,
+  images = [],
+  currentCount = 0,
+  maxCount = 3,
+  onDeleteImage,
+}: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastAsset, setLastAsset] = useState<UploadImageAsset | null>(null);
 
   const pickFile = () => inputRef.current?.click();
 
@@ -27,12 +38,16 @@ export default function ImagePanel({ code, onUploaded }: Props) {
     e.target.value = ""; // 同じファイル再選択できるようにする
     if (!file) return;
 
+    if (currentCount >= maxCount) {
+      setError("画像は最大3枚までです");
+      return;
+    }
+
     setError(null);
     setIsUploading(true);
 
     try {
       const asset = await uploadImage(code, file);
-      setLastAsset(asset);
       onUploaded?.(asset);
     } catch (err: any) {
       setError(err?.message ?? "upload_failed");
@@ -52,6 +67,10 @@ export default function ImagePanel({ code, onUploaded }: Props) {
             className="hidden"
             onChange={onChangeFile}
           />
+
+          <div className="text-xs text-zinc-500">
+            {currentCount} / {maxCount} 枚
+          </div>
 
           <button
             type="button"
@@ -78,23 +97,42 @@ export default function ImagePanel({ code, onUploaded }: Props) {
         </div>
       </PanelSection>
 
-      <PanelSection title="プレビュー">
-        {lastAsset ? (
-          <div className="space-y-2">
-            <div className="rounded-2xl bg-black/5 p-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={lastAsset.signedUrl}
-                alt={lastAsset.originalName ?? "uploaded"}
-                className="h-auto w-full rounded-xl object-contain"
-              />
-            </div>
-            <div className="text-xs text-black/60 break-all">
-              assetId: {lastAsset.id}
-            </div>
-          </div>
-        ) : (
+      <PanelSection title="画像一覧">
+        {images.length === 0 ? (
           <div className="text-sm text-black/40">まだ画像はありません</div>
+        ) : (
+          <div className="space-y-3">
+            {images.map((img) => (
+              <div
+                key={img.id}
+                className="flex items-center gap-3 rounded-2xl bg-black/5 p-2"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={img.url}
+                  alt={img.assetId ?? "uploaded"}
+                  className="h-16 w-16 rounded-xl object-cover"
+                />
+
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-xs text-black/70">
+                    assetId: {img.assetId}
+                  </div>
+                  <div className="text-xs text-black/40">
+                    {Math.round(img.w)} × {Math.round(img.h)}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onDeleteImage(img.id)}
+                  className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-700 hover:bg-red-500/15"
+                >
+                  削除
+                </button>
+              </div>
+            ))}
+          </div>
         )}
       </PanelSection>
     </div>

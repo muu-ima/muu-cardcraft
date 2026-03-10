@@ -5,6 +5,7 @@ import type { Block } from "@/shared/blocks";
 import type { TabKey } from "@/shared/editor";
 import type { DesignKey } from "@/shared/design";
 import type { FontKey } from "@/shared/fonts";
+import type { CardImage } from "@/shared/images";
 import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
 
 import TextPanel from "@/app/components/panels/TextPanel";
@@ -27,6 +28,10 @@ type Props = {
   side: Side;
   onChangeSide: (side: Side) => void;
   onUploadedImage: (asset: UploadImageAsset) => void;
+  images: CardImage[];
+  currentImageCount: number;
+  maxImageCount: number;
+  onDeleteImage: (id: string) => void;
   blocks: Block[];
   isPreview: boolean;
   onChangeText: (id: string, value: string) => void;
@@ -37,7 +42,6 @@ type Props = {
   onPreviewColor: (id: string, color: string) => void;
   design: DesignKey;
   onChangeDesign: (design: DesignKey) => void;
-
   fontFamily: string;
   onDownload: (
     format: "png" | "jpeg",
@@ -64,6 +68,10 @@ export default function ToolPanel({
   onCommitText,
   onBumpFontSize,
   onUploadedImage,
+  images,
+  currentImageCount,
+  maxImageCount,
+  onDeleteImage,
   design,
   onChangeDesign,
   onDownload,
@@ -167,8 +175,12 @@ export default function ToolPanel({
           <ImagePanel
             code={code}
             onUploaded={(asset) => {
-              onUploadedImage(asset); // ✅ ここでは触らない
+              onUploadedImage(asset);
             }}
+            images={images}
+            currentCount={currentImageCount}
+            maxCount={maxImageCount}
+            onDeleteImage={onDeleteImage}
           />
         )}
         {activeTab === "export" && (
