@@ -6,7 +6,7 @@ import CanvasArea from "@/app/components/editor/CanvasArea";
 import CenterToolbar from "@/app/components/editor/CenterToolbar";
 import EditorCanvas from "@/app/components/editor/EditorCanvas";
 import ToolPanel from "@/app/components/ToolPanel";
-import type { CardEditorDesktopProps } from "./CardEditor.types";
+import type { CardEditorDesktopProps } from "./CardEditorDesktop.types";
 import clsx from "clsx"; // 使ってなかったら追加（なくても三項演算子で書ける）
 
 export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {

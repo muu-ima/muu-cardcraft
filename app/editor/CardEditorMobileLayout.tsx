@@ -8,7 +8,7 @@ import CanvasArea from "@/app/components/editor/CanvasArea";
 import CenterToolbar from "@/app/components/editor/CenterToolbar";
 import EditorCanvas from "@/app/components/editor/EditorCanvas";
 import ToolPanel from "@/app/components/ToolPanel";
-import type { CardEditorMobileProps } from "./CardEditor.types";
+import type { CardEditorMobileProps } from "./CardEditorMobile.types";
 
 export function CardEditorMobileLayout(props: CardEditorMobileProps) {
   const {
