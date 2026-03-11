@@ -5,9 +5,12 @@ import type { Block } from "@/shared/blocks";
 import type { TabKey } from "@/shared/editor";
 import type { DesignKey } from "@/shared/design";
 import type { FontKey } from "@/shared/fonts";
+import type { CardImage } from "@/shared/images";
+import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
 
 import TextPanel from "@/app/components/panels/TextPanel";
 import FontPanel from "@/app/components/panels/FontPanel";
+import ImagePanel from "@/app/components/panels/ImagePanel";
 import DesignPanel from "@/app/components/panels/DesignPanel";
 import ExportPanel from "@/app/components/panels/ExportPanel";
 import type { FontSizeDelta } from "@/shared/fonts";
@@ -21,10 +24,14 @@ type Props = {
   activeBlockId: string;
   onAddBlock: () => void;
   variant?: "desktop" | "sheet";
-
+  code: string;
   side: Side;
   onChangeSide: (side: Side) => void;
-
+  onUploadedImage: (asset: UploadImageAsset) => void;
+  images: CardImage[];
+  currentImageCount: number;
+  maxImageCount: number;
+  onDeleteImage: (id: string) => void;
   blocks: Block[];
   isPreview: boolean;
   onChangeText: (id: string, value: string) => void;
@@ -35,7 +42,6 @@ type Props = {
   onPreviewColor: (id: string, color: string) => void;
   design: DesignKey;
   onChangeDesign: (design: DesignKey) => void;
-
   fontFamily: string;
   onDownload: (
     format: "png" | "jpeg",
@@ -49,6 +55,7 @@ type Props = {
 export default function ToolPanel({
   open,
   onClose,
+  code,
   activeTab,
   activeBlockId,
   side,
@@ -60,6 +67,11 @@ export default function ToolPanel({
   onChangeFont,
   onCommitText,
   onBumpFontSize,
+  onUploadedImage,
+  images,
+  currentImageCount,
+  maxImageCount,
+  onDeleteImage,
   design,
   onChangeDesign,
   onDownload,
@@ -158,6 +170,18 @@ export default function ToolPanel({
         )}
         {activeTab === "design" && (
           <DesignPanel design={design} onChangeDesign={onChangeDesign} />
+        )}
+        {activeTab === "image" && (
+          <ImagePanel
+            code={code}
+            onUploaded={(asset) => {
+              onUploadedImage(asset);
+            }}
+            images={images}
+            currentCount={currentImageCount}
+            maxCount={maxImageCount}
+            onDeleteImage={onDeleteImage}
+          />
         )}
         {activeTab === "export" && (
           <ExportPanel design={design} onDownload={onDownload} />

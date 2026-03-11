@@ -5,6 +5,7 @@ import {
   Type,
   TextCursor,
   Image as ImageIcon,
+  ImagePlus,
   Download,
   Undo2,
   Redo2,
@@ -27,6 +28,7 @@ const tools: { key: TabKey; label: string; Icon: React.ElementType }[] = [
   { key: "text", label: "文字", Icon: Type },
   { key: "font", label: "フォント", Icon: TextCursor },
   { key: "design", label: "背景", Icon: ImageIcon },
+  { key: "image", label: "画像", Icon: ImagePlus },
   { key: "export", label: "書き出し", Icon: Download },
 ];
 

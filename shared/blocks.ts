@@ -4,7 +4,7 @@ import type { FontKey } from "@/shared/fonts";
 
 export type Block = {
   id: string;
-  type: "text"; 
+  type: "text";
   text: string;
   x: number;
   y: number;
@@ -30,7 +30,7 @@ export const INITIAL_BLOCKS: Block[] = [
     fontWeight: "bold",
     fontKey: "serif",
     side: "front",
-    color: "#111827", 
+    color: "#111827",
   },
   {
     id: "title",
@@ -43,8 +43,6 @@ export const INITIAL_BLOCKS: Block[] = [
     fontKey: "sans",
     width: 140,
     side: "front",
-    color: "#111827", 
+    color: "#111827",
   },
-
-
 ];

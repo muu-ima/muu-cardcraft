@@ -11,6 +11,8 @@ import type { DesignKey } from "@/shared/design";
 import type { Block } from "@/shared/blocks";
 import type { FontKey, FontSizeDelta } from "@/shared/fonts";
 import type { SnapGuide } from "@/hooks/card/useSnap";
+import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
+import type { CardImage } from "@/shared/images";
 
 // CenterToolbar 内で宣言している align と同じにしておく
 export type Align = "left" | "center" | "right";
@@ -41,6 +43,9 @@ export type EditorActionsForLayout = {
 export type SheetSnap = "collapsed" | "half" | "full";
 
 export type CardEditorMobileProps = {
+  // 画像アップロード
+  code: string;
+
   // ---- 状態 & アクション
   state: EditorStateForLayout;
   actions: EditorActionsForLayout;
@@ -60,6 +65,11 @@ export type CardEditorMobileProps = {
 
   // ---- blocks / デザイン
   getBlocksFor: (side: Side) => Block[];
+  getImagesFor: (side: "front" | "back") => CardImage[];
+  moveImage: (id: string, x: number, y: number) => void;
+  currentImageCount: number;
+  maxImageCount: number;
+  onDeleteImage: (id: string) => void;
   editableBlocks: Block[];
   addBlock: () => void;
   onChangeText: (id: string, value: string) => void;
@@ -71,6 +81,7 @@ export type CardEditorMobileProps = {
   onChangeWidth?: (id: string, width: number) => void;
   setTextColor: (id: string, color: string) => void;
   previewTextColor: (id: string, color: string) => void;
+  onUploadedImage: (asset: UploadImageAsset) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;
@@ -103,6 +114,8 @@ export type CardEditorMobileProps = {
 };
 
 export type CardEditorDesktopProps = {
+  // 画像アップロード
+  code: string;
   // ---- 状態 & アクション
   state: EditorStateForLayout;
   actions: EditorActionsForLayout;
@@ -116,6 +129,7 @@ export type CardEditorDesktopProps = {
 
   // ---- blocks / デザイン
   getBlocksFor: (side: Side) => Block[];
+  getImagesFor: (side: "front" | "back") => CardImage[];
   editableBlocks: Block[];
   addBlock: () => void;
   onChangeText: (id: string, value: string) => void;
@@ -126,6 +140,11 @@ export type CardEditorDesktopProps = {
   setDesign: (d: DesignKey) => void;
   setTextColor: (id: string, color: string) => void;
   previewTextColor: (id: string, color: string) => void;
+  onUploadedImage: (asset: UploadImageAsset) => void;
+  moveImage: (id: string, x: number, y: number) => void;
+  currentImageCount: number;
+  maxImageCount: number;
+  onDeleteImage: (id: string) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;

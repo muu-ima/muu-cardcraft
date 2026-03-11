@@ -8,6 +8,8 @@ import InlineTextEditor from "@/app/components/editor/InlineTextEditor";
 
 import { useScaleToFit } from "@/hooks/useScaleToFit";
 import { useCardBlocks } from "@/hooks/useCardBlocks";
+import { useCardImages } from "@/hooks/card/useCardImages";
+import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
 import { useEditorLayout } from "@/hooks/useEditorLayout";
 import { useCardEditorState } from "@/hooks/useCardEditorState";
 import { type DesignKey } from "@/shared/design";
@@ -24,9 +26,13 @@ import type {
 
 type Side = "front" | "back";
 
+type Props = {
+  code: string;
+};
+
 type EditingState = { id: string; initialText: string } | null;
 
-export default function CardEditor() {
+export default function CardEditor({ code }: Props) {
   // =========================
   // 🧠 1. コア状態 & ロジック
   // =========================
@@ -73,6 +79,34 @@ export default function CardEditor() {
     previewTextColor,
   } = useCardBlocks();
 
+  const {
+    images,
+    addFromUpload,
+    getImagesFor,
+    moveImage,
+    removeImage,
+    countImagesFor,
+    maxImagesPerSide,
+  } = useCardImages();
+
+  // ✅ ImagePanel から来た upload 結果を、画像ステートに反映する
+  const onUploadedImage = (asset: UploadImageAsset) => {
+    console.log("[onUploadedImage] asset", asset);
+    console.log("[onUploadedImage] side before add", state.side);
+
+    const result = addFromUpload({
+      assetId: asset.id,
+      url: asset.signedUrl,
+      side: state.side,
+    });
+
+    if (!result.ok) {
+      console.warn("この面には画像を最大3枚まで追加できます");
+      return;
+    }
+
+    console.log("[onUploadedImage] added", result.image);
+  };
   const editor = useCardEditorState({
     editableBlocks,
     design,
@@ -234,6 +268,7 @@ export default function CardEditor() {
 
   // ③ Mobile レイアウトに渡す全部入り props
   const mobileProps: CardEditorMobileProps = {
+    code,
     // ---- 状態 & アクション
     state: layoutState,
     actions: layoutActions,
@@ -253,6 +288,7 @@ export default function CardEditor() {
 
     // ---- blocks / デザイン
     getBlocksFor,
+    getImagesFor,
     editableBlocks,
     addBlock,
     onChangeText,
@@ -264,6 +300,12 @@ export default function CardEditor() {
     onChangeWidth: handleChangeBlockWidth,
     setTextColor,
     previewTextColor,
+    onUploadedImage,
+    moveImage,
+
+    currentImageCount: countImagesFor(state.side),
+    maxImageCount: maxImagesPerSide,
+    onDeleteImage: removeImage,
 
     // ---- export
     exportRef,
@@ -290,6 +332,10 @@ export default function CardEditor() {
     redo,
   };
 
+  console.log("[CardEditor] side", state.side);
+  console.log("[CardEditor] images", images);
+  console.log("[CardEditor] filtered", getImagesFor(state.side));
+
   // =========================
   // 🎨 2. レイアウト描画
   // =========================
@@ -311,12 +357,19 @@ export default function CardEditor() {
         <CardEditorDesktopLayout
           state={state}
           actions={layoutActions}
+          code={code}
           openTab={openTab}
+          onUploadedImage={onUploadedImage}
+          currentImageCount={countImagesFor(state.side)}
+          maxImageCount={maxImagesPerSide}
+          onDeleteImage={removeImage}
           canvasAreaRef={canvasAreaRef}
           centerWrapRef={centerWrapRef}
           scaleWrapRefDesktop={scaleWrapRefDesktop}
           scaleDesktop={scaleDesktop}
           getBlocksFor={getBlocksFor}
+          getImagesFor={getImagesFor}
+          moveImage={moveImage}
           editableBlocks={editableBlocks}
           addBlock={addBlock}
           onChangeText={onChangeText}
@@ -368,6 +421,8 @@ export default function CardEditor() {
             >
               <CardSurface
                 blocks={getBlocksFor(state.side)}
+                images={getImagesFor(state.side)}
+                onMoveImage={moveImage}
                 design={design}
                 w={CARD_BASE_W}
                 h={CARD_BASE_H}
@@ -385,6 +440,7 @@ export default function CardEditor() {
       <ExportSurface
         ref={exportRef}
         blocks={getBlocksFor(state.side)}
+        images={getImagesFor(state.side)}
         design={design}
       />
       {editing && (

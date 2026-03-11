@@ -12,6 +12,7 @@ import type { CardEditorMobileProps } from "./CardEditor.types";
 
 export function CardEditorMobileLayout(props: CardEditorMobileProps) {
   const {
+    code,
     state,
     actions,
     sheetTitle,
@@ -23,6 +24,11 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     centerWrapRef,
     scaleWrapRefMobile,
     scaleMobile,
+    getImagesFor,
+    currentImageCount,
+    maxImageCount,
+    onDeleteImage,
+    moveImage,
     getBlocksFor,
     addBlock,
     onChangeText,
@@ -49,6 +55,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     redo,
     onChangeWidth,
     setTextColor,
+    onUploadedImage,
   } = props;
 
   const blocksForSide = getBlocksFor(state.side);
@@ -80,6 +87,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
         title={sheetTitle}
       >
         <ToolPanel
+          code={code}
           variant="sheet"
           open={sheetSnap !== "collapsed"}
           onClose={closeSheet}
@@ -95,6 +103,10 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
           onChangeFont={updateFont}
           onBumpFontSize={bumpFontSize}
           onChangeWidth={onChangeWidth}
+          images={getImagesFor(state.side)}
+          currentImageCount={currentImageCount}
+          maxImageCount={maxImageCount}
+          onDeleteImage={onDeleteImage}
           design={design}
           onChangeDesign={setDesign}
           onPreviewColor={props.previewTextColor}
@@ -105,6 +117,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
           }}
           onDeleteBlock={handleDeleteBlock}
           onChangeColor={setTextColor}
+          onUploadedImage={onUploadedImage}
         />
       </BottomSheet>
 
@@ -135,6 +148,8 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
               <div ref={scaleWrapRefMobile} className="w-full min-w-0 px-3">
                 <EditorCanvas
                   blocks={getBlocksFor(state.side)}
+                  images={getImagesFor(state.side)}
+                  moveImage={moveImage}
                   design={design}
                   scale={scaleMobile}
                   isPreview={state.isPreview}
