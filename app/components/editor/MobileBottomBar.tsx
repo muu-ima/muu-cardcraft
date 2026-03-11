@@ -7,6 +7,7 @@ import {
   Type,
   TextCursor,
   Image as ImageIcon,
+  ImagePlus,
   Download,
 } from "lucide-react";
 
@@ -76,7 +77,7 @@ export default function MobileBottomBar({
               activeTab={activeTab}
               onChangeTab={onChangeTab}
             />
-           
+
             <MobileBottomBarItem
               tab="font"
               label="フォント"
@@ -88,6 +89,13 @@ export default function MobileBottomBar({
               tab="design"
               label="デザイン"
               Icon={ImageIcon}
+              activeTab={activeTab}
+              onChangeTab={onChangeTab}
+            />
+            <MobileBottomBarItem
+              tab="image"
+              label="画像"
+              Icon={ImagePlus}
               activeTab={activeTab}
               onChangeTab={onChangeTab}
             />
