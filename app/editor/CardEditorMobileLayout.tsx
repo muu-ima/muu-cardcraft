@@ -25,6 +25,9 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     scaleWrapRefMobile,
     scaleMobile,
     getImagesFor,
+    currentImageCount,
+    maxImageCount,
+    onDeleteImage,
     moveImage,
     getBlocksFor,
     addBlock,
@@ -100,6 +103,10 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
           onChangeFont={updateFont}
           onBumpFontSize={bumpFontSize}
           onChangeWidth={onChangeWidth}
+          images={getImagesFor(state.side)}
+          currentImageCount={currentImageCount}
+          maxImageCount={maxImageCount}
+          onDeleteImage={onDeleteImage}
           design={design}
           onChangeDesign={setDesign}
           onPreviewColor={props.previewTextColor}
