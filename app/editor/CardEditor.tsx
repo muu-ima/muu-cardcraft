@@ -19,12 +19,13 @@ import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
 import { CardEditorMobileLayout } from "@/app/editor/CardEditorMobileLayout";
 import { CardEditorDesktopLayout } from "@/app/editor/CardEditorDesktopLayout";
 import type {
-  CardEditorMobileProps,
   EditorStateForLayout,
   EditorActionsForLayout,
+  SheetSnap,
+  Side,
 } from "./CardEditor.types";
-
-type Side = "front" | "back";
+import type { CardEditorDesktopProps } from "./CardEditorDesktop.types";
+import type { CardEditorMobileProps } from "./CardEditorMobile.types";
 
 type Props = {
   code: string;
@@ -126,9 +127,6 @@ export default function CardEditor({ code }: Props) {
     activeTab: state.activeTab,
     isPreview: state.isPreview,
   });
-
-  // 追加（CardEditor 内）
-  type SheetSnap = "collapsed" | "half" | "full";
 
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("collapsed");
 
@@ -241,7 +239,7 @@ export default function CardEditor({ code }: Props) {
   const centerToolbarValue = selectors.centerToolbarValue;
 
   // =========================
-  // 📦  レイアウト用に詰め替え
+  // 📦 Layout Props
   // =========================
 
   // ① レイアウト用 state
@@ -266,7 +264,53 @@ export default function CardEditor({ code }: Props) {
     removeBlock,
   };
 
-  // ③ Mobile レイアウトに渡す全部入り props
+  // ③ Desktop レイアウトに渡す全部入り props
+  const desktopProps: CardEditorDesktopProps = {
+    code,
+    state: layoutState,
+    actions: layoutActions,
+    openTab,
+    canvasAreaRef,
+    centerWrapRef,
+    scaleWrapRefDesktop,
+    scaleDesktop,
+    getBlocksFor,
+    getImagesFor,
+    moveImage,
+    editableBlocks,
+    addBlock,
+    onChangeText,
+    onCommitText,
+    updateFont,
+    bumpFontSize,
+    design,
+    setDesign,
+    exportRef,
+    downloadImage,
+    currentImageCount: countImagesFor(state.side),
+    maxImageCount: maxImagesPerSide,
+    onDeleteImage: removeImage,
+    onUploadedImage,
+    onAnyPointerDownCapture,
+    centerToolbarValue,
+    centerVisible,
+    handleBlockPointerDown,
+    startEditing,
+    editingBlockId,
+    editingText,
+    setEditingText,
+    stopEditing,
+    snapGuide,
+    cardRef,
+    blockRefs,
+    undo,
+    redo,
+    onChangeWidth: handleChangeBlockWidth,
+    setTextColor,
+    previewTextColor,
+  };
+
+  // ④ Mobile レイアウトに渡す全部入り props
   const mobileProps: CardEditorMobileProps = {
     code,
     // ---- 状態 & アクション
@@ -354,50 +398,7 @@ export default function CardEditor({ code }: Props) {
 
       {/* ---------- Desktop / Tablet (>=768px) ---------- */}
       <div className="hidden md:block">
-        <CardEditorDesktopLayout
-          state={state}
-          actions={layoutActions}
-          code={code}
-          openTab={openTab}
-          onUploadedImage={onUploadedImage}
-          currentImageCount={countImagesFor(state.side)}
-          maxImageCount={maxImagesPerSide}
-          onDeleteImage={removeImage}
-          canvasAreaRef={canvasAreaRef}
-          centerWrapRef={centerWrapRef}
-          scaleWrapRefDesktop={scaleWrapRefDesktop}
-          scaleDesktop={scaleDesktop}
-          getBlocksFor={getBlocksFor}
-          getImagesFor={getImagesFor}
-          moveImage={moveImage}
-          editableBlocks={editableBlocks}
-          addBlock={addBlock}
-          onChangeText={onChangeText}
-          onCommitText={onCommitText}
-          updateFont={updateFont}
-          bumpFontSize={bumpFontSize}
-          onChangeWidth={handleChangeBlockWidth}
-          design={design}
-          setDesign={setDesign}
-          exportRef={exportRef}
-          downloadImage={downloadImage}
-          onAnyPointerDownCapture={onAnyPointerDownCapture}
-          centerToolbarValue={centerToolbarValue}
-          centerVisible={centerVisible}
-          handleBlockPointerDown={handleBlockPointerDown}
-          startEditing={startEditing}
-          editingBlockId={editingBlockId}
-          editingText={editingText}
-          setEditingText={setEditingText}
-          stopEditing={stopEditing}
-          cardRef={cardRef}
-          blockRefs={blockRefs}
-          undo={undo}
-          redo={redo}
-          setTextColor={setTextColor}
-          previewTextColor={previewTextColor}
-          snapGuide={snapGuide}
-        />
+        <CardEditorDesktopLayout {...desktopProps} />
       </div>
       {/* ---------- Preview / Export / Inline Editor ---------- */}
       {/* ここは「出力モデル」担当 */}

@@ -1,86 +1,25 @@
 // @/app/components/ToolPanel.tsx
 "use client";
 
-import type { Block } from "@/shared/blocks";
-import type { TabKey } from "@/shared/editor";
-import type { DesignKey } from "@/shared/design";
-import type { FontKey } from "@/shared/fonts";
-import type { CardImage } from "@/shared/images";
-import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
-
 import TextPanel from "@/app/components/panels/TextPanel";
 import FontPanel from "@/app/components/panels/FontPanel";
 import ImagePanel from "@/app/components/panels/ImagePanel";
 import DesignPanel from "@/app/components/panels/DesignPanel";
 import ExportPanel from "@/app/components/panels/ExportPanel";
-import type { FontSizeDelta } from "@/shared/fonts";
-
-type Side = "front" | "back";
-
-type Props = {
-  open: boolean;
-  onClose: () => void;
-  activeTab: TabKey | null;
-  activeBlockId: string;
-  onAddBlock: () => void;
-  variant?: "desktop" | "sheet";
-  code: string;
-  side: Side;
-  onChangeSide: (side: Side) => void;
-  onUploadedImage: (asset: UploadImageAsset) => void;
-  images: CardImage[];
-  currentImageCount: number;
-  maxImageCount: number;
-  onDeleteImage: (id: string) => void;
-  blocks: Block[];
-  isPreview: boolean;
-  onChangeText: (id: string, value: string) => void;
-  onCommitText: (id: string, value: string) => void;
-  onBumpFontSize?: (id: string, delta: FontSizeDelta) => void;
-  onChangeFont: (id: string, fontKey: FontKey) => void;
-  onChangeColor: (id: string, color: string) => void;
-  onPreviewColor: (id: string, color: string) => void;
-  design: DesignKey;
-  onChangeDesign: (design: DesignKey) => void;
-  fontFamily: string;
-  onDownload: (
-    format: "png" | "jpeg",
-    design: DesignKey,
-    options?: { quality?: number; pixelRatio?: number; fontFamily?: string },
-  ) => void;
-  onChangeWidth?: (id: string, width: number) => void;
-  onDeleteBlock?: (id: string) => void;
-};
+import type { ToolPanelProps } from "@/shared/toolPanel";
 
 export default function ToolPanel({
   open,
   onClose,
-  code,
+
   activeTab,
-  activeBlockId,
-  side,
-  onChangeSide,
-  blocks,
-  onAddBlock,
-  isPreview,
-  onChangeText,
-  onChangeFont,
-  onCommitText,
-  onBumpFontSize,
-  onUploadedImage,
-  images,
-  currentImageCount,
-  maxImageCount,
-  onDeleteImage,
-  design,
-  onChangeDesign,
-  onDownload,
   variant = "desktop",
-  onChangeWidth,
-  onDeleteBlock,
-  onChangeColor,
-  onPreviewColor,
-}: Props) {
+  textPanel,
+  fontPanel,
+  imagePanel,
+  designPanel,
+  exportPanel,
+}: ToolPanelProps) {
   // ✅ open と activeTab を一致させる（事故防止）
   if (!open || !activeTab) return null;
 
@@ -143,48 +82,48 @@ export default function ToolPanel({
           variant === "desktop" ? "h-[calc(100%-41px)]" : "h-full",
         ].join(" ")}
       >
-        {" "}
         {activeTab === "text" && (
           <TextPanel
-            side={side}
-            onChangeSide={onChangeSide}
-            blocks={blocks}
-            onAddBlock={onAddBlock}
-            isPreview={isPreview}
-            onChangeText={onChangeText}
-            onCommitText={onCommitText}
-            onBumpFontSize={onBumpFontSize}
-            onChangeWidth={onChangeWidth}
-            activeBlockId={activeBlockId}
-            onDeleteBlock={onDeleteBlock}
+            side={textPanel.side}
+            onChangeSide={textPanel.onChangeSide}
+            blocks={textPanel.blocks}
+            onAddBlock={textPanel.onAddBlock}
+            isPreview={textPanel.isPreview}
+            onChangeText={textPanel.onChangeText}
+            onCommitText={textPanel.onCommitText}
+            onBumpFontSize={textPanel.onBumpFontSize}
+            onChangeWidth={textPanel.onChangeWidth}
+            activeBlockId={textPanel.activeBlockId}
+            onDeleteBlock={textPanel.onDeleteBlock}
           />
         )}
         {activeTab === "font" && (
           <FontPanel
-            blocks={blocks}
-            activeBlockId={activeBlockId}
-            onChangeFont={onChangeFont}
-            onChangeColor={onChangeColor}
-            onPreviewColor={onPreviewColor}
+            blocks={fontPanel.blocks}
+            activeBlockId={fontPanel.activeBlockId}
+            onChangeFont={fontPanel.onChangeFont}
+            onChangeColor={fontPanel.onChangeColor}
+            onPreviewColor={fontPanel.onPreviewColor}
           />
         )}
         {activeTab === "design" && (
-          <DesignPanel design={design} onChangeDesign={onChangeDesign} />
+          <DesignPanel
+            design={designPanel.design}
+            onChangeDesign={designPanel.onChangeDesign}
+          />
         )}
         {activeTab === "image" && (
           <ImagePanel
-            code={code}
-            onUploaded={(asset) => {
-              onUploadedImage(asset);
-            }}
-            images={images}
-            currentCount={currentImageCount}
-            maxCount={maxImageCount}
-            onDeleteImage={onDeleteImage}
+            code={imagePanel.code}
+            onUploaded={imagePanel.onUploadedImage}
+            images={imagePanel.images}
+            currentCount={imagePanel.currentImageCount}
+            maxCount={imagePanel.maxImageCount}
+            onDeleteImage={imagePanel.onDeleteImage}
           />
         )}
         {activeTab === "export" && (
-          <ExportPanel design={design} onDownload={onDownload} />
+          <ExportPanel onDownload={exportPanel.onDownload} />
         )}
       </div>
     </aside>
