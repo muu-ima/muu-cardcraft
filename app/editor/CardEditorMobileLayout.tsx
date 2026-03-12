@@ -30,15 +30,17 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     onDeleteImage,
     moveImage,
     getBlocksFor,
-    addBlock,
+    addBlock: onAddBlock,
     onChangeText,
     onCommitText,
-    updateFont,
-    bumpFontSize,
+    updateFont: onChangeFont,
+    bumpFontSize: onBumpFontSize,
+    previewTextColor: onPreviewColor,
+    setTextColor: onChangeColor,
     design,
-    setDesign,
+    setDesign: onChangeDesign,
     exportRef,
-    downloadImage,
+    downloadImage: onDownload,
     onAnyPointerDownCapture,
     centerToolbarValue,
     centerVisible,
@@ -87,37 +89,49 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
         title={sheetTitle}
       >
         <ToolPanel
-          code={code}
           variant="sheet"
           open={sheetSnap !== "collapsed"}
           onClose={closeSheet}
           activeTab={state.activeTab}
-          activeBlockId={state.activeBlockId}
-          side={state.side}
-          onChangeSide={actions.setSide}
-          blocks={blocksForSide}
-          onAddBlock={addBlock}
-          isPreview={state.isPreview}
-          onChangeText={onChangeText}
-          onCommitText={onCommitText}
-          onChangeFont={updateFont}
-          onBumpFontSize={bumpFontSize}
-          onChangeWidth={onChangeWidth}
-          images={getImagesFor(state.side)}
-          currentImageCount={currentImageCount}
-          maxImageCount={maxImageCount}
-          onDeleteImage={onDeleteImage}
-          design={design}
-          onChangeDesign={setDesign}
-          onPreviewColor={props.previewTextColor}
-          fontFamily="default"
-          onDownload={(format) => {
-            if (!exportRef.current) return;
-            downloadImage(format, exportRef.current);
+          textPanel={{
+            side: state.side,
+            onChangeSide: actions.setSide,
+            blocks: blocksForSide,
+            activeBlockId: state.activeBlockId,
+            onAddBlock,
+            isPreview: state.isPreview,
+            onChangeText,
+            onCommitText,
+            onBumpFontSize,
+            onChangeWidth,
+            onDeleteBlock: handleDeleteBlock,
           }}
-          onDeleteBlock={handleDeleteBlock}
-          onChangeColor={setTextColor}
-          onUploadedImage={onUploadedImage}
+          fontPanel={{
+            blocks: blocksForSide,
+            activeBlockId: state.activeBlockId,
+            onChangeFont,
+            onChangeColor,
+            onPreviewColor,
+          }}
+          imagePanel={{
+            code,
+            onUploadedImage,
+            images: getImagesFor(state.side),
+            currentImageCount,
+            maxImageCount,
+            onDeleteImage,
+          }}
+          designPanel={{
+            design,
+            onChangeDesign,
+          }}
+          exportPanel={{
+            onDownload: (format: "png" | "jpeg") => {
+              const target = exportRef.current;
+              if (!target) return;
+              onDownload(format, target);
+            },
+          }}
         />
       </BottomSheet>
 

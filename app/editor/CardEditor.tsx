@@ -21,6 +21,7 @@ import { CardEditorDesktopLayout } from "@/app/editor/CardEditorDesktopLayout";
 import type {
   EditorStateForLayout,
   EditorActionsForLayout,
+  SheetSnap,
   Side,
 } from "./CardEditor.types";
 import type { CardEditorDesktopProps } from "./CardEditorDesktop.types";
@@ -126,9 +127,6 @@ export default function CardEditor({ code }: Props) {
     activeTab: state.activeTab,
     isPreview: state.isPreview,
   });
-
-  // 追加（CardEditor 内）
-  type SheetSnap = "collapsed" | "half" | "full";
 
   const [sheetSnap, setSheetSnap] = useState<SheetSnap>("collapsed");
 

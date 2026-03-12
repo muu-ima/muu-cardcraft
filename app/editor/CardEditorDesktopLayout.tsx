@@ -22,17 +22,17 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     getBlocksFor,
     getImagesFor,
     moveImage,
-    addBlock,
+    addBlock: onAddBlock,
     onUploadedImage,
     onChangeText,
     onCommitText,
-    previewTextColor,
-    updateFont,
-    bumpFontSize,
+    previewTextColor: onPreviewColor,
+    updateFont: onChangeFont,
+    bumpFontSize: onBumpFontSize,
     design,
-    setDesign,
+    setDesign: onChangeDesign,
     exportRef,
-    downloadImage,
+    downloadImage: onDownload,
     currentImageCount,
     maxImageCount,
     onDeleteImage,
@@ -51,16 +51,15 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     undo,
     redo,
     onChangeWidth,
-    setTextColor,
+    setTextColor: onChangeColor,
   } = props;
 
   const isPanelOpen = state.activeTab !== null;
 
   const blocksForSide = getBlocksFor(state.side);
 
-  // 削除ハンドラ
   const handleDeleteBlock = (id: string) => {
-    actions.removeBlock(id); // ← 実際に持ってる削除アクション名に合わせて
+    actions.removeBlock(id);
   };
 
   return (
@@ -95,37 +94,49 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
           )}
         >
           <ToolPanel
-            code={code}
             variant="desktop"
             open={isPanelOpen}
             onClose={() => actions.setActiveTab(null)}
             activeTab={state.activeTab}
-            activeBlockId={state.activeBlockId}
-            side={state.side}
-            isPreview={state.isPreview}
-            onChangeSide={actions.setSide}
-            onUploadedImage={onUploadedImage}
-            images={getImagesFor(state.side)}
-            currentImageCount={currentImageCount}
-            maxImageCount={maxImageCount}
-            onDeleteImage={onDeleteImage}
-            blocks={getBlocksFor(state.side)}
-            onAddBlock={addBlock}
-            onChangeText={onChangeText}
-            onCommitText={onCommitText}
-            onBumpFontSize={bumpFontSize}
-            onChangeFont={updateFont}
-            onPreviewColor={previewTextColor}
-            design={design}
-            onChangeDesign={setDesign}
-            fontFamily="default"
-            onChangeWidth={onChangeWidth}
-            onDownload={(format) => {
-              if (!exportRef.current) return;
-              downloadImage(format, exportRef.current);
+            textPanel={{
+              side: state.side,
+              onChangeSide: actions.setSide,
+              blocks: blocksForSide,
+              activeBlockId: state.activeBlockId,
+              onAddBlock,
+              isPreview: state.isPreview,
+              onChangeText,
+              onCommitText,
+              onBumpFontSize,
+              onChangeWidth,
+              onDeleteBlock: handleDeleteBlock,
             }}
-            onDeleteBlock={handleDeleteBlock}
-            onChangeColor={setTextColor}
+            fontPanel={{
+              blocks: blocksForSide,
+              activeBlockId: state.activeBlockId,
+              onChangeFont,
+              onChangeColor,
+              onPreviewColor,
+            }}
+            imagePanel={{
+              code,
+              onUploadedImage,
+              images: getImagesFor(state.side),
+              currentImageCount,
+              maxImageCount,
+              onDeleteImage,
+            }}
+            designPanel={{
+              design,
+              onChangeDesign,
+            }}
+            exportPanel={{
+              onDownload: (format: "png" | "jpeg") => {
+                const target = exportRef.current;
+                if (!target) return;
+                onDownload(format, target);
+              },
+            }}
           />
         </aside>
       )}
