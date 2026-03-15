@@ -1,7 +1,7 @@
 // hooks/card/useCardImages.ts
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CardImage, Side } from "@/shared/images";
 import {
   IMAGE_MIN_W,
@@ -37,6 +37,18 @@ type AddFromUploadArgs = {
 export function useCardImages(initial: CardImage[] = []) {
   const [images, setImages] = useState<CardImage[]>(initial);
 
+  useEffect(() => {
+    console.log(
+      "[useCardImages] images",
+      images.map((img) => ({
+        id: img.id,
+        side: img.side,
+        z: img.z,
+        assetId: img.assetId,
+      })),
+    );
+  }, [images]);
+
   const countImagesFor = useCallback(
     (side: Side) => images.filter((it) => it.side === side).length,
     [images],
@@ -45,6 +57,10 @@ export function useCardImages(initial: CardImage[] = []) {
   const addFromUpload = useCallback(
     (args: AddFromUploadArgs) => {
       const currentCount = images.filter((it) => it.side === args.side).length;
+      const nextZ =
+        images
+          .filter((it) => it.side === args.side)
+          .reduce((max, it) => Math.max(max, it.z ?? 0), 0) + 1;
 
       if (currentCount >= MAX_IMAGES_PER_SIDE) {
         return {
@@ -77,6 +93,7 @@ export function useCardImages(initial: CardImage[] = []) {
         side: args.side,
         x: args.x ?? 80,
         y: args.y ?? 80,
+        z: nextZ,
         w: initialW,
         h: initialH,
         rotate: 0,
@@ -134,6 +151,66 @@ export function useCardImages(initial: CardImage[] = []) {
     [images],
   );
 
+  const bringImageToFront = useCallback((id: string) => {
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id);
+      if (!target) return prev;
+
+      const sameSide = prev
+        .filter((img) => img.side === target.side)
+        .sort((a, b) => (a.z ?? 0) - (b.z ?? 0));
+
+      const others = prev.filter((img) => img.side !== target.side);
+      const withoutTarget = sameSide.filter((img) => img.id !== id);
+      const reordered = [...withoutTarget, target].map((img, index) => ({
+        ...img,
+        z: index + 1,
+      }));
+
+      console.log("[bringImageToFront]", {
+        targetId: id,
+        side: target.side,
+        reordered: reordered.map((img) => ({
+          id: img.id,
+          z: img.z,
+          assetId: img.assetId,
+        })),
+      });
+
+      return [...others, ...reordered];
+    });
+  }, []);
+
+  const sendImageToBack = useCallback((id: string) => {
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id);
+      if (!target) return prev;
+
+      const sameSide = prev
+        .filter((img) => img.side === target.side)
+        .sort((a, b) => (a.z ?? 0) - (b.z ?? 0));
+
+      const others = prev.filter((img) => img.side !== target.side);
+      const withoutTarget = sameSide.filter((img) => img.id !== id);
+      const reordered = [target, ...withoutTarget].map((img, index) => ({
+        ...img,
+        z: index + 1,
+      }));
+
+      console.log("[sendImageToBack]", {
+        targetId: id,
+        side: target.side,
+        reordered: reordered.map((img) => ({
+          id: img.id,
+          z: img.z,
+          assetId: img.assetId,
+        })),
+      });
+
+      return [...others, ...reordered];
+    });
+  }, []);
+
   const api = useMemo(
     () => ({
       images,
@@ -146,6 +223,8 @@ export function useCardImages(initial: CardImage[] = []) {
       clearSide,
       getImagesFor,
       countImagesFor,
+      bringImageToFront,
+      sendImageToBack,
       maxImagesPerSide: MAX_IMAGES_PER_SIDE,
     }),
     [
@@ -158,6 +237,8 @@ export function useCardImages(initial: CardImage[] = []) {
       clearSide,
       getImagesFor,
       countImagesFor,
+      bringImageToFront,
+      sendImageToBack,
     ],
   );
 

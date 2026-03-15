@@ -89,6 +89,10 @@ type UseCardEditorLayoutPropsParams = {
   redo: CardEditorDesktopProps["redo"];
 
   removeBlock: EditorActionsForLayout["removeBlock"];
+  selectedImageId: string | null;
+  setSelectedImageId: (id: string | null) => void;
+  onBringSelectedImageToFront: () => void;
+  onSendSelectedImageToBack: () => void;
 };
 
 export function useCardEditorLayoutProps({
@@ -142,6 +146,10 @@ export function useCardEditorLayoutProps({
   undo,
   redo,
   removeBlock,
+  selectedImageId,
+  setSelectedImageId,
+  onBringSelectedImageToFront,
+  onSendSelectedImageToBack,
 }: UseCardEditorLayoutPropsParams) {
   const layoutState: EditorStateForLayout = {
     activeTab: state.activeTab,
@@ -207,6 +215,10 @@ export function useCardEditorLayoutProps({
     onChangeWidth,
     setTextColor,
     previewTextColor,
+    selectedImageId,
+    onSelectImage: setSelectedImageId,
+    onBringSelectedImageToFront,
+    onSendSelectedImageToBack,
   };
 
   const mobileProps: CardEditorMobileProps = {
@@ -257,6 +269,10 @@ export function useCardEditorLayoutProps({
     snapGuide,
     undo,
     redo,
+    selectedImageId,
+    onSelectImage: setSelectedImageId,
+    onBringSelectedImageToFront,
+    onSendSelectedImageToBack,
   };
 
   return {

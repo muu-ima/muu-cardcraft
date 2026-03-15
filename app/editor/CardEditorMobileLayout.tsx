@@ -59,6 +59,10 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     onChangeWidth,
     setTextColor,
     onUploadedImage,
+    selectedImageId,
+    onSelectImage,
+    onBringSelectedImageToFront,
+    onSendSelectedImageToBack,
   } = props;
 
   const blocksForSide = getBlocksFor(state.side);
@@ -121,6 +125,9 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
             currentImageCount,
             maxImageCount,
             onDeleteImage,
+            selectedImageId,
+            onBringSelectedImageToFront,
+            onSendSelectedImageToBack,
           }}
           designPanel={{
             design,
@@ -190,6 +197,8 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                   snapGuide={snapGuide}
                   cardRef={cardRef}
                   blockRefs={blockRefs}
+                  selectedImageId={selectedImageId}
+                  onSelectImage={onSelectImage}
                 />
               </div>
             </div>

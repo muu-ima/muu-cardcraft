@@ -9,6 +9,7 @@ export type CardImage = {
 
   x: number;
   y: number;
+  z: number;
   w: number;
   h: number;
 

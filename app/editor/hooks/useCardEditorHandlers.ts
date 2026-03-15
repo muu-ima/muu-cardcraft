@@ -5,14 +5,10 @@ import type { Dispatch, RefObject, SetStateAction } from "react";
 
 import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
 import type { TabKey } from "@/shared/editor";
+import type { Block } from "@/shared/blocks";
 import type { SheetSnap, Side } from "../CardEditor.types";
-import type { EditorBlock, TextBlock } from "@/shared/editorBlocks";
 
 type EditingState = { id: string; initialText: string } | null;
-
-function isTextBlock(block: EditorBlock | undefined): block is TextBlock {
-  return !!block && block.type === "text";
-}
 
 type UseCardEditorHandlersParams = {
   state: {
@@ -25,7 +21,7 @@ type UseCardEditorHandlersParams = {
   };
   editing: EditingState;
   setEditing: Dispatch<SetStateAction<EditingState>>;
-  currentBlocks: EditorBlock[];
+  currentBlocks: Block[];
   commitText: (id: string, value: string) => void;
   previewText: (id: string, value: string) => void;
   setBlockWidth: (id: string, width: number) => void;
@@ -41,6 +37,13 @@ type UseCardEditorHandlersParams = {
   setSheetSnap: Dispatch<SetStateAction<SheetSnap>>;
   cardRef: RefObject<HTMLDivElement | null>;
   centerWrapRef: RefObject<HTMLDivElement | null>;
+
+  currentImages: { id: string; side: Side; z: number }[];
+  updateImage: (id: string, patch: { z: number }) => void;
+  updateBlockZ: (id: string, z: number) => void;
+
+  activeBlockId?: string;
+  selectedImageId?: string | null;
 };
 
 export function useCardEditorHandlers({
@@ -57,8 +60,12 @@ export function useCardEditorHandlers({
   setSheetSnap,
   cardRef,
   centerWrapRef,
+  currentImages,
+  updateImage,
+  updateBlockZ,
+  activeBlockId,
+  selectedImageId,
 }: UseCardEditorHandlersParams) {
-  // ✅ ImagePanel から来た upload 結果を、画像ステートに反映する
   const onUploadedImage = (asset: UploadImageAsset) => {
     console.log("[onUploadedImage] asset", asset);
     console.log("[onUploadedImage] side before add", state.side);
@@ -77,7 +84,6 @@ export function useCardEditorHandlers({
     console.log("[onUploadedImage] added", result.image);
   };
 
-  // ✅ “タブを開く”はイベントでやる（useEffectで同期しない）
   const openTab = (tab: TabKey) => {
     actions.onChangeTab(tab);
     setSheetSnap((s) => (s === "collapsed" ? "half" : s));
@@ -91,7 +97,7 @@ export function useCardEditorHandlers({
   const resetEditingState = (mode: "commit" | "cancel" = "commit") => {
     if (editing) {
       const b = currentBlocks.find((x) => x.id === editing.id);
-      if (isTextBlock(b)) {
+      if (b) {
         if (mode === "commit") commitText(editing.id, b.text);
         if (mode === "cancel") previewText(editing.id, editing.initialText);
       }
@@ -108,19 +114,15 @@ export function useCardEditorHandlers({
 
     const target = e.target as Node;
 
-    // ✅ ツールバー上なら無視（=全解除しない）
     if (centerWrapRef.current?.contains(target)) return;
 
-    // ✅ カード外を押した → 全解除
     if (!cardEl.contains(target)) {
       if (editing) {
         const b = currentBlocks.find((x) => x.id === editing.id);
-        if (isTextBlock(b)) {
+        if (b) {
           commitText(editing.id, b.text);
         }
         setEditing(null);
-
-        // ✅ 編集中の“外クリック”は編集終了だけで止める（選択は維持）
         return;
       }
 
@@ -148,23 +150,19 @@ export function useCardEditorHandlers({
     blockId: string,
     opts: { scale: number },
   ) => {
-    // ✅ 編集中でも「切り替え」は許可する
     if (editing) {
       e.preventDefault();
       e.stopPropagation();
 
-      // ① 現在の編集中テキストを確定
       const cur = currentBlocks.find((x) => x.id === editing.id);
-      if (isTextBlock(cur)) {
+      if (cur) {
         commitText(editing.id, cur.text);
       }
 
-      // ② クリックしたブロックへ選択移動
       actions.setActiveBlockId(blockId);
 
-      // ③ クリック先が text なら編集を切り替える。違うなら編集終了
       const next = currentBlocks.find((x) => x.id === blockId);
-      if (isTextBlock(next)) {
+      if (next) {
         setEditing({ id: blockId, initialText: next.text });
       } else {
         setEditing(null);
@@ -173,9 +171,51 @@ export function useCardEditorHandlers({
       return;
     }
 
-    // 通常時はこれまで通り
     actions.setActiveBlockId(blockId);
     dragPointerDown(e, blockId, opts);
+  };
+
+  const buildLayerItems = () => {
+    return [
+      ...currentBlocks
+        .filter((b) => b.side === state.side)
+        .map((b) => ({ id: b.id, kind: "block" as const, z: b.z })),
+      ...currentImages
+        .filter((img) => img.side === state.side)
+        .map((img) => ({ id: img.id, kind: "image" as const, z: img.z })),
+    ];
+  };
+
+  const bringSelectionToFront = () => {
+    const layerItems = buildLayerItems();
+    if (layerItems.length === 0) return;
+
+    const maxZ = Math.max(...layerItems.map((it) => it.z));
+
+    if (selectedImageId) {
+      updateImage(selectedImageId, { z: maxZ + 1 });
+      return;
+    }
+
+    if (activeBlockId) {
+      updateBlockZ(activeBlockId, maxZ + 1);
+    }
+  };
+
+  const sendSelectionToBack = () => {
+    const layerItems = buildLayerItems();
+    if (layerItems.length === 0) return;
+
+    const minZ = Math.min(...layerItems.map((it) => it.z));
+
+    if (selectedImageId) {
+      updateImage(selectedImageId, { z: minZ - 1 });
+      return;
+    }
+
+    if (activeBlockId) {
+      updateBlockZ(activeBlockId, minZ - 1);
+    }
   };
 
   return {
@@ -188,5 +228,7 @@ export function useCardEditorHandlers({
     onCommitText,
     handleChangeBlockWidth,
     handleBlockPointerDown,
+    bringSelectionToFront,
+    sendSelectionToBack,
   };
 }

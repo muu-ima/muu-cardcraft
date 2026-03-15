@@ -19,6 +19,7 @@ const INITIAL_BLOCKS: Block[] = [
     text: "Pastel Link",
     x: 100,
     y: 120,
+    z: 2,
     fontSize: 24,
     fontWeight: "bold",
     fontKey: "serif",
@@ -30,6 +31,7 @@ const INITIAL_BLOCKS: Block[] = [
     text: "Designer",
     x: 100,
     y: 80,
+    z: 1,
     fontSize: 18,
     fontWeight: "normal",
     fontKey: "sans",
@@ -52,6 +54,7 @@ export function useCardBlocks() {
     removeBlock,
     setTextColor,
     previewTextColor,
+    updateBlockZ,
   } = useBlockActions({ set, commit, blocksRef });
 
   const {
@@ -105,5 +108,6 @@ export function useCardBlocks() {
     removeBlock,
     setTextColor,
     previewTextColor,
+    updateBlockZ,
   };
 }

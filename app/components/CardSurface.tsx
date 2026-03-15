@@ -180,6 +180,31 @@ export default function CardSurface({
 
   console.log("[CardSurface] images", images);
 
+  const layerItems = [
+    ...images.map((img) => ({
+      kind: "image" as const,
+      z: img.z,
+      data: img,
+    })),
+    ...blocks.map((block) => ({
+      kind: "block" as const,
+      z: block.z,
+      data: block,
+    })),
+  ].sort((a, b) => a.z - b.z);
+
+  console.log(
+    "[CardSurface] layerItems",
+    layerItems.map((item) => ({
+      kind: item.kind,
+      id: item.data.id,
+      z: item.z,
+      ...(item.kind === "image"
+        ? { assetId: item.data.assetId }
+        : { text: item.data.type === "text" ? item.data.text : item.data.id }),
+    })),
+  );
+
   return (
     <div
       ref={cardRef}
@@ -205,75 +230,80 @@ export default function CardSurface({
       }}
       className={`rounded-xl border shadow-md ${className ?? ""}`}
     >
-      {/* 画像レイヤー */}
-      {images.map((img: CardImage) => {
-        const isDragging = dragImage?.id === img.id;
-        const isSelected = selectedImageId === img.id;
-        return (
-          <div
-            key={img.id}
-            data-image-id={img.id}
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              onSelectImage?.(img.id);
-              handleImagePointerDown(e, img);
-            }}
-            style={{
-              position: "absolute",
-              left: img.x,
-              top: img.y,
-              width: img.w,
-              height: img.h,
-              transform: `rotate(${img.rotate ?? 0}deg)`,
-              transformOrigin: "center",
-              cursor: interactive
-                ? isDragging
-                  ? "grabbing"
-                  : "grab"
-                : "default",
-              userSelect: "none",
-              border: isSelected ? "2px solid #2563eb" : "none",
-              boxSizing: "border-box",
-            }}
-          >
-            <img
-              src={img.url}
-              alt=""
-              draggable={false}
-              style={{
-                display: "block",
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                userSelect: "none",
+      {/* z順で統合描画するレイヤー */}{" "}
+      {layerItems.map((item) => {
+        if (item.kind === "image") {
+          const img = item.data;
+          const isDragging = dragImage?.id === img.id;
+          const isSelected = selectedImageId === img.id;
+
+          return (
+            <div
+              key={img.id}
+              data-image-id={img.id}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                onSelectImage?.(img.id);
+                handleImagePointerDown(e, img);
               }}
-            />
-            {interactive && isSelected && (
-              <button
-                type="button"
-                data-resize-handle="true"
-                onPointerDown={(e) => {
-                  e.stopPropagation();
-                  onResizeImageStart?.(e, img);
-                }}
+              style={{
+                position: "absolute",
+                left: img.x,
+                top: img.y,
+                width: img.w,
+                height: img.h,
+                zIndex: img.z,
+                transform: `rotate(${img.rotate ?? 0}deg)`,
+                transformOrigin: "center",
+                cursor: interactive
+                  ? isDragging
+                    ? "grabbing"
+                    : "grab"
+                  : "default",
+                userSelect: "none",
+                border: isSelected ? "2px solid #2563eb" : "none",
+                boxSizing: "border-box",
+              }}
+            >
+              <img
+                src={img.url}
+                alt=""
+                draggable={false}
                 style={{
-                  position: "absolute",
-                  right: -8,
-                  bottom: -8,
-                  width: 16,
-                  height: 16,
-                  borderRadius: 9999,
-                  border: "2px solid white",
-                  background: "#2563eb",
-                  cursor: "nwse-resize",
+                  display: "block",
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  userSelect: "none",
                 }}
               />
-            )}
-          </div>
-        );
-      })}
+              {interactive && isSelected && (
+                <button
+                  type="button"
+                  data-resize-handle="true"
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                    onResizeImageStart?.(e, img);
+                  }}
+                  style={{
+                    position: "absolute",
+                    right: -8,
+                    bottom: -8,
+                    width: 16,
+                    height: 16,
+                    borderRadius: 9999,
+                    border: "2px solid white",
+                    background: "#2563eb",
+                    cursor: "nwse-resize",
+                  }}
+                />
+              )}
+            </div>
+          );
+        }
 
-      {blocks.map((block) => {
+        const block = item.data;
+
         const showSelection =
           interactive &&
           activeBlockId === block.id &&
@@ -288,22 +318,21 @@ export default function CardSurface({
             data-block-id={block.id}
             onPointerDown={(e) => {
               if (!interactive) return;
-              e.stopPropagation(); // ✅ 外クリック判定に伝播させない
-              onBlockPointerDown?.(e, block.id); // ✅ フォーカス/ドラッグ開始
+              e.stopPropagation();
+              onBlockPointerDown?.(e, block.id);
             }}
             onClick={() => handleBlockClick(block)}
             style={{
               position: "absolute",
               top: block.y,
               left: block.x,
+              zIndex: block.z,
               width: block.width ?? "auto",
               textAlign: block.align ?? "left",
               cursor: interactive ? "move" : "default",
-              // ✅ padding は外側から外す（リングのズレ原因）
               padding: 0,
               color: textColor,
             }}
-            // 「ブロック幅」を示す枠をここ（外側）に出す
             className={[
               "relative select-none",
               showSelection
@@ -311,10 +340,9 @@ export default function CardSurface({
                 : "",
             ].join(" ")}
           >
-            {/* ✅ リング/実寸/計測は inner に寄せる */}
             <div
               ref={(el) => {
-                if (blockRefs) blockRefs.current[block.id] = el; // ✅ 幅計測もここ
+                if (blockRefs) blockRefs.current[block.id] = el;
               }}
               className={["inline-block rounded px-1 py-0.5"].join(" ")}
               style={{
@@ -333,17 +361,17 @@ export default function CardSurface({
               {block.type === "text" &&
                 (editingBlockId === block.id ? null : block.text)}
             </div>
-            {/* 🆕 幅ラベル（showSelection 中だけ表示） */}
+
             {showSelection && typeof block.width === "number" && (
               <div
                 className="
-                  pointer-events-none
-                  absolute -top-4 right-0
-                  text-[10px]
-                  rounded-full border border-zinc-200
-                  bg-white/90 px-2 py-0.5
-                  text-zinc-500 shadow-sm
-                "
+            pointer-events-none
+            absolute -top-4 right-0
+            text-[10px]
+            rounded-full border border-zinc-200
+            bg-white/90 px-2 py-0.5
+            text-zinc-500 shadow-sm
+          "
               >
                 {Math.round(block.width)}px
               </div>

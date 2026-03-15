@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import ModalPreview from "@/app/components/ModalPreview";
 import CardSurface from "@/app/components/CardSurface";
 import ExportSurface from "@/app/components/ExportSurface";
@@ -32,6 +32,8 @@ export default function CardEditor({ code }: Props) {
   // =========================
   const [editing, setEditing] = useState<EditingState>(null);
   const [design, setDesign] = useState<DesignKey>("mint");
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+
   const exportRef = useRef<HTMLDivElement | null>(null);
 
   // ✅ CanvasArea 自体の ref（スクロール/レイアウト用）
@@ -71,6 +73,7 @@ export default function CardEditor({ code }: Props) {
     removeBlock,
     setTextColor,
     previewTextColor,
+    updateBlockZ,
   } = useCardBlocks();
 
   const {
@@ -82,6 +85,7 @@ export default function CardEditor({ code }: Props) {
     removeImage,
     countImagesFor,
     maxImagesPerSide,
+    updateImage,
   } = useCardImages();
 
   const editor = useCardEditorState({
@@ -112,6 +116,65 @@ export default function CardEditor({ code }: Props) {
   // いま編集してる面
   const currentBlocks = getBlocksFor(state.side);
 
+  const handleBringSelectedImageToFront = useCallback(() => {
+    if (!selectedImageId) return;
+
+    const blocksForSide = getBlocksFor(state.side);
+    const imagesForSide = getImagesFor(state.side);
+
+    const maxBlockZ = blocksForSide.reduce(
+      (max, block) => Math.max(max, block.z ?? 0),
+      0,
+    );
+    const maxImageZ = imagesForSide.reduce(
+      (max, image) => Math.max(max, image.z ?? 0),
+      0,
+    );
+
+    const nextZ = Math.max(maxBlockZ, maxImageZ) + 1;
+
+    console.log("[handleBringSelectedImageToFront]", {
+      selectedImageId,
+      side: state.side,
+      maxBlockZ,
+      maxImageZ,
+      nextZ,
+    });
+
+    updateImage(selectedImageId, { z: nextZ });
+  }, [selectedImageId, state.side, getBlocksFor, getImagesFor, updateImage]);
+
+  const handleSendSelectedImageToBack = useCallback(() => {
+    if (!selectedImageId) return;
+
+    const blocksForSide = getBlocksFor(state.side);
+    const imagesForSide = getImagesFor(state.side);
+
+    const minBlockZ = blocksForSide.reduce(
+      (min, block) => Math.min(min, block.z ?? 0),
+      Infinity,
+    );
+    const minImageZ = imagesForSide.reduce(
+      (min, image) => Math.min(min, image.z ?? 0),
+      Infinity,
+    );
+
+    const safeMinBlockZ = Number.isFinite(minBlockZ) ? minBlockZ : 1;
+    const safeMinImageZ = Number.isFinite(minImageZ) ? minImageZ : 1;
+
+    const nextZ = Math.min(safeMinBlockZ, safeMinImageZ) - 1;
+
+    console.log("[handleSendSelectedImageToBack]", {
+      selectedImageId,
+      side: state.side,
+      minBlockZ: safeMinBlockZ,
+      minImageZ: safeMinImageZ,
+      nextZ,
+    });
+
+    updateImage(selectedImageId, { z: nextZ });
+  }, [selectedImageId, state.side, getBlocksFor, getImagesFor, updateImage]);
+
   const centerWrapRef = useRef<HTMLDivElement | null>(null);
 
   const handlers = useCardEditorHandlers({
@@ -128,6 +191,11 @@ export default function CardEditor({ code }: Props) {
     setSheetSnap,
     cardRef,
     centerWrapRef,
+    currentImages: images,
+    updateImage,
+    updateBlockZ,
+    activeBlockId: state.activeBlockId,
+    selectedImageId,
   });
 
   const centerVisible = selectors.centerVisible;
@@ -188,6 +256,10 @@ export default function CardEditor({ code }: Props) {
     undo,
     redo,
     removeBlock,
+    selectedImageId,
+    setSelectedImageId,
+    onBringSelectedImageToFront: handleBringSelectedImageToFront,
+    onSendSelectedImageToBack: handleSendSelectedImageToBack,
   });
 
   console.log("[CardEditor] side", state.side);

@@ -56,6 +56,10 @@ export type CardEditorMobileProps = {
   setTextColor: (id: string, color: string) => void;
   previewTextColor: (id: string, color: string) => void;
   onUploadedImage: (asset: UploadImageAsset) => void;
+  selectedImageId: string | null;
+  onSelectImage: (id: string | null) => void;
+  onBringSelectedImageToFront: () => void;
+  onSendSelectedImageToBack: () => void;
 
   exportRef: RefObject<HTMLDivElement | null>;
   downloadImage: (format: "png" | "jpeg", target: HTMLDivElement) => void;

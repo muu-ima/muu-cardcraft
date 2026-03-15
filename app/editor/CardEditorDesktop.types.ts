@@ -51,6 +51,10 @@ export type CardEditorDesktopProps = {
   currentImageCount: number;
   maxImageCount: number;
   onDeleteImage: (id: string) => void;
+  selectedImageId: string | null;
+  onSelectImage: (id: string | null) => void;
+  onBringSelectedImageToFront: () => void;
+  onSendSelectedImageToBack: () => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;

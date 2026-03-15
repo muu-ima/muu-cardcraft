@@ -44,6 +44,9 @@ export type ImagePanelSectionProps = {
   currentImageCount: number;
   maxImageCount: number;
   onDeleteImage: (id: string) => void;
+  selectedImageId: string | null;
+  onBringSelectedImageToFront: () => void;
+  onSendSelectedImageToBack: () => void;
 };
 
 export type DesignPanelSectionProps = {

@@ -120,6 +120,9 @@ export default function ToolPanel({
             currentCount={imagePanel.currentImageCount}
             maxCount={imagePanel.maxImageCount}
             onDeleteImage={imagePanel.onDeleteImage}
+            selectedImageId={imagePanel.selectedImageId}
+            onBringSelectedImageToFront={imagePanel.onBringSelectedImageToFront}
+            onSendSelectedImageToBack={imagePanel.onSendSelectedImageToBack}
           />
         )}
         {activeTab === "export" && (

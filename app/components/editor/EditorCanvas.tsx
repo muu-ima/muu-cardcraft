@@ -55,6 +55,8 @@ type Props = {
   onCommitText?: (id: string, text: string) => void;
   editingText?: string;
   onChangeEditingText?: (text: string) => void;
+  selectedImageId: string | null;
+  onSelectImage: (id: string | null) => void;
 };
 
 export default function EditorCanvas({
@@ -78,6 +80,8 @@ export default function EditorCanvas({
   onCommitText,
   editingText,
   onChangeEditingText,
+  selectedImageId,
+  onSelectImage,
 }: Props) {
   // console.log("[EditorCanvas render]", {
   //   isPreview,
@@ -87,8 +91,6 @@ export default function EditorCanvas({
   // });
 
   const taRef = useRef<HTMLTextAreaElement | null>(null);
-
-  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
 
   const [resizeState, setResizeState] = useState<{
     id: string;
@@ -224,7 +226,7 @@ export default function EditorCanvas({
               images={images}
               onMoveImage={moveImage}
               selectedImageId={selectedImageId}
-              onSelectImage={setSelectedImageId}
+              onSelectImage={onSelectImage}
               onResizeImageStart={onResizeStart}
               design={design}
               w={CARD_BASE_W}
@@ -232,7 +234,7 @@ export default function EditorCanvas({
               interactive={!isPreview}
               onSurfacePointerDown={(e) => {
                 onSurfacePointerDown?.();
-                setSelectedImageId(null);
+                onSelectImage(null);
               }}
               onBlockPointerDown={(e, id) => onPointerDown?.(e, id, { scale })}
               onStartInlineEdit={onStartInlineEdit}
