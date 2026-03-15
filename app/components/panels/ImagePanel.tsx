@@ -86,7 +86,7 @@ export default function ImagePanel({
           </button>
 
           <div className="text-xs text-black/50">
-            PNG/JPEG/WebP（最大10MB・保存はWebP最適化）
+            PNG/JPEG/WebP（最大5MB・保存はWebP最適化）
           </div>
 
           {error && (
