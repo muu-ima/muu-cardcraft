@@ -14,3 +14,12 @@ export type CardImage = {
 
   rotate?: number;
 };
+
+export const IMAGE_MIN_W = 140;
+export const IMAGE_MIN_H = 100;
+export const IMAGE_MAX_W = 400;
+export const IMAGE_MAX_H = 280;
+
+export function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}

@@ -3,6 +3,13 @@
 
 import { useCallback, useMemo, useState } from "react";
 import type { CardImage, Side } from "@/shared/images";
+import {
+  IMAGE_MIN_W,
+  IMAGE_MIN_H,
+  IMAGE_MAX_W,
+  IMAGE_MAX_H,
+  clamp,
+} from "@/shared/images";
 
 // 依存なしで動く簡易ID（あとで randomId/uuid に差し替えOK）
 function makeId() {
@@ -46,22 +53,22 @@ export function useCardImages(initial: CardImage[] = []) {
         };
       }
 
-      const MIN_W = 140;
-      const MIN_H = 100;
-
-      let initialW = args.w ?? MIN_W;
-      let initialH = args.h ?? MIN_H;
+      let initialW = args.w ?? IMAGE_MIN_W;
+      let initialH = args.h ?? IMAGE_MIN_H;
 
       if (!args.w && !args.h && args.naturalWidth && args.naturalHeight) {
         const scale = Math.min(
-          MIN_W / args.naturalWidth,
-          MIN_H / args.naturalHeight,
+          IMAGE_MIN_W / args.naturalWidth,
+          IMAGE_MIN_H / args.naturalHeight,
           1,
         );
 
         initialW = Math.round(args.naturalWidth * scale);
         initialH = Math.round(args.naturalHeight * scale);
       }
+
+      initialW = clamp(Math.round(initialW), IMAGE_MIN_W, IMAGE_MAX_W);
+      initialH = clamp(Math.round(initialH), IMAGE_MIN_H, IMAGE_MAX_H);
 
       const img: CardImage = {
         id: makeId(),
@@ -101,16 +108,13 @@ export function useCardImages(initial: CardImage[] = []) {
   }, []);
 
   const resizeImage = useCallback((id: string, w: number, h: number) => {
-    const MIN_W = 140;
-    const MIN_H = 100;
-
     setImages((prev) =>
       prev.map((it) =>
         it.id === id
           ? {
               ...it,
-              w: Math.max(MIN_W, Math.round(w)),
-              h: Math.max(MIN_H, Math.round(h)),
+              w: clamp(Math.round(w), IMAGE_MIN_W, IMAGE_MAX_W),
+              h: clamp(Math.round(h), IMAGE_MIN_H, IMAGE_MAX_H),
             }
           : it,
       ),

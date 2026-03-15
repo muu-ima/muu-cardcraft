@@ -9,6 +9,13 @@ import type { DesignKey } from "@/shared/design";
 import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
 import { FONT_DEFINITIONS, type FontKey } from "@/shared/fonts";
 import type { CardImage } from "@/shared/images";
+import {
+  IMAGE_MIN_W,
+  IMAGE_MIN_H,
+  IMAGE_MAX_W,
+  IMAGE_MAX_H,
+  clamp,
+} from "@/shared/images";
 
 type Props = {
   blocks: Block[];
@@ -152,10 +159,23 @@ export default function EditorCanvas({
 
     const handlePointerMove = (e: PointerEvent) => {
       const dx = (e.clientX - resizeState.startX) / scale;
-      const nextW = resizeState.startW + dx;
 
       const ratio = resizeState.startH / resizeState.startW;
-      const nextH = nextW * ratio;
+
+      let nextW = resizeState.startW + dx;
+      nextW = clamp(nextW, IMAGE_MIN_W, IMAGE_MAX_W);
+
+      let nextH = nextW * ratio;
+
+      if (nextH > IMAGE_MAX_H) {
+        nextH = IMAGE_MAX_H;
+        nextW = nextH / ratio;
+      }
+
+      if (nextH < IMAGE_MIN_H) {
+        nextH = IMAGE_MIN_H;
+        nextW = nextH / ratio;
+      }
 
       resizeImage(resizeState.id, nextW, nextH);
     };
