@@ -169,7 +169,9 @@ export function useBlockActions(history: HistoryApi) {
   };
 
   const updateBlockZ = (id: string, z: number) => {
-    commit((prev) => prev.map((b) => (b.id === id ? { ...b, z } : b)));
+    const nextZ = Math.max(1, Math.round(z));
+
+    commit((prev) => prev.map((b) => (b.id === id ? { ...b, z: nextZ } : b)));
   };
 
   return {

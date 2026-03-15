@@ -191,14 +191,15 @@ export function useCardEditorHandlers({
     if (layerItems.length === 0) return;
 
     const maxZ = Math.max(...layerItems.map((it) => it.z));
+    const nextZ = Math.max(1, maxZ + 1);
 
     if (selectedImageId) {
-      updateImage(selectedImageId, { z: maxZ + 1 });
+      updateImage(selectedImageId, { z: nextZ });
       return;
     }
 
     if (activeBlockId) {
-      updateBlockZ(activeBlockId, maxZ + 1);
+      updateBlockZ(activeBlockId, nextZ);
     }
   };
 
@@ -207,14 +208,15 @@ export function useCardEditorHandlers({
     if (layerItems.length === 0) return;
 
     const minZ = Math.min(...layerItems.map((it) => it.z));
+    const nextZ = Math.max(1, minZ - 1);
 
     if (selectedImageId) {
-      updateImage(selectedImageId, { z: minZ - 1 });
+      updateImage(selectedImageId, { z: nextZ });
       return;
     }
 
     if (activeBlockId) {
-      updateBlockZ(activeBlockId, minZ - 1);
+      updateBlockZ(activeBlockId, nextZ);
     }
   };
 

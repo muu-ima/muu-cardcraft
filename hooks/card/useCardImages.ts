@@ -2,6 +2,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { moveToBack, moveToFront } from "@/shared/layers";
 import type { CardImage, Side } from "@/shared/images";
 import {
   IMAGE_MIN_W,
@@ -112,7 +113,18 @@ export function useCardImages(initial: CardImage[] = []) {
   const updateImage = useCallback(
     (id: string, patch: Partial<Omit<CardImage, "id">>) => {
       setImages((prev) =>
-        prev.map((it) => (it.id === id ? { ...it, ...patch } : it)),
+        prev.map((it) =>
+          it.id === id
+            ? {
+                ...it,
+                ...patch,
+                z:
+                  patch.z !== undefined
+                    ? Math.max(1, Math.round(patch.z))
+                    : it.z,
+              }
+            : it,
+        ),
       );
     },
     [],
@@ -156,16 +168,10 @@ export function useCardImages(initial: CardImage[] = []) {
       const target = prev.find((img) => img.id === id);
       if (!target) return prev;
 
-      const sameSide = prev
-        .filter((img) => img.side === target.side)
-        .sort((a, b) => (a.z ?? 0) - (b.z ?? 0));
-
+      const sameSide = prev.filter((img) => img.side === target.side);
       const others = prev.filter((img) => img.side !== target.side);
-      const withoutTarget = sameSide.filter((img) => img.id !== id);
-      const reordered = [...withoutTarget, target].map((img, index) => ({
-        ...img,
-        z: index + 1,
-      }));
+
+      const reordered = moveToFront(sameSide, id);
 
       console.log("[bringImageToFront]", {
         targetId: id,
@@ -186,16 +192,10 @@ export function useCardImages(initial: CardImage[] = []) {
       const target = prev.find((img) => img.id === id);
       if (!target) return prev;
 
-      const sameSide = prev
-        .filter((img) => img.side === target.side)
-        .sort((a, b) => (a.z ?? 0) - (b.z ?? 0));
-
+      const sameSide = prev.filter((img) => img.side === target.side);
       const others = prev.filter((img) => img.side !== target.side);
-      const withoutTarget = sameSide.filter((img) => img.id !== id);
-      const reordered = [target, ...withoutTarget].map((img, index) => ({
-        ...img,
-        z: index + 1,
-      }));
+
+      const reordered = moveToBack(sameSide, id);
 
       console.log("[sendImageToBack]", {
         targetId: id,
