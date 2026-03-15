@@ -46,16 +46,16 @@ export function useCardImages(initial: CardImage[] = []) {
         };
       }
 
-      const MAX_W = 140;
-      const MAX_H = 100;
+      const MIN_W = 140;
+      const MIN_H = 100;
 
-      let initialW = args.w ?? MAX_W;
-      let initialH = args.h ?? MAX_H;
+      let initialW = args.w ?? MIN_W;
+      let initialH = args.h ?? MIN_H;
 
       if (!args.w && !args.h && args.naturalWidth && args.naturalHeight) {
         const scale = Math.min(
-          MAX_W / args.naturalWidth,
-          MAX_H / args.naturalHeight,
+          MIN_W / args.naturalWidth,
+          MIN_H / args.naturalHeight,
           1,
         );
 
@@ -101,8 +101,19 @@ export function useCardImages(initial: CardImage[] = []) {
   }, []);
 
   const resizeImage = useCallback((id: string, w: number, h: number) => {
+    const MIN_W = 140;
+    const MIN_H = 100;
+
     setImages((prev) =>
-      prev.map((it) => (it.id === id ? { ...it, w, h } : it)),
+      prev.map((it) =>
+        it.id === id
+          ? {
+              ...it,
+              w: Math.max(MIN_W, Math.round(w)),
+              h: Math.max(MIN_H, Math.round(h)),
+            }
+          : it,
+      ),
     );
   }, []);
 

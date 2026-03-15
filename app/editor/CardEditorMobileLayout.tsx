@@ -29,6 +29,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     maxImageCount,
     onDeleteImage,
     moveImage,
+    resizeImage,
     getBlocksFor,
     addBlock: onAddBlock,
     onChangeText,
@@ -164,6 +165,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                   blocks={getBlocksFor(state.side)}
                   images={getImagesFor(state.side)}
                   moveImage={moveImage}
+                  resizeImage={resizeImage}
                   design={design}
                   scale={scaleMobile}
                   isPreview={state.isPreview}

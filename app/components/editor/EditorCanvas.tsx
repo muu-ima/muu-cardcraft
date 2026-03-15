@@ -1,7 +1,7 @@
 // app/components/editor/EditorCanvas.tsx
 "use client";
 
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import CardSurface from "@/app/components/CardSurface";
 import PrintGuides from "@/app/components/editor/PrintGuides";
 import type { Block } from "@/shared/blocks";
@@ -15,6 +15,7 @@ type Props = {
   images: CardImage[];
   design: DesignKey;
   moveImage: (id: string, x: number, y: number) => void;
+  resizeImage: (id: string, w: number, h: number) => void;
   scale: number;
   activeBlockId?: string;
   isPreview: boolean;
@@ -53,6 +54,7 @@ export default function EditorCanvas({
   blocks,
   images,
   moveImage,
+  resizeImage,
   design,
   scale,
   isPreview,
@@ -78,6 +80,31 @@ export default function EditorCanvas({
   // });
 
   const taRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+
+  const [resizeState, setResizeState] = useState<{
+    id: string;
+    startX: number;
+    startY: number;
+    startW: number;
+    startH: number;
+  } | null>(null);
+
+  const onResizeStart = (
+    e: React.PointerEvent,
+    image: { id: string; w: number; h: number },
+  ) => {
+    e.stopPropagation();
+
+    setResizeState({
+      id: image.id,
+      startX: e.clientX,
+      startY: e.clientY,
+      startW: image.w,
+      startH: image.h,
+    });
+  };
 
   useLayoutEffect(() => {
     if (isPreview) return;
@@ -120,6 +147,32 @@ export default function EditorCanvas({
     });
   }, [isPreview, editingBlockId, editingText]);
 
+  useEffect(() => {
+    if (!resizeState) return;
+
+    const handlePointerMove = (e: PointerEvent) => {
+      const dx = (e.clientX - resizeState.startX) / scale;
+      const nextW = resizeState.startW + dx;
+
+      const ratio = resizeState.startH / resizeState.startW;
+      const nextH = nextW * ratio;
+
+      resizeImage(resizeState.id, nextW, nextH);
+    };
+
+    const handlePointerUp = () => {
+      setResizeState(null);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [resizeState, resizeImage, scale]);
+
   console.log("[EditorCanvas] images", images);
 
   return (
@@ -150,11 +203,17 @@ export default function EditorCanvas({
               blocks={blocks}
               images={images}
               onMoveImage={moveImage}
+              selectedImageId={selectedImageId}
+              onSelectImage={setSelectedImageId}
+              onResizeImageStart={onResizeStart}
               design={design}
               w={CARD_BASE_W}
               h={CARD_BASE_H}
               interactive={!isPreview}
-              onSurfacePointerDown={() => onSurfacePointerDown?.()}
+              onSurfacePointerDown={(e) => {
+                onSurfacePointerDown?.();
+                setSelectedImageId(null);
+              }}
               onBlockPointerDown={(e, id) => onPointerDown?.(e, id, { scale })}
               onStartInlineEdit={onStartInlineEdit}
               activeBlockId={editingBlockId ? undefined : activeBlockId}

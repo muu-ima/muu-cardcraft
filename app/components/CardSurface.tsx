@@ -25,7 +25,6 @@ type CardSurfaceProps = {
 
   /** 編集可能か (ドラッグ有無) */
   interactive?: boolean;
-
   editingBlockId?: string | null;
 
   /** ブロック押下（選択/ドラッグ開始） */
@@ -50,6 +49,14 @@ type CardSurfaceProps = {
   /** class / style 拡張 */
   className?: string;
   style?: CSSProperties;
+
+  /** resizeImage */
+  selectedImageId?: string | null;
+  onSelectImage?: (id: string | null) => void;
+  onResizeImageStart?: (
+    e: React.PointerEvent,
+    image: { id: string; w: number; h: number },
+  ) => void;
 };
 
 type DragImageState = {
@@ -83,6 +90,9 @@ export default function CardSurface({
   blocks,
   images = [],
   onMoveImage,
+  selectedImageId,
+  onSelectImage,
+  onResizeImageStart,
   design,
   w,
   h,
@@ -120,6 +130,10 @@ export default function CardSurface({
 
   const handleImagePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>, img: CardImage) => {
+      const target = e.target as HTMLElement;
+      const isResizeHandle = target.closest("[data-resize-handle='true']");
+      if (isResizeHandle) return;
+
       if (!interactive) return;
       if (!onMoveImage) return;
 
@@ -194,11 +208,16 @@ export default function CardSurface({
       {/* 画像レイヤー */}
       {images.map((img: CardImage) => {
         const isDragging = dragImage?.id === img.id;
+        const isSelected = selectedImageId === img.id;
         return (
           <div
             key={img.id}
             data-image-id={img.id}
-            onPointerDown={(e) => handleImagePointerDown(e, img)}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              onSelectImage?.(img.id);
+              handleImagePointerDown(e, img);
+            }}
             style={{
               position: "absolute",
               left: img.x,
@@ -213,6 +232,8 @@ export default function CardSurface({
                   : "grab"
                 : "default",
               userSelect: "none",
+              border: isSelected ? "2px solid #2563eb" : "none",
+              boxSizing: "border-box",
             }}
           >
             <img
@@ -227,6 +248,27 @@ export default function CardSurface({
                 userSelect: "none",
               }}
             />
+            {interactive && isSelected && (
+              <button
+                type="button"
+                data-resize-handle="true"
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                  onResizeImageStart?.(e, img);
+                }}
+                style={{
+                  position: "absolute",
+                  right: -8,
+                  bottom: -8,
+                  width: 16,
+                  height: 16,
+                  borderRadius: 9999,
+                  border: "2px solid white",
+                  background: "#2563eb",
+                  cursor: "nwse-resize",
+                }}
+              />
+            )}
           </div>
         );
       })}

@@ -49,6 +49,7 @@ type UseCardEditorLayoutPropsParams = {
   getBlocksFor: CardEditorDesktopProps["getBlocksFor"];
   getImagesFor: CardEditorDesktopProps["getImagesFor"];
   moveImage: CardEditorDesktopProps["moveImage"];
+  resizeImage: CardEditorDesktopProps["resizeImage"];
 
   editableBlocks: CardEditorDesktopProps["editableBlocks"];
   addBlock: CardEditorDesktopProps["addBlock"];
@@ -108,6 +109,7 @@ export function useCardEditorLayoutProps({
   getBlocksFor,
   getImagesFor,
   moveImage,
+  resizeImage,
   editableBlocks,
   addBlock,
   onChangeText,
@@ -173,6 +175,7 @@ export function useCardEditorLayoutProps({
     getBlocksFor,
     getImagesFor,
     moveImage,
+    resizeImage,
     editableBlocks,
     addBlock,
     onChangeText,
@@ -234,6 +237,7 @@ export function useCardEditorLayoutProps({
     previewTextColor,
     onUploadedImage,
     moveImage,
+    resizeImage,
     currentImageCount,
     maxImageCount,
     onDeleteImage,

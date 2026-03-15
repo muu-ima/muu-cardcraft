@@ -47,6 +47,7 @@ export type CardEditorDesktopProps = {
   previewTextColor: (id: string, color: string) => void;
   onUploadedImage: (asset: UploadImageAsset) => void;
   moveImage: (id: string, x: number, y: number) => void;
+  resizeImage: (id: string, w: number, h: number) => void;
   currentImageCount: number;
   maxImageCount: number;
   onDeleteImage: (id: string) => void;
