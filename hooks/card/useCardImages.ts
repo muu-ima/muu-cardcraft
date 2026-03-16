@@ -2,7 +2,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { moveToBack, moveToFront } from "@/shared/layers";
+import {
+  moveToBack,
+  moveToFront,
+  moveForwardOne,
+  moveBackwardOne,
+  normalizeLayers,
+} from "@/shared/layers";
 import type { CardImage, Side } from "@/shared/images";
 import {
   IMAGE_MIN_W,
@@ -151,7 +157,19 @@ export function useCardImages(initial: CardImage[] = []) {
   }, []);
 
   const removeImage = useCallback((id: string) => {
-    setImages((prev) => prev.filter((it) => it.id !== id));
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id);
+      if (!target) return prev;
+
+      const sameSide = prev.filter(
+        (img) => img.side === target.side && img.id !== id,
+      );
+      const others = prev.filter((img) => img.side !== target.side);
+
+      const normalized = normalizeLayers(sameSide);
+
+      return [...others, ...normalized];
+    });
   }, []);
 
   const clearSide = useCallback((side: Side) => {
@@ -159,7 +177,8 @@ export function useCardImages(initial: CardImage[] = []) {
   }, []);
 
   const getImagesFor = useCallback(
-    (side: Side) => images.filter((it) => it.side === side),
+    (side: Side) =>
+      [...images].filter((it) => it.side === side).sort((a, b) => a.z - b.z),
     [images],
   );
 
@@ -211,6 +230,54 @@ export function useCardImages(initial: CardImage[] = []) {
     });
   }, []);
 
+  const bringImageForwardOne = useCallback((id: string) => {
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id);
+      if (!target) return prev;
+
+      const sameSide = prev.filter((img) => img.side === target.side);
+      const others = prev.filter((img) => img.side !== target.side);
+
+      const reordered = moveForwardOne(sameSide, id);
+
+      console.log("[bringImageForwardOne]", {
+        targetId: id,
+        side: target.side,
+        reordered: reordered.map((img) => ({
+          id: img.id,
+          z: img.z,
+          assetId: img.assetId,
+        })),
+      });
+
+      return [...others, ...reordered];
+    });
+  }, []);
+
+  const sendImageBackwardOne = useCallback((id: string) => {
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id);
+      if (!target) return prev;
+
+      const sameSide = prev.filter((img) => img.side === target.side);
+      const others = prev.filter((img) => img.side !== target.side);
+
+      const reordered = moveBackwardOne(sameSide, id);
+
+      console.log("[sendImageBackwardOne]", {
+        targetId: id,
+        side: target.side,
+        reordered: reordered.map((img) => ({
+          id: img.id,
+          z: img.z,
+          assetId: img.assetId,
+        })),
+      });
+
+      return [...others, ...reordered];
+    });
+  }, []);
+
   const api = useMemo(
     () => ({
       images,
@@ -226,6 +293,8 @@ export function useCardImages(initial: CardImage[] = []) {
       bringImageToFront,
       sendImageToBack,
       maxImagesPerSide: MAX_IMAGES_PER_SIDE,
+      bringImageForwardOne,
+      sendImageBackwardOne,
     }),
     [
       images,
@@ -239,6 +308,8 @@ export function useCardImages(initial: CardImage[] = []) {
       countImagesFor,
       bringImageToFront,
       sendImageToBack,
+      bringImageForwardOne,
+      sendImageBackwardOne,
     ],
   );
 

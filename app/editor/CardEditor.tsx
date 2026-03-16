@@ -85,7 +85,10 @@ export default function CardEditor({ code }: Props) {
     removeImage,
     countImagesFor,
     maxImagesPerSide,
-    updateImage,
+    bringImageToFront,
+    sendImageToBack,
+    bringImageForwardOne,
+    sendImageBackwardOne,
   } = useCardImages();
 
   const editor = useCardEditorState({
@@ -116,65 +119,6 @@ export default function CardEditor({ code }: Props) {
   // いま編集してる面
   const currentBlocks = getBlocksFor(state.side);
 
-  const handleBringSelectedImageToFront = useCallback(() => {
-    if (!selectedImageId) return;
-
-    const blocksForSide = getBlocksFor(state.side);
-    const imagesForSide = getImagesFor(state.side);
-
-    const maxBlockZ = blocksForSide.reduce(
-      (max, block) => Math.max(max, block.z ?? 0),
-      0,
-    );
-    const maxImageZ = imagesForSide.reduce(
-      (max, image) => Math.max(max, image.z ?? 0),
-      0,
-    );
-
-    const nextZ = Math.max(maxBlockZ, maxImageZ) + 1;
-
-    console.log("[handleBringSelectedImageToFront]", {
-      selectedImageId,
-      side: state.side,
-      maxBlockZ,
-      maxImageZ,
-      nextZ,
-    });
-
-    updateImage(selectedImageId, { z: nextZ });
-  }, [selectedImageId, state.side, getBlocksFor, getImagesFor, updateImage]);
-
-  const handleSendSelectedImageToBack = useCallback(() => {
-    if (!selectedImageId) return;
-
-    const blocksForSide = getBlocksFor(state.side);
-    const imagesForSide = getImagesFor(state.side);
-
-    const minBlockZ = blocksForSide.reduce(
-      (min, block) => Math.min(min, block.z ?? 0),
-      Infinity,
-    );
-    const minImageZ = imagesForSide.reduce(
-      (min, image) => Math.min(min, image.z ?? 0),
-      Infinity,
-    );
-
-    const safeMinBlockZ = Number.isFinite(minBlockZ) ? minBlockZ : 1;
-    const safeMinImageZ = Number.isFinite(minImageZ) ? minImageZ : 1;
-
-    const nextZ = Math.min(safeMinBlockZ, safeMinImageZ) - 1;
-
-    console.log("[handleSendSelectedImageToBack]", {
-      selectedImageId,
-      side: state.side,
-      minBlockZ: safeMinBlockZ,
-      minImageZ: safeMinImageZ,
-      nextZ,
-    });
-
-    updateImage(selectedImageId, { z: nextZ });
-  }, [selectedImageId, state.side, getBlocksFor, getImagesFor, updateImage]);
-
   const centerWrapRef = useRef<HTMLDivElement | null>(null);
 
   const handlers = useCardEditorHandlers({
@@ -191,9 +135,10 @@ export default function CardEditor({ code }: Props) {
     setSheetSnap,
     cardRef,
     centerWrapRef,
-    currentImages: images,
-    updateImage,
-    updateBlockZ,
+    bringImageToFront,
+    sendImageToBack,
+    bringImageForwardOne,
+    sendImageBackwardOne,
     activeBlockId: state.activeBlockId,
     selectedImageId,
   });
@@ -258,8 +203,8 @@ export default function CardEditor({ code }: Props) {
     removeBlock,
     selectedImageId,
     setSelectedImageId,
-    onBringSelectedImageToFront: handleBringSelectedImageToFront,
-    onSendSelectedImageToBack: handleSendSelectedImageToBack,
+    onBringSelectedImageToFront: handlers.bringSelectionToFront,
+    onSendSelectedImageToBack: handlers.sendSelectionToBack,
   });
 
   console.log("[CardEditor] side", state.side);

@@ -37,10 +37,15 @@ type UseCardEditorHandlersParams = {
   setSheetSnap: Dispatch<SetStateAction<SheetSnap>>;
   cardRef: RefObject<HTMLDivElement | null>;
   centerWrapRef: RefObject<HTMLDivElement | null>;
+  bringImageToFront: (id: string) => void;
+  sendImageToBack: (id: string) => void;
+  bringImageForwardOne: (id: string) => void;
+  sendImageBackwardOne: (id: string) => void;
 
-  currentImages: { id: string; side: Side; z: number }[];
-  updateImage: (id: string, patch: { z: number }) => void;
-  updateBlockZ: (id: string, z: number) => void;
+  bringBlockToFront?: (id: string) => void;
+  sendBlockToBack?: (id: string) => void;
+  bringBlockForwardOne?: (id: string) => void;
+  sendBlockBackwardOne?: (id: string) => void;
 
   activeBlockId?: string;
   selectedImageId?: string | null;
@@ -60,9 +65,14 @@ export function useCardEditorHandlers({
   setSheetSnap,
   cardRef,
   centerWrapRef,
-  currentImages,
-  updateImage,
-  updateBlockZ,
+  bringImageToFront,
+  sendImageToBack,
+  bringImageForwardOne,
+  sendImageBackwardOne,
+  bringBlockToFront,
+  sendBlockToBack,
+  bringBlockForwardOne,
+  sendBlockBackwardOne,
   activeBlockId,
   selectedImageId,
 }: UseCardEditorHandlersParams) {
@@ -175,17 +185,6 @@ export function useCardEditorHandlers({
     dragPointerDown(e, blockId, opts);
   };
 
-  const buildLayerItems = () => {
-    return [
-      ...currentBlocks
-        .filter((b) => b.side === state.side)
-        .map((b) => ({ id: b.id, kind: "block" as const, z: b.z })),
-      ...currentImages
-        .filter((img) => img.side === state.side)
-        .map((img) => ({ id: img.id, kind: "image" as const, z: img.z })),
-    ];
-  };
-
   const getSelectedLayerTarget = () => {
     if (selectedImageId) {
       return { kind: "image" as const, id: selectedImageId };
@@ -198,32 +197,58 @@ export function useCardEditorHandlers({
     return null;
   };
 
-  const applyZToSelection = (z: number) => {
+  const bringSelectionToFront = () => {
+    const target = getSelectedLayerTarget();
+    console.log("[bringSelectionToFront] target", target);
+    if (!target) return;
+
+    if (target.kind === "image") {
+      console.log("[bringSelectionToFront] image", target.id);
+      bringImageToFront(target.id);
+      return;
+    }
+
+    console.log("[bringSelectionToFront] block", target.id);
+    bringBlockToFront?.(target.id);
+  };
+
+  const sendSelectionToBack = () => {
+    const target = getSelectedLayerTarget();
+    console.log("[sendSelectionToBack] target", target);
+    if (!target) return;
+
+    if (target.kind === "image") {
+      console.log("[sendSelectionToBack] image", target.id);
+      sendImageToBack(target.id);
+      return;
+    }
+
+    console.log("[sendSelectionToBack] block", target.id);
+    sendBlockToBack?.(target.id);
+  };
+
+  const bringSelectionForwardOne = () => {
     const target = getSelectedLayerTarget();
     if (!target) return;
 
     if (target.kind === "image") {
-      updateImage(target.id, { z });
+      bringImageForwardOne(target.id);
       return;
     }
 
-    updateBlockZ(target.id, z);
+    bringBlockForwardOne?.(target.id);
   };
 
-  const bringSelectionToFront = () => {
-    const layerItems = buildLayerItems();
-    if (layerItems.length === 0) return;
+  const sendSelectionBackwardOne = () => {
+    const target = getSelectedLayerTarget();
+    if (!target) return;
 
-    const maxZ = Math.max(...layerItems.map((it) => it.z));
-    applyZToSelection(maxZ + 1);
-  };
+    if (target.kind === "image") {
+      sendImageBackwardOne(target.id);
+      return;
+    }
 
-  const sendSelectionToBack = () => {
-    const layerItems = buildLayerItems();
-    if (layerItems.length === 0) return;
-
-    const minZ = Math.min(...layerItems.map((it) => it.z));
-    applyZToSelection(Math.max(1, minZ - 1));
+    sendBlockBackwardOne?.(target.id);
   };
 
   return {
@@ -238,5 +263,7 @@ export function useCardEditorHandlers({
     handleBlockPointerDown,
     bringSelectionToFront,
     sendSelectionToBack,
+    bringSelectionForwardOne,
+    sendSelectionBackwardOne,
   };
 }

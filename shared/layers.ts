@@ -14,6 +14,14 @@ export function normalizeLayers<T extends LayerItem>(items: T[]): T[] {
     }));
 }
 
+// 配列の現在順をそのまま z=1,2,3... に振り直す
+function reindexLayers<T extends LayerItem>(items: T[]): T[] {
+  return items.map((item, index) => ({
+    ...item,
+    z: index + 1,
+  }));
+}
+
 export function moveToFront<T extends LayerItem>(
   items: T[],
   targetId: string,
@@ -23,7 +31,7 @@ export function moveToFront<T extends LayerItem>(
   if (!target) return normalized;
 
   const withoutTarget = normalized.filter((item) => item.id !== targetId);
-  return normalizeLayers([...withoutTarget, target]);
+  return reindexLayers([...withoutTarget, target]);
 }
 
 export function moveToBack<T extends LayerItem>(
@@ -35,7 +43,7 @@ export function moveToBack<T extends LayerItem>(
   if (!target) return normalized;
 
   const withoutTarget = normalized.filter((item) => item.id !== targetId);
-  return normalizeLayers([target, ...withoutTarget]);
+  return reindexLayers([target, ...withoutTarget]);
 }
 
 export function moveForwardOne<T extends LayerItem>(
@@ -49,7 +57,7 @@ export function moveForwardOne<T extends LayerItem>(
   const next = [...normalized];
   [next[index], next[index + 1]] = [next[index + 1], next[index]];
 
-  return normalizeLayers(next);
+  return reindexLayers(next);
 }
 
 export function moveBackwardOne<T extends LayerItem>(
@@ -63,5 +71,5 @@ export function moveBackwardOne<T extends LayerItem>(
   const next = [...normalized];
   [next[index - 1], next[index]] = [next[index], next[index - 1]];
 
-  return normalizeLayers(next);
+  return reindexLayers(next);
 }
