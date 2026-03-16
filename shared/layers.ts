@@ -5,6 +5,14 @@ export type LayerItem = {
   z: number;
 };
 
+export type LayerKind = "block" | "image";
+
+export type MixedLayerItem = {
+  id: string;
+  kind: LayerKind;
+  z: number;
+};
+
 export function normalizeLayers<T extends LayerItem>(items: T[]): T[] {
   return [...items]
     .sort((a, b) => (a.z ?? 0) - (b.z ?? 0))
@@ -72,4 +80,53 @@ export function moveBackwardOne<T extends LayerItem>(
   [next[index - 1], next[index]] = [next[index], next[index - 1]];
 
   return reindexLayers(next);
+}
+
+/**
+ * block / image を混ぜたレイヤー一覧を作る
+ */
+export function buildMixedLayers<
+  TBlock extends { id: string; z: number },
+  TImage extends { id: string; z: number },
+>(blocks: TBlock[], images: TImage[]): MixedLayerItem[] {
+  return normalizeLayers([
+    ...blocks.map((block) => ({
+      id: block.id,
+      kind: "block" as const,
+      z: block.z,
+    })),
+    ...images.map((image) => ({
+      id: image.id,
+      kind: "image" as const,
+      z: image.z,
+    })),
+  ]);
+}
+
+/**
+ * 並び替え後の mixedLayers の z を blocks / images に戻す
+ */
+export function applyLayerOrderToBlocksAndImages<
+  TBlock extends { id: string; z: number },
+  TImage extends { id: string; z: number },
+>(
+  blocks: TBlock[],
+  images: TImage[],
+  mixedLayers: MixedLayerItem[],
+): {
+  blocks: TBlock[];
+  images: TImage[];
+} {
+  const zMap = new Map(mixedLayers.map((item) => [item.id, item.z]));
+
+  return {
+    blocks: blocks.map((block) => ({
+      ...block,
+      z: zMap.get(block.id) ?? block.z,
+    })),
+    images: images.map((image) => ({
+      ...image,
+      z: zMap.get(image.id) ?? image.z,
+    })),
+  };
 }

@@ -51,6 +51,7 @@ export default function CardEditor({ code }: Props) {
 
   const {
     blocks: editableBlocks,
+    setBlocks,
     addBlock,
     previewText,
     commitText,
@@ -78,6 +79,7 @@ export default function CardEditor({ code }: Props) {
 
   const {
     images,
+    setImages,
     addFromUpload,
     getImagesFor,
     moveImage,
@@ -85,10 +87,6 @@ export default function CardEditor({ code }: Props) {
     removeImage,
     countImagesFor,
     maxImagesPerSide,
-    bringImageToFront,
-    sendImageToBack,
-    bringImageForwardOne,
-    sendImageBackwardOne,
   } = useCardImages();
 
   const editor = useCardEditorState({
@@ -118,7 +116,7 @@ export default function CardEditor({ code }: Props) {
 
   // いま編集してる面
   const currentBlocks = getBlocksFor(state.side);
-
+  const currentImages = getImagesFor(state.side);
   const centerWrapRef = useRef<HTMLDivElement | null>(null);
 
   const handlers = useCardEditorHandlers({
@@ -127,6 +125,7 @@ export default function CardEditor({ code }: Props) {
     editing,
     setEditing,
     currentBlocks,
+    currentImages,
     commitText,
     previewText,
     setBlockWidth,
@@ -135,12 +134,10 @@ export default function CardEditor({ code }: Props) {
     setSheetSnap,
     cardRef,
     centerWrapRef,
-    bringImageToFront,
-    sendImageToBack,
-    bringImageForwardOne,
-    sendImageBackwardOne,
     activeBlockId: state.activeBlockId,
     selectedImageId,
+    setBlocks,
+    setImages,
   });
 
   const centerVisible = selectors.centerVisible;

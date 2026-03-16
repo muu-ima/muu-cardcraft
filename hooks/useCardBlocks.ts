@@ -85,6 +85,9 @@ export function useCardBlocks() {
 
   return {
     blocks,
+
+    // 追加：混合レイヤー反映用
+    setBlocks: set,
     addBlock,
     previewText,
     commitText,

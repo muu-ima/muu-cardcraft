@@ -6,9 +6,20 @@ import type { Dispatch, RefObject, SetStateAction } from "react";
 import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
 import type { TabKey } from "@/shared/editor";
 import type { Block } from "@/shared/blocks";
-import type { SheetSnap, Side } from "../CardEditor.types";
+import type { CardImage, Side } from "@/shared/images";
+import {
+  buildMixedLayers,
+  applyLayerOrderToBlocksAndImages,
+  moveToFront,
+  moveToBack,
+  moveForwardOne,
+  moveBackwardOne,
+} from "@/shared/layers";
+
+import type { SheetSnap } from "../CardEditor.types";
 
 type EditingState = { id: string; initialText: string } | null;
+type LayerMoveAction = "front" | "back" | "forward" | "backward";
 
 type UseCardEditorHandlersParams = {
   state: {
@@ -21,7 +32,6 @@ type UseCardEditorHandlersParams = {
   };
   editing: EditingState;
   setEditing: Dispatch<SetStateAction<EditingState>>;
-  currentBlocks: Block[];
   commitText: (id: string, value: string) => void;
   previewText: (id: string, value: string) => void;
   setBlockWidth: (id: string, width: number) => void;
@@ -37,26 +47,66 @@ type UseCardEditorHandlersParams = {
   setSheetSnap: Dispatch<SetStateAction<SheetSnap>>;
   cardRef: RefObject<HTMLDivElement | null>;
   centerWrapRef: RefObject<HTMLDivElement | null>;
-  bringImageToFront: (id: string) => void;
-  sendImageToBack: (id: string) => void;
-  bringImageForwardOne: (id: string) => void;
-  sendImageBackwardOne: (id: string) => void;
-
-  bringBlockToFront?: (id: string) => void;
-  sendBlockToBack?: (id: string) => void;
-  bringBlockForwardOne?: (id: string) => void;
-  sendBlockBackwardOne?: (id: string) => void;
-
   activeBlockId?: string;
   selectedImageId?: string | null;
+
+  currentBlocks: Block[];
+  currentImages: CardImage[];
+  setBlocks: (next: Block[] | ((prev: Block[]) => Block[])) => void;
+  setImages: (next: CardImage[] | ((prev: CardImage[]) => CardImage[])) => void;
 };
+
+export function reorderMixedLayers(params: {
+  targetId: string;
+  action: LayerMoveAction;
+  currentBlocks: Block[];
+  currentImages: CardImage[];
+  side: Side;
+}) {
+  const { targetId, action, currentBlocks, currentImages, side } = params;
+
+  const sideBlocks = currentBlocks.filter((b) => b.side === side);
+  const otherBlocks = currentBlocks.filter((b) => b.side !== side);
+
+  const sideImages = currentImages.filter((img) => img.side === side);
+  const otherImages = currentImages.filter((img) => img.side !== side);
+
+  const mixedLayers = buildMixedLayers(sideBlocks, sideImages);
+
+  let nextLayers = mixedLayers;
+
+  switch (action) {
+    case "front":
+      nextLayers = moveToFront(mixedLayers, targetId);
+      break;
+    case "back":
+      nextLayers = moveToBack(mixedLayers, targetId);
+      break;
+    case "forward":
+      nextLayers = moveForwardOne(mixedLayers, targetId);
+      break;
+    case "backward":
+      nextLayers = moveBackwardOne(mixedLayers, targetId);
+      break;
+  }
+
+  const reordered = applyLayerOrderToBlocksAndImages(
+    sideBlocks,
+    sideImages,
+    nextLayers,
+  );
+
+  return {
+    blocks: [...otherBlocks, ...reordered.blocks],
+    images: [...otherImages, ...reordered.images],
+  };
+}
 
 export function useCardEditorHandlers({
   state,
   actions,
   editing,
   setEditing,
-  currentBlocks,
   commitText,
   previewText,
   setBlockWidth,
@@ -65,33 +115,26 @@ export function useCardEditorHandlers({
   setSheetSnap,
   cardRef,
   centerWrapRef,
-  bringImageToFront,
-  sendImageToBack,
-  bringImageForwardOne,
-  sendImageBackwardOne,
-  bringBlockToFront,
-  sendBlockToBack,
-  bringBlockForwardOne,
-  sendBlockBackwardOne,
   activeBlockId,
   selectedImageId,
+  currentBlocks,
+  currentImages,
+  setBlocks,
+  setImages,
 }: UseCardEditorHandlersParams) {
-  const onUploadedImage = (asset: UploadImageAsset) => {
-    console.log("[onUploadedImage] asset", asset);
-    console.log("[onUploadedImage] side before add", state.side);
+  const { side } = state;
 
+  const onUploadedImage = (asset: UploadImageAsset) => {
     const result = addFromUpload({
       assetId: asset.id,
       url: asset.signedUrl,
-      side: state.side,
+      side,
     });
 
     if (!result.ok) {
       console.warn("この面には画像を最大3枚まで追加できます");
       return;
     }
-
-    console.log("[onUploadedImage] added", result.image);
   };
 
   const openTab = (tab: TabKey) => {
@@ -142,12 +185,12 @@ export function useCardEditorHandlers({
   };
 
   const onChangeText = (id: string, value: string) => {
-    if (state.side !== "front") return;
+    if (side !== "front") return;
     previewText(id, value);
   };
 
   const onCommitText = (id: string, value: string) => {
-    if (state.side !== "front") return;
+    if (side !== "front") return;
     commitText(id, value);
   };
 
@@ -197,58 +240,44 @@ export function useCardEditorHandlers({
     return null;
   };
 
+  const handleMoveMixedLayer = (
+    targetId: string,
+    action: "front" | "back" | "forward" | "backward",
+  ) => {
+    const result = reorderMixedLayers({
+      targetId,
+      action,
+      currentBlocks,
+      currentImages,
+      side,
+    });
+
+    setBlocks(result.blocks);
+    setImages(result.images);
+  };
+
   const bringSelectionToFront = () => {
     const target = getSelectedLayerTarget();
-    console.log("[bringSelectionToFront] target", target);
     if (!target) return;
-
-    if (target.kind === "image") {
-      console.log("[bringSelectionToFront] image", target.id);
-      bringImageToFront(target.id);
-      return;
-    }
-
-    console.log("[bringSelectionToFront] block", target.id);
-    bringBlockToFront?.(target.id);
+    handleMoveMixedLayer(target.id, "front");
   };
 
   const sendSelectionToBack = () => {
     const target = getSelectedLayerTarget();
-    console.log("[sendSelectionToBack] target", target);
     if (!target) return;
-
-    if (target.kind === "image") {
-      console.log("[sendSelectionToBack] image", target.id);
-      sendImageToBack(target.id);
-      return;
-    }
-
-    console.log("[sendSelectionToBack] block", target.id);
-    sendBlockToBack?.(target.id);
+    handleMoveMixedLayer(target.id, "back");
   };
 
   const bringSelectionForwardOne = () => {
     const target = getSelectedLayerTarget();
     if (!target) return;
-
-    if (target.kind === "image") {
-      bringImageForwardOne(target.id);
-      return;
-    }
-
-    bringBlockForwardOne?.(target.id);
+    handleMoveMixedLayer(target.id, "forward");
   };
 
   const sendSelectionBackwardOne = () => {
     const target = getSelectedLayerTarget();
     if (!target) return;
-
-    if (target.kind === "image") {
-      sendImageBackwardOne(target.id);
-      return;
-    }
-
-    sendBlockBackwardOne?.(target.id);
+    handleMoveMixedLayer(target.id, "backward");
   };
 
   return {
