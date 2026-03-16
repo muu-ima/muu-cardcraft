@@ -221,6 +221,7 @@ export default function CardEditor({ code }: Props) {
     setSelectedImageId,
     onBringSelectedImageToFront: handlers.bringSelectionToFront,
     onSendSelectedImageToBack: handlers.sendSelectionToBack,
+    setActiveBlockId: actions.setActiveBlockId,
   });
 
   console.log("[CardEditor] side", state.side);

@@ -67,6 +67,7 @@ export type CardEditorMobileProps = {
   onSelectImage: (id: string | null) => void;
   onBringSelectedImageToFront: () => void;
   onSendSelectedImageToBack: () => void;
+  setActiveBlockId: (id: string) => void;
 
   exportRef: RefObject<HTMLDivElement | null>;
   downloadImage: (format: "png" | "jpeg", target: HTMLDivElement) => void;

@@ -62,6 +62,7 @@ export type CardEditorDesktopProps = {
   onSelectImage: (id: string | null) => void;
   onBringSelectedImageToFront: () => void;
   onSendSelectedImageToBack: () => void;
+  setActiveBlockId: (id: string) => void;
 
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;

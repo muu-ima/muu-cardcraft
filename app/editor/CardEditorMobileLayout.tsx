@@ -64,6 +64,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     onSelectImage,
     onBringSelectedImageToFront,
     onSendSelectedImageToBack,
+    setActiveBlockId,
   } = props;
 
   const blocksForSide = getBlocksFor(state.side);
@@ -129,6 +130,15 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
             selectedImageId,
             onBringSelectedImageToFront,
             onSendSelectedImageToBack,
+          }}
+          layerPanel={{
+            mixedLayers,
+            blocks: getBlocksFor(state.side),
+            images: getImagesFor(state.side),
+            activeBlockId: state.activeBlockId,
+            selectedImageId,
+            onSelectBlock: setActiveBlockId,
+            onSelectImage,
           }}
           designPanel={{
             design,

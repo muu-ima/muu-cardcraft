@@ -93,6 +93,7 @@ type UseCardEditorLayoutPropsParams = {
   setSelectedImageId: (id: string | null) => void;
   onBringSelectedImageToFront: () => void;
   onSendSelectedImageToBack: () => void;
+  setActiveBlockId: (id: string) => void;
 
   getMixedLayersFor: (side: Side) => {
     kind: "block" | "image";
@@ -157,6 +158,7 @@ export function useCardEditorLayoutProps({
   setSelectedImageId,
   onBringSelectedImageToFront,
   onSendSelectedImageToBack,
+  setActiveBlockId,
 }: UseCardEditorLayoutPropsParams) {
   const layoutState: EditorStateForLayout = {
     activeTab: state.activeTab,
@@ -227,6 +229,7 @@ export function useCardEditorLayoutProps({
     onBringSelectedImageToFront,
     onSendSelectedImageToBack,
     mixedLayers: getMixedLayersFor(state.side),
+    setActiveBlockId,
   };
 
   const mobileProps: CardEditorMobileProps = {
@@ -282,6 +285,7 @@ export function useCardEditorLayoutProps({
     onBringSelectedImageToFront,
     onSendSelectedImageToBack,
     mixedLayers: getMixedLayersFor(state.side),
+    setActiveBlockId,
   };
 
   return {

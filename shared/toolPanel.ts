@@ -49,6 +49,22 @@ export type ImagePanelSectionProps = {
   onSendSelectedImageToBack: () => void;
 };
 
+export type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
+
+export type LayerPanelSectionProps = {
+  mixedLayers: MixedLayer[];
+  blocks: Block[];
+  images: CardImage[];
+  activeBlockId: string;
+  selectedImageId: string | null;
+  onSelectBlock: (id: string) => void;
+  onSelectImage: (id: string | null) => void;
+};
+
 export type DesignPanelSectionProps = {
   design: DesignKey;
   onChangeDesign: (design: DesignKey) => void;
@@ -62,6 +78,7 @@ export type ToolPanelProps = ToolPanelBaseProps & {
   textPanel: TextPanelSectionProps;
   fontPanel: FontPanelSectionProps;
   imagePanel: ImagePanelSectionProps;
+  layerPanel: LayerPanelSectionProps;
   designPanel: DesignPanelSectionProps;
   exportPanel: ExportPanelSectionProps;
 };
