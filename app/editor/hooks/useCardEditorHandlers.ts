@@ -186,21 +186,36 @@ export function useCardEditorHandlers({
     ];
   };
 
+  const getSelectedLayerTarget = () => {
+    if (selectedImageId) {
+      return { kind: "image" as const, id: selectedImageId };
+    }
+
+    if (activeBlockId) {
+      return { kind: "block" as const, id: activeBlockId };
+    }
+
+    return null;
+  };
+
+  const applyZToSelection = (z: number) => {
+    const target = getSelectedLayerTarget();
+    if (!target) return;
+
+    if (target.kind === "image") {
+      updateImage(target.id, { z });
+      return;
+    }
+
+    updateBlockZ(target.id, z);
+  };
+
   const bringSelectionToFront = () => {
     const layerItems = buildLayerItems();
     if (layerItems.length === 0) return;
 
     const maxZ = Math.max(...layerItems.map((it) => it.z));
-    const nextZ = Math.max(1, maxZ + 1);
-
-    if (selectedImageId) {
-      updateImage(selectedImageId, { z: nextZ });
-      return;
-    }
-
-    if (activeBlockId) {
-      updateBlockZ(activeBlockId, nextZ);
-    }
+    applyZToSelection(maxZ + 1);
   };
 
   const sendSelectionToBack = () => {
@@ -208,16 +223,7 @@ export function useCardEditorHandlers({
     if (layerItems.length === 0) return;
 
     const minZ = Math.min(...layerItems.map((it) => it.z));
-    const nextZ = Math.max(1, minZ - 1);
-
-    if (selectedImageId) {
-      updateImage(selectedImageId, { z: nextZ });
-      return;
-    }
-
-    if (activeBlockId) {
-      updateBlockZ(activeBlockId, nextZ);
-    }
+    applyZToSelection(Math.max(1, minZ - 1));
   };
 
   return {

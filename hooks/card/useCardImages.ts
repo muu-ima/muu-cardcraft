@@ -61,7 +61,7 @@ export function useCardImages(initial: CardImage[] = []) {
       const nextZ =
         images
           .filter((it) => it.side === args.side)
-          .reduce((max, it) => Math.max(max, it.z ?? 0), 0) + 1;
+          .reduce((max, it) => Math.max(max, it.z), 0) + 1;
 
       if (currentCount >= MAX_IMAGES_PER_SIDE) {
         return {
