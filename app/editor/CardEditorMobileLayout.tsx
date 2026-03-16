@@ -30,6 +30,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     onDeleteImage,
     moveImage,
     resizeImage,
+    mixedLayers,
     getBlocksFor,
     addBlock: onAddBlock,
     onChangeText,
@@ -171,6 +172,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                 <EditorCanvas
                   blocks={getBlocksFor(state.side)}
                   images={getImagesFor(state.side)}
+                  mixedLayers={mixedLayers}
                   moveImage={moveImage}
                   resizeImage={resizeImage}
                   design={design}

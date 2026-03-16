@@ -93,6 +93,12 @@ type UseCardEditorLayoutPropsParams = {
   setSelectedImageId: (id: string | null) => void;
   onBringSelectedImageToFront: () => void;
   onSendSelectedImageToBack: () => void;
+
+  getMixedLayersFor: (side: Side) => {
+    kind: "block" | "image";
+    id: string;
+    z: number;
+  }[];
 };
 
 export function useCardEditorLayoutProps({
@@ -112,6 +118,7 @@ export function useCardEditorLayoutProps({
   scaleMobile,
   getBlocksFor,
   getImagesFor,
+  getMixedLayersFor,
   moveImage,
   resizeImage,
   editableBlocks,
@@ -219,6 +226,7 @@ export function useCardEditorLayoutProps({
     onSelectImage: setSelectedImageId,
     onBringSelectedImageToFront,
     onSendSelectedImageToBack,
+    mixedLayers: getMixedLayersFor(state.side),
   };
 
   const mobileProps: CardEditorMobileProps = {
@@ -273,6 +281,7 @@ export function useCardEditorLayoutProps({
     onSelectImage: setSelectedImageId,
     onBringSelectedImageToFront,
     onSendSelectedImageToBack,
+    mixedLayers: getMixedLayersFor(state.side),
   };
 
   return {

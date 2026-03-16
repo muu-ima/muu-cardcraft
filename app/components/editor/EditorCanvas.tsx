@@ -17,9 +17,16 @@ import {
   clamp,
 } from "@/shared/images";
 
+type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
+
 type Props = {
   blocks: Block[];
   images: CardImage[];
+  mixedLayers: MixedLayer[];
   design: DesignKey;
   moveImage: (id: string, x: number, y: number) => void;
   resizeImage: (id: string, w: number, h: number) => void;
@@ -82,14 +89,8 @@ export default function EditorCanvas({
   onChangeEditingText,
   selectedImageId,
   onSelectImage,
+  mixedLayers,
 }: Props) {
-  // console.log("[EditorCanvas render]", {
-  //   isPreview,
-  //   editingBlockId,
-  //   editingText,
-  //   scale,
-  // });
-
   const taRef = useRef<HTMLTextAreaElement | null>(null);
 
   const [resizeState, setResizeState] = useState<{
@@ -119,11 +120,6 @@ export default function EditorCanvas({
     if (isPreview) return;
 
     const ta = taRef.current;
-    console.log("[autosize] start", {
-      editingBlockId,
-      hasTa: !!ta,
-      valueLen: (ta?.value ?? "").length,
-    });
     if (!ta) return;
     if (!editingBlockId) return;
 
@@ -137,23 +133,11 @@ export default function EditorCanvas({
     const sw = ta.scrollWidth;
     const sh = ta.scrollHeight;
 
-    console.log("[autosize] measured", {
-      sw,
-      sh,
-      cw: ta.clientWidth,
-      ch: ta.clientHeight,
-    });
-
     const padX = 12; // 2px 6px の左右合計
     const padY = 4;
 
     ta.style.width = `${Math.max(20, sw + padX)}px`;
     ta.style.height = `${Math.max(20, sh + padY)}px`;
-
-    console.log("[autosize] applied", {
-      width: ta.style.width,
-      height: ta.style.height,
-    });
   }, [isPreview, editingBlockId, editingText]);
 
   useEffect(() => {
@@ -195,8 +179,6 @@ export default function EditorCanvas({
     };
   }, [resizeState, resizeImage, scale]);
 
-  console.log("[EditorCanvas] images", images);
-
   return (
     <section className="flex flex-col items-center gap-3">
       <div className="w-full flex justify-center">
@@ -224,6 +206,7 @@ export default function EditorCanvas({
             <CardSurface
               blocks={blocks}
               images={images}
+              mixedLayers={mixedLayers}
               onMoveImage={moveImage}
               selectedImageId={selectedImageId}
               onSelectImage={onSelectImage}

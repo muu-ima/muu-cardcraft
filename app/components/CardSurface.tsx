@@ -9,9 +9,17 @@ import type { DesignKey } from "@/shared/design";
 import { CARD_FULL_DESIGNS } from "@/shared/cardDesigns";
 import { FONT_DEFINITIONS } from "@/shared/fonts";
 
+type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
+
 type CardSurfaceProps = {
   blocks: Block[];
   images?: CardImage[];
+  mixedLayers: MixedLayer[];
+
   onMoveImage?: (id: string, x: number, y: number) => void;
   design: DesignKey;
 
@@ -89,6 +97,7 @@ function getCardStyle(design: DesignKey): CSSProperties {
 export default function CardSurface({
   blocks,
   images = [],
+  mixedLayers = [],
   onMoveImage,
   selectedImageId,
   onSelectImage,
@@ -178,33 +187,6 @@ export default function CardSurface({
     [dragImage],
   );
 
-  console.log("[CardSurface] images", images);
-
-  const layerItems = [
-    ...images.map((img) => ({
-      kind: "image" as const,
-      z: img.z,
-      data: img,
-    })),
-    ...blocks.map((block) => ({
-      kind: "block" as const,
-      z: block.z,
-      data: block,
-    })),
-  ].sort((a, b) => a.z - b.z);
-
-  console.log(
-    "[CardSurface] layerItems",
-    layerItems.map((item) => ({
-      kind: item.kind,
-      id: item.data.id,
-      z: item.z,
-      ...(item.kind === "image"
-        ? { assetId: item.data.assetId }
-        : { text: item.data.type === "text" ? item.data.text : item.data.id }),
-    })),
-  );
-
   return (
     <div
       ref={cardRef}
@@ -231,9 +213,10 @@ export default function CardSurface({
       className={`rounded-xl border shadow-md ${className ?? ""}`}
     >
       {/* z順で統合描画するレイヤー */}{" "}
-      {layerItems.map((item) => {
-        if (item.kind === "image") {
-          const img = item.data;
+      {mixedLayers.map((layer) => {
+        if (layer.kind === "image") {
+          const img = images.find((x) => x.id === layer.id);
+          if (!img) return null;
           const isDragging = dragImage?.id === img.id;
           const isSelected = selectedImageId === img.id;
 
@@ -302,7 +285,8 @@ export default function CardSurface({
           );
         }
 
-        const block = item.data;
+        const block = blocks.find((x) => x.id === layer.id);
+        if (!block) return null;
 
         const showSelection =
           interactive &&

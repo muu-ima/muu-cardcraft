@@ -19,6 +19,12 @@ import type {
   Side,
 } from "./CardEditor.types";
 
+type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
+
 export type CardEditorMobileProps = {
   code: string;
 
@@ -38,6 +44,7 @@ export type CardEditorMobileProps = {
 
   getBlocksFor: (side: Side) => Block[];
   getImagesFor: (side: Side) => CardImage[];
+  mixedLayers: MixedLayer[];
   moveImage: (id: string, x: number, y: number) => void;
   resizeImage: (id: string, w: number, h: number) => void;
   currentImageCount: number;

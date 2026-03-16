@@ -114,6 +114,24 @@ export default function CardEditor({ code }: Props) {
   const getBlocksFor = (s: Side) =>
     s === "front" ? editableBlocks : CARD_FULL_DESIGNS[design].back.blocks;
 
+  const getMixedLayersFor = (side: Side) => {
+    const sideBlocks = getBlocksFor(side);
+    const sideImages = getImagesFor(side);
+
+    return [
+      ...sideImages.map((img) => ({
+        kind: "image" as const,
+        id: img.id,
+        z: img.z,
+      })),
+      ...sideBlocks.map((block) => ({
+        kind: "block" as const,
+        id: block.id,
+        z: block.z,
+      })),
+    ].sort((a, b) => a.z - b.z);
+  };
+
   // いま編集してる面
   const currentBlocks = getBlocksFor(state.side);
   const currentImages = getImagesFor(state.side);
@@ -164,6 +182,7 @@ export default function CardEditor({ code }: Props) {
     scaleMobile,
     getBlocksFor,
     getImagesFor,
+    getMixedLayersFor,
     moveImage,
     resizeImage,
     editableBlocks,
@@ -251,6 +270,7 @@ export default function CardEditor({ code }: Props) {
               <CardSurface
                 blocks={getBlocksFor(state.side)}
                 images={getImagesFor(state.side)}
+                mixedLayers={getMixedLayersFor(state.side)}
                 onMoveImage={moveImage}
                 design={design}
                 w={CARD_BASE_W}

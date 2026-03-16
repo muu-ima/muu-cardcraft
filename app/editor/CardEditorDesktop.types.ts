@@ -18,6 +18,12 @@ import type {
   Side,
 } from "./CardEditor.types";
 
+type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
+
 export type CardEditorDesktopProps = {
   // 画像アップロード
   code: string;
@@ -35,6 +41,7 @@ export type CardEditorDesktopProps = {
   // ---- blocks / デザイン
   getBlocksFor: (side: Side) => Block[];
   getImagesFor: (side: "front" | "back") => CardImage[];
+  mixedLayers: MixedLayer[];
   editableBlocks: Block[];
   addBlock: () => void;
   onChangeText: (id: string, value: string) => void;
