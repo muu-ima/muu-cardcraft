@@ -59,6 +59,9 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     onBringSelectedImageToFront,
     onSendSelectedImageToBack,
     setActiveBlockId,
+    onMoveLayerFront,
+    onMoveLayerBack,
+    onDeleteLayer,
   } = props;
 
   const isPanelOpen = state.activeTab !== null;
@@ -148,6 +151,9 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
               selectedImageId,
               onSelectBlock: setActiveBlockId,
               onSelectImage,
+              onMoveLayerFront,
+              onMoveLayerBack,
+              onDeleteLayer,
             }}
             exportPanel={{
               onDownload: (format: "png" | "jpeg") => {

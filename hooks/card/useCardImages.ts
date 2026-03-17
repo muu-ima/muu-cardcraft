@@ -44,18 +44,6 @@ type AddFromUploadArgs = {
 export function useCardImages(initial: CardImage[] = []) {
   const [images, setImages] = useState<CardImage[]>(initial);
 
-  useEffect(() => {
-    console.log(
-      "[useCardImages] images",
-      images.map((img) => ({
-        id: img.id,
-        side: img.side,
-        z: img.z,
-        assetId: img.assetId,
-      })),
-    );
-  }, [images]);
-
   const countImagesFor = useCallback(
     (side: Side) => images.filter((it) => it.side === side).length,
     [images],
@@ -192,16 +180,6 @@ export function useCardImages(initial: CardImage[] = []) {
 
       const reordered = moveToFront(sameSide, id);
 
-      console.log("[bringImageToFront]", {
-        targetId: id,
-        side: target.side,
-        reordered: reordered.map((img) => ({
-          id: img.id,
-          z: img.z,
-          assetId: img.assetId,
-        })),
-      });
-
       return [...others, ...reordered];
     });
   }, []);
@@ -215,16 +193,6 @@ export function useCardImages(initial: CardImage[] = []) {
       const others = prev.filter((img) => img.side !== target.side);
 
       const reordered = moveToBack(sameSide, id);
-
-      console.log("[sendImageToBack]", {
-        targetId: id,
-        side: target.side,
-        reordered: reordered.map((img) => ({
-          id: img.id,
-          z: img.z,
-          assetId: img.assetId,
-        })),
-      });
 
       return [...others, ...reordered];
     });
@@ -240,16 +208,6 @@ export function useCardImages(initial: CardImage[] = []) {
 
       const reordered = moveForwardOne(sameSide, id);
 
-      console.log("[bringImageForwardOne]", {
-        targetId: id,
-        side: target.side,
-        reordered: reordered.map((img) => ({
-          id: img.id,
-          z: img.z,
-          assetId: img.assetId,
-        })),
-      });
-
       return [...others, ...reordered];
     });
   }, []);
@@ -263,16 +221,6 @@ export function useCardImages(initial: CardImage[] = []) {
       const others = prev.filter((img) => img.side !== target.side);
 
       const reordered = moveBackwardOne(sameSide, id);
-
-      console.log("[sendImageBackwardOne]", {
-        targetId: id,
-        side: target.side,
-        reordered: reordered.map((img) => ({
-          id: img.id,
-          z: img.z,
-          assetId: img.assetId,
-        })),
-      });
 
       return [...others, ...reordered];
     });

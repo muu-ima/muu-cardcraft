@@ -24,6 +24,12 @@ type Props = {
   code: string;
 };
 
+type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
+
 type EditingState = { id: string; initialText: string } | null;
 
 export default function CardEditor({ code }: Props) {
@@ -165,6 +171,53 @@ export default function CardEditor({ code }: Props) {
   // 📦 Layout Props
   // =========================
 
+  const handleMoveLayerFront = useCallback(
+    (layer: MixedLayer) => {
+      const mixed = getMixedLayersFor(state.side);
+      const maxZ =
+        mixed.length > 0 ? Math.max(...mixed.map((item) => item.z)) : 1;
+
+      if (layer.kind === "block") {
+        updateBlockZ(layer.id, maxZ + 1);
+        return;
+      }
+
+      setImages((prev) =>
+        prev.map((img) =>
+          img.id === layer.id ? { ...img, z: maxZ + 1 } : img,
+        ),
+      );
+    },
+    [getMixedLayersFor, state.side, updateBlockZ, setImages],
+  );
+
+  const handleMoveLayerBack = useCallback(
+    (layer: MixedLayer) => {
+      if (layer.kind === "block") {
+        updateBlockZ(layer.id, 0);
+        return;
+      }
+
+      setImages((prev) =>
+        prev.map((img) => (img.id === layer.id ? { ...img, z: 0 } : img)),
+      );
+    },
+    [updateBlockZ, setImages],
+  );
+
+  const handleDeleteLayer = useCallback(
+    (layer: MixedLayer) => {
+      if (layer.kind === "image") {
+        removeImage(layer.id);
+        setSelectedImageId(null);
+        return;
+      }
+
+      removeBlock(layer.id);
+    },
+    [removeImage, removeBlock],
+  );
+
   const { desktopProps, mobileProps } = useCardEditorLayoutProps({
     code,
     state,
@@ -222,11 +275,10 @@ export default function CardEditor({ code }: Props) {
     onBringSelectedImageToFront: handlers.bringSelectionToFront,
     onSendSelectedImageToBack: handlers.sendSelectionToBack,
     setActiveBlockId: actions.setActiveBlockId,
+    onMoveLayerFront: handleMoveLayerFront,
+    onMoveLayerBack: handleMoveLayerBack,
+    onDeleteLayer: handleDeleteLayer,
   });
-
-  console.log("[CardEditor] side", state.side);
-  console.log("[CardEditor] images", images);
-  console.log("[CardEditor] filtered", getImagesFor(state.side));
 
   // =========================
   // 🎨 2. レイアウト描画

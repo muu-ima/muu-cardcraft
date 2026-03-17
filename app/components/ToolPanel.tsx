@@ -142,6 +142,9 @@ export default function ToolPanel({
             selectedImageId={layerPanel.selectedImageId}
             onSelectBlock={layerPanel.onSelectBlock}
             onSelectImage={layerPanel.onSelectImage}
+            onMoveLayerFront={layerPanel.onMoveLayerFront}
+            onMoveLayerBack={layerPanel.onMoveLayerBack}
+            onDeleteLayer={layerPanel.onDeleteLayer}
           />
         )}
         {activeTab === "export" && (

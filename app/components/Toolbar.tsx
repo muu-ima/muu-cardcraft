@@ -11,6 +11,7 @@ import {
   Redo2,
   Eye,
   Pencil,
+  Layers,
 } from "lucide-react";
 import type { TabKey } from "@/shared/editor";
 
@@ -29,6 +30,7 @@ const tools: { key: TabKey; label: string; Icon: React.ElementType }[] = [
   { key: "font", label: "フォント", Icon: TextCursor },
   { key: "design", label: "背景", Icon: ImageIcon },
   { key: "image", label: "画像", Icon: ImagePlus },
+  { key: "layers", label: "レイヤー", Icon: Layers },
   { key: "export", label: "書き出し", Icon: Download },
 ];
 

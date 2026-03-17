@@ -10,6 +10,12 @@ import type { CardEditorMobileProps } from "../CardEditorMobile.types";
 import type { TabKey } from "@/shared/editor";
 import type { DesignKey } from "@/shared/design";
 
+type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
+
 type UseCardEditorLayoutPropsParams = {
   code: string;
 
@@ -93,13 +99,14 @@ type UseCardEditorLayoutPropsParams = {
   setSelectedImageId: (id: string | null) => void;
   onBringSelectedImageToFront: () => void;
   onSendSelectedImageToBack: () => void;
+
   setActiveBlockId: (id: string) => void;
 
-  getMixedLayersFor: (side: Side) => {
-    kind: "block" | "image";
-    id: string;
-    z: number;
-  }[];
+  onMoveLayerFront: (layer: MixedLayer) => void;
+  onMoveLayerBack: (layer: MixedLayer) => void;
+  onDeleteLayer: (layer: MixedLayer) => void;
+
+  getMixedLayersFor: (side: Side) => MixedLayer[];
 };
 
 export function useCardEditorLayoutProps({
@@ -159,6 +166,9 @@ export function useCardEditorLayoutProps({
   onBringSelectedImageToFront,
   onSendSelectedImageToBack,
   setActiveBlockId,
+  onMoveLayerFront,
+  onMoveLayerBack,
+  onDeleteLayer,
 }: UseCardEditorLayoutPropsParams) {
   const layoutState: EditorStateForLayout = {
     activeTab: state.activeTab,
@@ -230,6 +240,9 @@ export function useCardEditorLayoutProps({
     onSendSelectedImageToBack,
     mixedLayers: getMixedLayersFor(state.side),
     setActiveBlockId,
+    onMoveLayerFront,
+    onMoveLayerBack,
+    onDeleteLayer,
   };
 
   const mobileProps: CardEditorMobileProps = {
@@ -286,6 +299,9 @@ export function useCardEditorLayoutProps({
     onSendSelectedImageToBack,
     mixedLayers: getMixedLayersFor(state.side),
     setActiveBlockId,
+    onMoveLayerFront,
+    onMoveLayerBack,
+    onDeleteLayer,
   };
 
   return {

@@ -69,6 +69,9 @@ export type CardEditorMobileProps = {
   onSendSelectedImageToBack: () => void;
   setActiveBlockId: (id: string) => void;
 
+  onMoveLayerFront: (layer: MixedLayer) => void;
+  onMoveLayerBack: (layer: MixedLayer) => void;
+  onDeleteLayer: (layer: MixedLayer) => void;
   exportRef: RefObject<HTMLDivElement | null>;
   downloadImage: (format: "png" | "jpeg", target: HTMLDivElement) => void;
 

@@ -55,14 +55,20 @@ export type MixedLayer = {
   z: number;
 };
 
-export type LayerPanelSectionProps = {
+type LayerPanelSectionProps = {
   mixedLayers: MixedLayer[];
   blocks: Block[];
   images: CardImage[];
-  activeBlockId: string;
-  selectedImageId: string | null;
-  onSelectBlock: (id: string) => void;
-  onSelectImage: (id: string | null) => void;
+
+  activeBlockId?: string;
+  selectedImageId?: string | null;
+
+  onSelectBlock?: (id: string) => void;
+  onSelectImage?: (id: string | null) => void;
+
+  onMoveLayerFront?: (layer: MixedLayer) => void;
+  onMoveLayerBack?: (layer: MixedLayer) => void;
+  onDeleteLayer?: (layer: MixedLayer) => void;
 };
 
 export type DesignPanelSectionProps = {
