@@ -18,6 +18,19 @@ const ExportSurface = forwardRef<HTMLDivElement, Props>(function ExportSurface(
   { blocks, images = [], design },
   ref,
 ) {
+  const mixedLayers = [
+    ...images.map((img) => ({
+      kind: "image" as const,
+      id: img.id,
+      z: img.z,
+    })),
+    ...blocks.map((block) => ({
+      kind: "block" as const,
+      id: block.id,
+      z: block.z,
+    })),
+  ].sort((a, b) => a.z - b.z);
+
   return (
     <div
       style={{
@@ -35,6 +48,7 @@ const ExportSurface = forwardRef<HTMLDivElement, Props>(function ExportSurface(
         <CardSurface
           blocks={blocks}
           images={images}
+          mixedLayers={mixedLayers}
           design={design}
           w={CARD_BASE_W}
           h={CARD_BASE_H}
