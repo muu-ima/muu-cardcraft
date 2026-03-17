@@ -34,6 +34,7 @@ const BASE_FRONT_BLOCKS: Block[] = [
     side: "front",
     x: 40,
     y: 40,
+    z: 1,
     fontSize: 20,
     fontWeight: "bold",
     fontKey: "sans",
@@ -45,6 +46,7 @@ const BASE_FRONT_BLOCKS: Block[] = [
     side: "front",
     x: 40,
     y: 80,
+    z: 2,
     fontSize: 14,
     fontWeight: "normal",
     fontKey: "sans",
@@ -59,6 +61,7 @@ const BASE_BACK_BLOCKS: Block[] = [
     side: "front",
     x: 100,
     y: 120,
+    z: 2,
     fontSize: 24,
     fontWeight: "bold",
     fontKey: "sans",
@@ -70,6 +73,7 @@ const BASE_BACK_BLOCKS: Block[] = [
     side: "front",
     x: 100,
     y: 80,
+    z: 1,
     fontSize: 18,
     fontWeight: "normal",
     fontKey: "sans",
@@ -115,4 +119,3 @@ export const CARD_FULL_DESIGNS: Record<DesignKey, cardDesign> = {
   kinmokusei: makeDesign("kinmokusei"),
   usaCarrot: makeDesign("usaCarrot"),
 };
-
