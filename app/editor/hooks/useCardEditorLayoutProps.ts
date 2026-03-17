@@ -10,6 +10,12 @@ import type { CardEditorMobileProps } from "../CardEditorMobile.types";
 import type { TabKey } from "@/shared/editor";
 import type { DesignKey } from "@/shared/design";
 
+type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
+
 type UseCardEditorLayoutPropsParams = {
   code: string;
 
@@ -49,6 +55,7 @@ type UseCardEditorLayoutPropsParams = {
   getBlocksFor: CardEditorDesktopProps["getBlocksFor"];
   getImagesFor: CardEditorDesktopProps["getImagesFor"];
   moveImage: CardEditorDesktopProps["moveImage"];
+  resizeImage: CardEditorDesktopProps["resizeImage"];
 
   editableBlocks: CardEditorDesktopProps["editableBlocks"];
   addBlock: CardEditorDesktopProps["addBlock"];
@@ -88,6 +95,18 @@ type UseCardEditorLayoutPropsParams = {
   redo: CardEditorDesktopProps["redo"];
 
   removeBlock: EditorActionsForLayout["removeBlock"];
+  selectedImageId: string | null;
+  setSelectedImageId: (id: string | null) => void;
+  onBringSelectedImageToFront: () => void;
+  onSendSelectedImageToBack: () => void;
+
+  setActiveBlockId: (id: string) => void;
+
+  onMoveLayerFront: (layer: MixedLayer) => void;
+  onMoveLayerBack: (layer: MixedLayer) => void;
+  onDeleteLayer: (layer: MixedLayer) => void;
+
+  getMixedLayersFor: (side: Side) => MixedLayer[];
 };
 
 export function useCardEditorLayoutProps({
@@ -107,7 +126,9 @@ export function useCardEditorLayoutProps({
   scaleMobile,
   getBlocksFor,
   getImagesFor,
+  getMixedLayersFor,
   moveImage,
+  resizeImage,
   editableBlocks,
   addBlock,
   onChangeText,
@@ -140,6 +161,14 @@ export function useCardEditorLayoutProps({
   undo,
   redo,
   removeBlock,
+  selectedImageId,
+  setSelectedImageId,
+  onBringSelectedImageToFront,
+  onSendSelectedImageToBack,
+  setActiveBlockId,
+  onMoveLayerFront,
+  onMoveLayerBack,
+  onDeleteLayer,
 }: UseCardEditorLayoutPropsParams) {
   const layoutState: EditorStateForLayout = {
     activeTab: state.activeTab,
@@ -173,6 +202,7 @@ export function useCardEditorLayoutProps({
     getBlocksFor,
     getImagesFor,
     moveImage,
+    resizeImage,
     editableBlocks,
     addBlock,
     onChangeText,
@@ -204,6 +234,15 @@ export function useCardEditorLayoutProps({
     onChangeWidth,
     setTextColor,
     previewTextColor,
+    selectedImageId,
+    onSelectImage: setSelectedImageId,
+    onBringSelectedImageToFront,
+    onSendSelectedImageToBack,
+    mixedLayers: getMixedLayersFor(state.side),
+    setActiveBlockId,
+    onMoveLayerFront,
+    onMoveLayerBack,
+    onDeleteLayer,
   };
 
   const mobileProps: CardEditorMobileProps = {
@@ -234,6 +273,7 @@ export function useCardEditorLayoutProps({
     previewTextColor,
     onUploadedImage,
     moveImage,
+    resizeImage,
     currentImageCount,
     maxImageCount,
     onDeleteImage,
@@ -253,6 +293,15 @@ export function useCardEditorLayoutProps({
     snapGuide,
     undo,
     redo,
+    selectedImageId,
+    onSelectImage: setSelectedImageId,
+    onBringSelectedImageToFront,
+    onSendSelectedImageToBack,
+    mixedLayers: getMixedLayersFor(state.side),
+    setActiveBlockId,
+    onMoveLayerFront,
+    onMoveLayerBack,
+    onDeleteLayer,
   };
 
   return {

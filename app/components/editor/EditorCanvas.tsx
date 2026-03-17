@@ -1,7 +1,7 @@
 // app/components/editor/EditorCanvas.tsx
 "use client";
 
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import CardSurface from "@/app/components/CardSurface";
 import PrintGuides from "@/app/components/editor/PrintGuides";
 import type { Block } from "@/shared/blocks";
@@ -9,12 +9,27 @@ import type { DesignKey } from "@/shared/design";
 import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
 import { FONT_DEFINITIONS, type FontKey } from "@/shared/fonts";
 import type { CardImage } from "@/shared/images";
+import {
+  IMAGE_MIN_W,
+  IMAGE_MIN_H,
+  IMAGE_MAX_W,
+  IMAGE_MAX_H,
+  clamp,
+} from "@/shared/images";
+
+type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
 
 type Props = {
   blocks: Block[];
   images: CardImage[];
+  mixedLayers: MixedLayer[];
   design: DesignKey;
   moveImage: (id: string, x: number, y: number) => void;
+  resizeImage: (id: string, w: number, h: number) => void;
   scale: number;
   activeBlockId?: string;
   isPreview: boolean;
@@ -47,12 +62,15 @@ type Props = {
   onCommitText?: (id: string, text: string) => void;
   editingText?: string;
   onChangeEditingText?: (text: string) => void;
+  selectedImageId: string | null;
+  onSelectImage: (id: string | null) => void;
 };
 
 export default function EditorCanvas({
   blocks,
   images,
   moveImage,
+  resizeImage,
   design,
   scale,
   isPreview,
@@ -69,25 +87,39 @@ export default function EditorCanvas({
   onCommitText,
   editingText,
   onChangeEditingText,
+  selectedImageId,
+  onSelectImage,
+  mixedLayers,
 }: Props) {
-  // console.log("[EditorCanvas render]", {
-  //   isPreview,
-  //   editingBlockId,
-  //   editingText,
-  //   scale,
-  // });
-
   const taRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const [resizeState, setResizeState] = useState<{
+    id: string;
+    startX: number;
+    startY: number;
+    startW: number;
+    startH: number;
+  } | null>(null);
+
+  const onResizeStart = (
+    e: React.PointerEvent,
+    image: { id: string; w: number; h: number },
+  ) => {
+    e.stopPropagation();
+
+    setResizeState({
+      id: image.id,
+      startX: e.clientX,
+      startY: e.clientY,
+      startW: image.w,
+      startH: image.h,
+    });
+  };
 
   useLayoutEffect(() => {
     if (isPreview) return;
 
     const ta = taRef.current;
-    console.log("[autosize] start", {
-      editingBlockId,
-      hasTa: !!ta,
-      valueLen: (ta?.value ?? "").length,
-    });
     if (!ta) return;
     if (!editingBlockId) return;
 
@@ -101,26 +133,51 @@ export default function EditorCanvas({
     const sw = ta.scrollWidth;
     const sh = ta.scrollHeight;
 
-    console.log("[autosize] measured", {
-      sw,
-      sh,
-      cw: ta.clientWidth,
-      ch: ta.clientHeight,
-    });
-
     const padX = 12; // 2px 6px の左右合計
     const padY = 4;
 
     ta.style.width = `${Math.max(20, sw + padX)}px`;
     ta.style.height = `${Math.max(20, sh + padY)}px`;
-
-    console.log("[autosize] applied", {
-      width: ta.style.width,
-      height: ta.style.height,
-    });
   }, [isPreview, editingBlockId, editingText]);
 
-  console.log("[EditorCanvas] images", images);
+  useEffect(() => {
+    if (!resizeState) return;
+
+    const handlePointerMove = (e: PointerEvent) => {
+      const dx = (e.clientX - resizeState.startX) / scale;
+
+      const ratio = resizeState.startH / resizeState.startW;
+
+      let nextW = resizeState.startW + dx;
+      nextW = clamp(nextW, IMAGE_MIN_W, IMAGE_MAX_W);
+
+      let nextH = nextW * ratio;
+
+      if (nextH > IMAGE_MAX_H) {
+        nextH = IMAGE_MAX_H;
+        nextW = nextH / ratio;
+      }
+
+      if (nextH < IMAGE_MIN_H) {
+        nextH = IMAGE_MIN_H;
+        nextW = nextH / ratio;
+      }
+
+      resizeImage(resizeState.id, nextW, nextH);
+    };
+
+    const handlePointerUp = () => {
+      setResizeState(null);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [resizeState, resizeImage, scale]);
 
   return (
     <section className="flex flex-col items-center gap-3">
@@ -149,12 +206,19 @@ export default function EditorCanvas({
             <CardSurface
               blocks={blocks}
               images={images}
+              mixedLayers={mixedLayers}
               onMoveImage={moveImage}
+              selectedImageId={selectedImageId}
+              onSelectImage={onSelectImage}
+              onResizeImageStart={onResizeStart}
               design={design}
               w={CARD_BASE_W}
               h={CARD_BASE_H}
               interactive={!isPreview}
-              onSurfacePointerDown={() => onSurfacePointerDown?.()}
+              onSurfacePointerDown={(e) => {
+                onSurfacePointerDown?.();
+                onSelectImage(null);
+              }}
               onBlockPointerDown={(e, id) => onPointerDown?.(e, id, { scale })}
               onStartInlineEdit={onStartInlineEdit}
               activeBlockId={editingBlockId ? undefined : activeBlockId}

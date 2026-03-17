@@ -9,9 +9,17 @@ import type { DesignKey } from "@/shared/design";
 import { CARD_FULL_DESIGNS } from "@/shared/cardDesigns";
 import { FONT_DEFINITIONS } from "@/shared/fonts";
 
+type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
+
 type CardSurfaceProps = {
   blocks: Block[];
   images?: CardImage[];
+  mixedLayers: MixedLayer[];
+
   onMoveImage?: (id: string, x: number, y: number) => void;
   design: DesignKey;
 
@@ -25,7 +33,6 @@ type CardSurfaceProps = {
 
   /** 編集可能か (ドラッグ有無) */
   interactive?: boolean;
-
   editingBlockId?: string | null;
 
   /** ブロック押下（選択/ドラッグ開始） */
@@ -50,6 +57,14 @@ type CardSurfaceProps = {
   /** class / style 拡張 */
   className?: string;
   style?: CSSProperties;
+
+  /** resizeImage */
+  selectedImageId?: string | null;
+  onSelectImage?: (id: string | null) => void;
+  onResizeImageStart?: (
+    e: React.PointerEvent,
+    image: { id: string; w: number; h: number },
+  ) => void;
 };
 
 type DragImageState = {
@@ -82,7 +97,11 @@ function getCardStyle(design: DesignKey): CSSProperties {
 export default function CardSurface({
   blocks,
   images = [],
+  mixedLayers = [],
   onMoveImage,
+  selectedImageId,
+  onSelectImage,
+  onResizeImageStart,
   design,
   w,
   h,
@@ -120,6 +139,10 @@ export default function CardSurface({
 
   const handleImagePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>, img: CardImage) => {
+      const target = e.target as HTMLElement;
+      const isResizeHandle = target.closest("[data-resize-handle='true']");
+      if (isResizeHandle) return;
+
       if (!interactive) return;
       if (!onMoveImage) return;
 
@@ -164,8 +187,6 @@ export default function CardSurface({
     [dragImage],
   );
 
-  console.log("[CardSurface] images", images);
-
   return (
     <div
       ref={cardRef}
@@ -191,47 +212,82 @@ export default function CardSurface({
       }}
       className={`rounded-xl border shadow-md ${className ?? ""}`}
     >
-      {/* 画像レイヤー */}
-      {images.map((img: CardImage) => {
-        const isDragging = dragImage?.id === img.id;
-        return (
-          <div
-            key={img.id}
-            data-image-id={img.id}
-            onPointerDown={(e) => handleImagePointerDown(e, img)}
-            style={{
-              position: "absolute",
-              left: img.x,
-              top: img.y,
-              width: img.w,
-              height: img.h,
-              transform: `rotate(${img.rotate ?? 0}deg)`,
-              transformOrigin: "center",
-              cursor: interactive
-                ? isDragging
-                  ? "grabbing"
-                  : "grab"
-                : "default",
-              userSelect: "none",
-            }}
-          >
-            <img
-              src={img.url}
-              alt=""
-              draggable={false}
-              style={{
-                display: "block",
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                userSelect: "none",
-              }}
-            />
-          </div>
-        );
-      })}
+      {/* z順で統合描画するレイヤー */}{" "}
+      {mixedLayers.map((layer) => {
+        if (layer.kind === "image") {
+          const img = images.find((x) => x.id === layer.id);
+          if (!img) return null;
+          const isDragging = dragImage?.id === img.id;
+          const isSelected = selectedImageId === img.id;
 
-      {blocks.map((block) => {
+          return (
+            <div
+              key={img.id}
+              data-image-id={img.id}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                onSelectImage?.(img.id);
+                handleImagePointerDown(e, img);
+              }}
+              style={{
+                position: "absolute",
+                left: img.x,
+                top: img.y,
+                width: img.w,
+                height: img.h,
+                zIndex: img.z,
+                transform: `rotate(${img.rotate ?? 0}deg)`,
+                transformOrigin: "center",
+                cursor: interactive
+                  ? isDragging
+                    ? "grabbing"
+                    : "grab"
+                  : "default",
+                userSelect: "none",
+                border: isSelected ? "2px solid #2563eb" : "none",
+                boxSizing: "border-box",
+              }}
+            >
+              <img
+                src={img.url}
+                alt=""
+                draggable={false}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  userSelect: "none",
+                }}
+              />
+              {interactive && isSelected && (
+                <button
+                  type="button"
+                  data-resize-handle="true"
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                    onResizeImageStart?.(e, img);
+                  }}
+                  style={{
+                    position: "absolute",
+                    right: -8,
+                    bottom: -8,
+                    width: 16,
+                    height: 16,
+                    borderRadius: 9999,
+                    border: "2px solid white",
+                    background: "#2563eb",
+                    cursor: "nwse-resize",
+                  }}
+                />
+              )}
+            </div>
+          );
+        }
+
+        const block = blocks.find((x) => x.id === layer.id);
+        if (!block) return null;
+
         const showSelection =
           interactive &&
           activeBlockId === block.id &&
@@ -246,22 +302,21 @@ export default function CardSurface({
             data-block-id={block.id}
             onPointerDown={(e) => {
               if (!interactive) return;
-              e.stopPropagation(); // ✅ 外クリック判定に伝播させない
-              onBlockPointerDown?.(e, block.id); // ✅ フォーカス/ドラッグ開始
+              e.stopPropagation();
+              onBlockPointerDown?.(e, block.id);
             }}
             onClick={() => handleBlockClick(block)}
             style={{
               position: "absolute",
               top: block.y,
               left: block.x,
+              zIndex: block.z,
               width: block.width ?? "auto",
               textAlign: block.align ?? "left",
               cursor: interactive ? "move" : "default",
-              // ✅ padding は外側から外す（リングのズレ原因）
               padding: 0,
               color: textColor,
             }}
-            // 「ブロック幅」を示す枠をここ（外側）に出す
             className={[
               "relative select-none",
               showSelection
@@ -269,10 +324,9 @@ export default function CardSurface({
                 : "",
             ].join(" ")}
           >
-            {/* ✅ リング/実寸/計測は inner に寄せる */}
             <div
               ref={(el) => {
-                if (blockRefs) blockRefs.current[block.id] = el; // ✅ 幅計測もここ
+                if (blockRefs) blockRefs.current[block.id] = el;
               }}
               className={["inline-block rounded px-1 py-0.5"].join(" ")}
               style={{
@@ -291,17 +345,17 @@ export default function CardSurface({
               {block.type === "text" &&
                 (editingBlockId === block.id ? null : block.text)}
             </div>
-            {/* 🆕 幅ラベル（showSelection 中だけ表示） */}
+
             {showSelection && typeof block.width === "number" && (
               <div
                 className="
-                  pointer-events-none
-                  absolute -top-4 right-0
-                  text-[10px]
-                  rounded-full border border-zinc-200
-                  bg-white/90 px-2 py-0.5
-                  text-zinc-500 shadow-sm
-                "
+            pointer-events-none
+            absolute -top-4 right-0
+            text-[10px]
+            rounded-full border border-zinc-200
+            bg-white/90 px-2 py-0.5
+            text-zinc-500 shadow-sm
+          "
               >
                 {Math.round(block.width)}px
               </div>

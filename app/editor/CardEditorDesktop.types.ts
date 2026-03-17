@@ -18,6 +18,12 @@ import type {
   Side,
 } from "./CardEditor.types";
 
+type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
+
 export type CardEditorDesktopProps = {
   // 画像アップロード
   code: string;
@@ -35,6 +41,7 @@ export type CardEditorDesktopProps = {
   // ---- blocks / デザイン
   getBlocksFor: (side: Side) => Block[];
   getImagesFor: (side: "front" | "back") => CardImage[];
+  mixedLayers: MixedLayer[];
   editableBlocks: Block[];
   addBlock: () => void;
   onChangeText: (id: string, value: string) => void;
@@ -47,10 +54,19 @@ export type CardEditorDesktopProps = {
   previewTextColor: (id: string, color: string) => void;
   onUploadedImage: (asset: UploadImageAsset) => void;
   moveImage: (id: string, x: number, y: number) => void;
+  resizeImage: (id: string, w: number, h: number) => void;
   currentImageCount: number;
   maxImageCount: number;
   onDeleteImage: (id: string) => void;
+  selectedImageId: string | null;
+  onSelectImage: (id: string | null) => void;
+  onBringSelectedImageToFront: () => void;
+  onSendSelectedImageToBack: () => void;
+  setActiveBlockId: (id: string) => void;
 
+  onMoveLayerFront: (layer: MixedLayer) => void;
+  onMoveLayerBack: (layer: MixedLayer) => void;
+  onDeleteLayer: (layer: MixedLayer) => void;
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;
   downloadImage: (format: "png" | "jpeg", target: HTMLDivElement) => void;

@@ -89,20 +89,30 @@ export function useBlockActions(history: HistoryApi) {
 
   // 新規追加（履歴）
   const addBlock = () => {
-    commit((prev) => [
-      ...prev,
-      {
-        id: createRandomId(),
-        type: "text",
-        text: "新しいテキスト",
-        x: 100,
-        y: 100,
-        fontSize: 16,
-        fontWeight: "normal",
-        fontKey: "sans",
-        side: "front",
-      },
-    ]);
+    commit((prev) => {
+      const side: Block["side"] = "front";
+
+      const nextZ =
+        prev
+          .filter((b) => b.side === side)
+          .reduce((max, b) => Math.max(max, b.z ?? 0), 0) + 1;
+
+      return [
+        ...prev,
+        {
+          id: createRandomId(),
+          type: "text",
+          text: "新しいテキスト",
+          x: 100,
+          y: 100,
+          z: nextZ,
+          fontSize: 16,
+          fontWeight: "normal",
+          fontKey: "sans",
+          side,
+        },
+      ];
+    });
   };
 
   // フォントサイズ（あなたの仕様：1クリック=1履歴）
@@ -158,6 +168,12 @@ export function useBlockActions(history: HistoryApi) {
     });
   };
 
+  const updateBlockZ = (id: string, z: number) => {
+    const nextZ = Math.max(1, Math.round(z));
+
+    commit((prev) => prev.map((b) => (b.id === id ? { ...b, z: nextZ } : b)));
+  };
+
   return {
     previewText,
     commitText,
@@ -170,5 +186,6 @@ export function useBlockActions(history: HistoryApi) {
     removeBlock,
     previewTextColor,
     setTextColor,
+    updateBlockZ,
   };
 }

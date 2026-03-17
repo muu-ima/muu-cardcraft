@@ -22,6 +22,8 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     getBlocksFor,
     getImagesFor,
     moveImage,
+    mixedLayers,
+    resizeImage,
     addBlock: onAddBlock,
     onUploadedImage,
     onChangeText,
@@ -52,6 +54,14 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     redo,
     onChangeWidth,
     setTextColor: onChangeColor,
+    selectedImageId,
+    onSelectImage,
+    onBringSelectedImageToFront,
+    onSendSelectedImageToBack,
+    setActiveBlockId,
+    onMoveLayerFront,
+    onMoveLayerBack,
+    onDeleteLayer,
   } = props;
 
   const isPanelOpen = state.activeTab !== null;
@@ -125,10 +135,25 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
               currentImageCount,
               maxImageCount,
               onDeleteImage,
+              selectedImageId,
+              onBringSelectedImageToFront,
+              onSendSelectedImageToBack,
             }}
             designPanel={{
               design,
               onChangeDesign,
+            }}
+            layerPanel={{
+              mixedLayers,
+              blocks: getBlocksFor(state.side),
+              images: getImagesFor(state.side),
+              activeBlockId: state.activeBlockId,
+              selectedImageId,
+              onSelectBlock: setActiveBlockId,
+              onSelectImage,
+              onMoveLayerFront,
+              onMoveLayerBack,
+              onDeleteLayer,
             }}
             exportPanel={{
               onDownload: (format: "png" | "jpeg") => {
@@ -177,6 +202,8 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                   blocks={getBlocksFor(state.side)}
                   images={getImagesFor(state.side)}
                   moveImage={moveImage}
+                  resizeImage={resizeImage}
+                  mixedLayers={mixedLayers}
                   design={design}
                   scale={scaleDesktop}
                   isPreview={state.isPreview}
@@ -184,6 +211,8 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                   onPointerDown={
                     state.side === "front" ? handleBlockPointerDown : undefined
                   }
+                  selectedImageId={selectedImageId}
+                  onSelectImage={onSelectImage}
                   onStartInlineEdit={(blockId) => {
                     const block = blocksForSide.find((b) => b.id === blockId);
                     if (!block || block.type !== "text") return;

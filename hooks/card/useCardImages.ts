@@ -1,8 +1,22 @@
 // hooks/card/useCardImages.ts
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  moveToBack,
+  moveToFront,
+  moveForwardOne,
+  moveBackwardOne,
+  normalizeLayers,
+} from "@/shared/layers";
 import type { CardImage, Side } from "@/shared/images";
+import {
+  IMAGE_MIN_W,
+  IMAGE_MIN_H,
+  IMAGE_MAX_W,
+  IMAGE_MAX_H,
+  clamp,
+} from "@/shared/images";
 
 // 依存なしで動く簡易ID（あとで randomId/uuid に差し替えOK）
 function makeId() {
@@ -38,6 +52,10 @@ export function useCardImages(initial: CardImage[] = []) {
   const addFromUpload = useCallback(
     (args: AddFromUploadArgs) => {
       const currentCount = images.filter((it) => it.side === args.side).length;
+      const nextZ =
+        images
+          .filter((it) => it.side === args.side)
+          .reduce((max, it) => Math.max(max, it.z), 0) + 1;
 
       if (currentCount >= MAX_IMAGES_PER_SIDE) {
         return {
@@ -46,22 +64,22 @@ export function useCardImages(initial: CardImage[] = []) {
         };
       }
 
-      const MAX_W = 140;
-      const MAX_H = 100;
-
-      let initialW = args.w ?? MAX_W;
-      let initialH = args.h ?? MAX_H;
+      let initialW = args.w ?? IMAGE_MIN_W;
+      let initialH = args.h ?? IMAGE_MIN_H;
 
       if (!args.w && !args.h && args.naturalWidth && args.naturalHeight) {
         const scale = Math.min(
-          MAX_W / args.naturalWidth,
-          MAX_H / args.naturalHeight,
+          IMAGE_MIN_W / args.naturalWidth,
+          IMAGE_MIN_H / args.naturalHeight,
           1,
         );
 
         initialW = Math.round(args.naturalWidth * scale);
         initialH = Math.round(args.naturalHeight * scale);
       }
+
+      initialW = clamp(Math.round(initialW), IMAGE_MIN_W, IMAGE_MAX_W);
+      initialH = clamp(Math.round(initialH), IMAGE_MIN_H, IMAGE_MAX_H);
 
       const img: CardImage = {
         id: makeId(),
@@ -70,6 +88,7 @@ export function useCardImages(initial: CardImage[] = []) {
         side: args.side,
         x: args.x ?? 80,
         y: args.y ?? 80,
+        z: nextZ,
         w: initialW,
         h: initialH,
         rotate: 0,
@@ -88,7 +107,18 @@ export function useCardImages(initial: CardImage[] = []) {
   const updateImage = useCallback(
     (id: string, patch: Partial<Omit<CardImage, "id">>) => {
       setImages((prev) =>
-        prev.map((it) => (it.id === id ? { ...it, ...patch } : it)),
+        prev.map((it) =>
+          it.id === id
+            ? {
+                ...it,
+                ...patch,
+                z:
+                  patch.z !== undefined
+                    ? Math.max(1, Math.round(patch.z))
+                    : it.z,
+              }
+            : it,
+        ),
       );
     },
     [],
@@ -102,12 +132,32 @@ export function useCardImages(initial: CardImage[] = []) {
 
   const resizeImage = useCallback((id: string, w: number, h: number) => {
     setImages((prev) =>
-      prev.map((it) => (it.id === id ? { ...it, w, h } : it)),
+      prev.map((it) =>
+        it.id === id
+          ? {
+              ...it,
+              w: clamp(Math.round(w), IMAGE_MIN_W, IMAGE_MAX_W),
+              h: clamp(Math.round(h), IMAGE_MIN_H, IMAGE_MAX_H),
+            }
+          : it,
+      ),
     );
   }, []);
 
   const removeImage = useCallback((id: string) => {
-    setImages((prev) => prev.filter((it) => it.id !== id));
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id);
+      if (!target) return prev;
+
+      const sameSide = prev.filter(
+        (img) => img.side === target.side && img.id !== id,
+      );
+      const others = prev.filter((img) => img.side !== target.side);
+
+      const normalized = normalizeLayers(sameSide);
+
+      return [...others, ...normalized];
+    });
   }, []);
 
   const clearSide = useCallback((side: Side) => {
@@ -115,9 +165,66 @@ export function useCardImages(initial: CardImage[] = []) {
   }, []);
 
   const getImagesFor = useCallback(
-    (side: Side) => images.filter((it) => it.side === side),
+    (side: Side) =>
+      [...images].filter((it) => it.side === side).sort((a, b) => a.z - b.z),
     [images],
   );
+
+  const bringImageToFront = useCallback((id: string) => {
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id);
+      if (!target) return prev;
+
+      const sameSide = prev.filter((img) => img.side === target.side);
+      const others = prev.filter((img) => img.side !== target.side);
+
+      const reordered = moveToFront(sameSide, id);
+
+      return [...others, ...reordered];
+    });
+  }, []);
+
+  const sendImageToBack = useCallback((id: string) => {
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id);
+      if (!target) return prev;
+
+      const sameSide = prev.filter((img) => img.side === target.side);
+      const others = prev.filter((img) => img.side !== target.side);
+
+      const reordered = moveToBack(sameSide, id);
+
+      return [...others, ...reordered];
+    });
+  }, []);
+
+  const bringImageForwardOne = useCallback((id: string) => {
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id);
+      if (!target) return prev;
+
+      const sameSide = prev.filter((img) => img.side === target.side);
+      const others = prev.filter((img) => img.side !== target.side);
+
+      const reordered = moveForwardOne(sameSide, id);
+
+      return [...others, ...reordered];
+    });
+  }, []);
+
+  const sendImageBackwardOne = useCallback((id: string) => {
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id);
+      if (!target) return prev;
+
+      const sameSide = prev.filter((img) => img.side === target.side);
+      const others = prev.filter((img) => img.side !== target.side);
+
+      const reordered = moveBackwardOne(sameSide, id);
+
+      return [...others, ...reordered];
+    });
+  }, []);
 
   const api = useMemo(
     () => ({
@@ -131,7 +238,11 @@ export function useCardImages(initial: CardImage[] = []) {
       clearSide,
       getImagesFor,
       countImagesFor,
+      bringImageToFront,
+      sendImageToBack,
       maxImagesPerSide: MAX_IMAGES_PER_SIDE,
+      bringImageForwardOne,
+      sendImageBackwardOne,
     }),
     [
       images,
@@ -143,6 +254,10 @@ export function useCardImages(initial: CardImage[] = []) {
       clearSide,
       getImagesFor,
       countImagesFor,
+      bringImageToFront,
+      sendImageToBack,
+      bringImageForwardOne,
+      sendImageBackwardOne,
     ],
   );
 

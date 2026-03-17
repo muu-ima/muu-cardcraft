@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import ModalPreview from "@/app/components/ModalPreview";
 import CardSurface from "@/app/components/CardSurface";
 import ExportSurface from "@/app/components/ExportSurface";
@@ -24,6 +24,12 @@ type Props = {
   code: string;
 };
 
+type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
+
 type EditingState = { id: string; initialText: string } | null;
 
 export default function CardEditor({ code }: Props) {
@@ -32,6 +38,8 @@ export default function CardEditor({ code }: Props) {
   // =========================
   const [editing, setEditing] = useState<EditingState>(null);
   const [design, setDesign] = useState<DesignKey>("mint");
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+
   const exportRef = useRef<HTMLDivElement | null>(null);
 
   // ✅ CanvasArea 自体の ref（スクロール/レイアウト用）
@@ -49,6 +57,7 @@ export default function CardEditor({ code }: Props) {
 
   const {
     blocks: editableBlocks,
+    setBlocks,
     addBlock,
     previewText,
     commitText,
@@ -71,13 +80,16 @@ export default function CardEditor({ code }: Props) {
     removeBlock,
     setTextColor,
     previewTextColor,
+    updateBlockZ,
   } = useCardBlocks();
 
   const {
     images,
+    setImages,
     addFromUpload,
     getImagesFor,
     moveImage,
+    resizeImage,
     removeImage,
     countImagesFor,
     maxImagesPerSide,
@@ -108,9 +120,27 @@ export default function CardEditor({ code }: Props) {
   const getBlocksFor = (s: Side) =>
     s === "front" ? editableBlocks : CARD_FULL_DESIGNS[design].back.blocks;
 
+  const getMixedLayersFor = (side: Side) => {
+    const sideBlocks = getBlocksFor(side);
+    const sideImages = getImagesFor(side);
+
+    return [
+      ...sideImages.map((img) => ({
+        kind: "image" as const,
+        id: img.id,
+        z: img.z,
+      })),
+      ...sideBlocks.map((block) => ({
+        kind: "block" as const,
+        id: block.id,
+        z: block.z,
+      })),
+    ].sort((a, b) => a.z - b.z);
+  };
+
   // いま編集してる面
   const currentBlocks = getBlocksFor(state.side);
-
+  const currentImages = getImagesFor(state.side);
   const centerWrapRef = useRef<HTMLDivElement | null>(null);
 
   const handlers = useCardEditorHandlers({
@@ -119,6 +149,7 @@ export default function CardEditor({ code }: Props) {
     editing,
     setEditing,
     currentBlocks,
+    currentImages,
     commitText,
     previewText,
     setBlockWidth,
@@ -127,6 +158,10 @@ export default function CardEditor({ code }: Props) {
     setSheetSnap,
     cardRef,
     centerWrapRef,
+    activeBlockId: state.activeBlockId,
+    selectedImageId,
+    setBlocks,
+    setImages,
   });
 
   const centerVisible = selectors.centerVisible;
@@ -135,6 +170,53 @@ export default function CardEditor({ code }: Props) {
   // =========================
   // 📦 Layout Props
   // =========================
+
+  const handleMoveLayerFront = useCallback(
+    (layer: MixedLayer) => {
+      const mixed = getMixedLayersFor(state.side);
+      const maxZ =
+        mixed.length > 0 ? Math.max(...mixed.map((item) => item.z)) : 1;
+
+      if (layer.kind === "block") {
+        updateBlockZ(layer.id, maxZ + 1);
+        return;
+      }
+
+      setImages((prev) =>
+        prev.map((img) =>
+          img.id === layer.id ? { ...img, z: maxZ + 1 } : img,
+        ),
+      );
+    },
+    [getMixedLayersFor, state.side, updateBlockZ, setImages],
+  );
+
+  const handleMoveLayerBack = useCallback(
+    (layer: MixedLayer) => {
+      if (layer.kind === "block") {
+        updateBlockZ(layer.id, 0);
+        return;
+      }
+
+      setImages((prev) =>
+        prev.map((img) => (img.id === layer.id ? { ...img, z: 0 } : img)),
+      );
+    },
+    [updateBlockZ, setImages],
+  );
+
+  const handleDeleteLayer = useCallback(
+    (layer: MixedLayer) => {
+      if (layer.kind === "image") {
+        removeImage(layer.id);
+        setSelectedImageId(null);
+        return;
+      }
+
+      removeBlock(layer.id);
+    },
+    [removeImage, removeBlock],
+  );
 
   const { desktopProps, mobileProps } = useCardEditorLayoutProps({
     code,
@@ -153,7 +235,9 @@ export default function CardEditor({ code }: Props) {
     scaleMobile,
     getBlocksFor,
     getImagesFor,
+    getMixedLayersFor,
     moveImage,
+    resizeImage,
     editableBlocks,
     addBlock,
     onChangeText: handlers.onChangeText,
@@ -186,11 +270,15 @@ export default function CardEditor({ code }: Props) {
     undo,
     redo,
     removeBlock,
+    selectedImageId,
+    setSelectedImageId,
+    onBringSelectedImageToFront: handlers.bringSelectionToFront,
+    onSendSelectedImageToBack: handlers.sendSelectionToBack,
+    setActiveBlockId: actions.setActiveBlockId,
+    onMoveLayerFront: handleMoveLayerFront,
+    onMoveLayerBack: handleMoveLayerBack,
+    onDeleteLayer: handleDeleteLayer,
   });
-
-  console.log("[CardEditor] side", state.side);
-  console.log("[CardEditor] images", images);
-  console.log("[CardEditor] filtered", getImagesFor(state.side));
 
   // =========================
   // 🎨 2. レイアウト描画
@@ -235,6 +323,7 @@ export default function CardEditor({ code }: Props) {
               <CardSurface
                 blocks={getBlocksFor(state.side)}
                 images={getImagesFor(state.side)}
+                mixedLayers={getMixedLayersFor(state.side)}
                 onMoveImage={moveImage}
                 design={design}
                 w={CARD_BASE_W}

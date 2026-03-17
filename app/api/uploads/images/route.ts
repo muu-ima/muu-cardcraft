@@ -11,7 +11,7 @@ import {
 export const runtime = "nodejs"; // sharp を使うので必須
 
 // 受け入れ制限（必要なら調整してOK）
-const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // 10MB（入力の上限）
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 function badRequest(message: string, extra?: Record<string, unknown>) {

@@ -44,6 +44,31 @@ export type ImagePanelSectionProps = {
   currentImageCount: number;
   maxImageCount: number;
   onDeleteImage: (id: string) => void;
+  selectedImageId: string | null;
+  onBringSelectedImageToFront: () => void;
+  onSendSelectedImageToBack: () => void;
+};
+
+export type MixedLayer = {
+  kind: "block" | "image";
+  id: string;
+  z: number;
+};
+
+type LayerPanelSectionProps = {
+  mixedLayers: MixedLayer[];
+  blocks: Block[];
+  images: CardImage[];
+
+  activeBlockId?: string;
+  selectedImageId?: string | null;
+
+  onSelectBlock?: (id: string) => void;
+  onSelectImage?: (id: string | null) => void;
+
+  onMoveLayerFront?: (layer: MixedLayer) => void;
+  onMoveLayerBack?: (layer: MixedLayer) => void;
+  onDeleteLayer?: (layer: MixedLayer) => void;
 };
 
 export type DesignPanelSectionProps = {
@@ -59,6 +84,7 @@ export type ToolPanelProps = ToolPanelBaseProps & {
   textPanel: TextPanelSectionProps;
   fontPanel: FontPanelSectionProps;
   imagePanel: ImagePanelSectionProps;
+  layerPanel: LayerPanelSectionProps;
   designPanel: DesignPanelSectionProps;
   exportPanel: ExportPanelSectionProps;
 };

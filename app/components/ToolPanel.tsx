@@ -5,6 +5,7 @@ import TextPanel from "@/app/components/panels/TextPanel";
 import FontPanel from "@/app/components/panels/FontPanel";
 import ImagePanel from "@/app/components/panels/ImagePanel";
 import DesignPanel from "@/app/components/panels/DesignPanel";
+import LayerPanel from "@/app/components/panels/LayerPanel";
 import ExportPanel from "@/app/components/panels/ExportPanel";
 import type { ToolPanelProps } from "@/shared/toolPanel";
 
@@ -17,6 +18,7 @@ export default function ToolPanel({
   textPanel,
   fontPanel,
   imagePanel,
+  layerPanel,
   designPanel,
   exportPanel,
 }: ToolPanelProps) {
@@ -30,9 +32,15 @@ export default function ToolPanel({
       ? "デザイン"
       : activeTab === "text"
         ? "テキスト"
-        : activeTab === "export"
-          ? "書き出し"
-          : "編集";
+        : activeTab === "font"
+          ? "フォント"
+          : activeTab === "image"
+            ? "画像"
+            : activeTab === "layers"
+              ? "レイヤー"
+              : activeTab === "export"
+                ? "書き出し"
+                : "編集";
 
   return (
     // ✅ xl以上だけ「左固定パネル」、xl未満は「普通のコンテンツ」
@@ -120,6 +128,23 @@ export default function ToolPanel({
             currentCount={imagePanel.currentImageCount}
             maxCount={imagePanel.maxImageCount}
             onDeleteImage={imagePanel.onDeleteImage}
+            selectedImageId={imagePanel.selectedImageId}
+            onBringSelectedImageToFront={imagePanel.onBringSelectedImageToFront}
+            onSendSelectedImageToBack={imagePanel.onSendSelectedImageToBack}
+          />
+        )}
+        {activeTab === "layers" && (
+          <LayerPanel
+            mixedLayers={layerPanel.mixedLayers}
+            blocks={layerPanel.blocks}
+            images={layerPanel.images}
+            activeBlockId={layerPanel.activeBlockId}
+            selectedImageId={layerPanel.selectedImageId}
+            onSelectBlock={layerPanel.onSelectBlock}
+            onSelectImage={layerPanel.onSelectImage}
+            onMoveLayerFront={layerPanel.onMoveLayerFront}
+            onMoveLayerBack={layerPanel.onMoveLayerBack}
+            onDeleteLayer={layerPanel.onDeleteLayer}
           />
         )}
         {activeTab === "export" && (

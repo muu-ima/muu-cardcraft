@@ -29,6 +29,8 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     maxImageCount,
     onDeleteImage,
     moveImage,
+    resizeImage,
+    mixedLayers,
     getBlocksFor,
     addBlock: onAddBlock,
     onChangeText,
@@ -58,6 +60,14 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     onChangeWidth,
     setTextColor,
     onUploadedImage,
+    selectedImageId,
+    onSelectImage,
+    onBringSelectedImageToFront,
+    onSendSelectedImageToBack,
+    setActiveBlockId,
+    onMoveLayerFront,
+    onMoveLayerBack,
+    onDeleteLayer,
   } = props;
 
   const blocksForSide = getBlocksFor(state.side);
@@ -120,6 +130,21 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
             currentImageCount,
             maxImageCount,
             onDeleteImage,
+            selectedImageId,
+            onBringSelectedImageToFront,
+            onSendSelectedImageToBack,
+          }}
+          layerPanel={{
+            mixedLayers,
+            blocks: getBlocksFor(state.side),
+            images: getImagesFor(state.side),
+            activeBlockId: state.activeBlockId,
+            selectedImageId,
+            onSelectBlock: setActiveBlockId,
+            onSelectImage,
+            onMoveLayerFront,
+            onMoveLayerBack,
+            onDeleteLayer,
           }}
           designPanel={{
             design,
@@ -163,7 +188,9 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                 <EditorCanvas
                   blocks={getBlocksFor(state.side)}
                   images={getImagesFor(state.side)}
+                  mixedLayers={mixedLayers}
                   moveImage={moveImage}
+                  resizeImage={resizeImage}
                   design={design}
                   scale={scaleMobile}
                   isPreview={state.isPreview}
@@ -188,6 +215,8 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                   snapGuide={snapGuide}
                   cardRef={cardRef}
                   blockRefs={blockRefs}
+                  selectedImageId={selectedImageId}
+                  onSelectImage={onSelectImage}
                 />
               </div>
             </div>

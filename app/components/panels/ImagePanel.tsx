@@ -17,6 +17,9 @@ type Props = {
   currentCount: number;
   maxCount: number;
   onDeleteImage: (id: string) => void;
+  selectedImageId: string | null;
+  onBringSelectedImageToFront: () => void;
+  onSendSelectedImageToBack: () => void;
 };
 
 export default function ImagePanel({
@@ -26,6 +29,9 @@ export default function ImagePanel({
   currentCount = 0,
   maxCount = 3,
   onDeleteImage,
+  selectedImageId,
+  onBringSelectedImageToFront,
+  onSendSelectedImageToBack,
 }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -86,7 +92,7 @@ export default function ImagePanel({
           </button>
 
           <div className="text-xs text-black/50">
-            PNG/JPEG/WebP（最大10MB・保存はWebP最適化）
+            PNG/JPEG/WebP（最大5MB・保存はWebP最適化）
           </div>
 
           {error && (
@@ -94,6 +100,45 @@ export default function ImagePanel({
               {error}
             </div>
           )}
+          <div className="border-t border-black/5 pt-3">
+            <div className="mb-2 text-sm font-medium text-zinc-800">
+              レイヤー
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={onBringSelectedImageToFront}
+                disabled={!selectedImageId}
+                className={clsx(
+                  "rounded-xl px-3 py-2 text-sm",
+                  "bg-black/5 hover:bg-black/10",
+                  "disabled:cursor-not-allowed disabled:opacity-50",
+                )}
+              >
+                前面へ
+              </button>
+
+              <button
+                type="button"
+                onClick={onSendSelectedImageToBack}
+                disabled={!selectedImageId}
+                className={clsx(
+                  "rounded-xl px-3 py-2 text-sm",
+                  "bg-black/5 hover:bg-black/10",
+                  "disabled:cursor-not-allowed disabled:opacity-50",
+                )}
+              >
+                背面へ
+              </button>
+            </div>
+
+            {!selectedImageId && (
+              <div className="mt-2 text-xs text-black/40">
+                画像を選択するとレイヤーを変更できます
+              </div>
+            )}
+          </div>
         </div>
       </PanelSection>
 

@@ -8,6 +8,7 @@ export type Block = {
   text: string;
   x: number;
   y: number;
+  z: number;
   fontSize: number;
   fontWeight: "normal" | "bold";
   fontKey: FontKey; // 実際の定義に合わせて
@@ -26,6 +27,7 @@ export const INITIAL_BLOCKS: Block[] = [
     text: "山田 太郎",
     x: 100,
     y: 120,
+    z: 2,
     fontSize: 24,
     fontWeight: "bold",
     fontKey: "serif",
@@ -38,6 +40,7 @@ export const INITIAL_BLOCKS: Block[] = [
     text: "デザイナー / Designer",
     x: 100,
     y: 80,
+    z: 1,
     fontSize: 18,
     fontWeight: "normal",
     fontKey: "sans",
