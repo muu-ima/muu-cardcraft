@@ -73,3 +73,38 @@ export function getSelectedLayerTarget(params: {
 
   return null;
 }
+
+export function removeLayerAndReorder(params: {
+  targetId: string;
+  kind: "block" | "image";
+  currentBlocks: Block[];
+  currentImages: CardImage[];
+  side: Side;
+}) {
+  const { targetId, kind, currentBlocks, currentImages, side } = params;
+
+  const sideBlocks = currentBlocks.filter((b) => b.side === side);
+  const otherBlocks = currentBlocks.filter((b) => b.side !== side);
+
+  const sideImages = currentImages.filter((img) => img.side === side);
+  const otherImages = currentImages.filter((img) => img.side !== side);
+
+  const nextSideBlocks =
+    kind === "block" ? sideBlocks.filter((b) => b.id !== targetId) : sideBlocks;
+
+  const nextSideImages =
+    kind === "image"
+      ? sideImages.filter((img) => img.id !== targetId)
+      : sideImages;
+
+  const reordered = applyLayerOrderToBlocksAndImages(
+    nextSideBlocks,
+    nextSideImages,
+    buildMixedLayers(nextSideBlocks, nextSideImages),
+  );
+
+  return {
+    blocks: [...otherBlocks, ...reordered.blocks],
+    images: [...otherImages, ...reordered.images],
+  };
+}

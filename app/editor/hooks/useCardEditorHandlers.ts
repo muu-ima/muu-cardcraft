@@ -7,18 +7,11 @@ import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
 import type { TabKey } from "@/shared/editor";
 import type { Block } from "@/shared/blocks";
 import type { CardImage, Side } from "@/shared/images";
-import {
-  buildMixedLayers,
-  applyLayerOrderToBlocksAndImages,
-  moveToFront,
-  moveToBack,
-  moveForwardOne,
-  moveBackwardOne,
-} from "@/shared/layers";
+import type { MixedLayerItem } from "@/shared/layers";
 import {
   reorderMixedLayers,
   getSelectedLayerTarget,
-  type LayerMoveAction,
+  removeLayerAndReorder,
 } from "../utils/layerActions";
 
 import type { SheetSnap } from "../CardEditor.types";
@@ -232,21 +225,25 @@ export function useCardEditorHandlers({
     handleMoveMixedLayer(target.id, "backward");
   };
 
-  const onMoveLayerFront = (layer: { id: string }) => {
+  const onMoveLayerFront = (layer: MixedLayerItem) => {
     handleMoveMixedLayer(layer.id, "front");
   };
 
-  const onMoveLayerBack = (layer: { id: string }) => {
+  const onMoveLayerBack = (layer: MixedLayerItem) => {
     handleMoveMixedLayer(layer.id, "back");
   };
 
-  const onDeleteLayer = (layer: { kind: "block" | "image"; id: string }) => {
-    if (layer.kind === "image") {
-      setImages((prev) => prev.filter((img) => img.id !== layer.id));
-      return;
-    }
+  const onDeleteLayer = (layer: MixedLayerItem) => {
+    const result = removeLayerAndReorder({
+      targetId: layer.id,
+      kind: layer.kind,
+      currentBlocks,
+      currentImages,
+      side,
+    });
 
-    setBlocks((prev) => prev.filter((block) => block.id !== layer.id));
+    setBlocks(result.blocks);
+    setImages(result.images);
   };
 
   return {
