@@ -158,7 +158,7 @@ export default function LayerPanel({
                     : "border-zinc-200 bg-white hover:bg-zinc-50",
                 ].join(" ")}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3">
                   <div
                     className={[
                       "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border",
@@ -171,7 +171,7 @@ export default function LayerPanel({
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-medium text-zinc-800">
+                    <div className="line-clamp-2 break-all text-sm font-medium leading-5 text-zinc-800">
                       {title}
                     </div>
 
@@ -186,97 +186,97 @@ export default function LayerPanel({
                       )}
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex shrink-0 items-center gap-1 transition md:opacity-0 md:group-hover:opacity-100">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onMoveLayerFront?.(layer);
-                      }}
-                      disabled={isTop}
-                      className={[
-                        "rounded-lg border bg-white p-2",
-                        isTop
-                          ? "cursor-not-allowed border-zinc-100 text-zinc-300"
-                          : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
-                      ].join(" ")}
-                      aria-label="最前面へ"
-                      title="最前面へ"
-                    >
-                      <ChevronUp className="h-4 w-4" />
-                    </button>
+                <div className="mt-3 flex flex-wrap items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMoveLayerFront?.(layer);
+                    }}
+                    disabled={isTop}
+                    className={[
+                      "rounded-lg border bg-white p-2",
+                      isTop
+                        ? "cursor-not-allowed border-zinc-100 text-zinc-300"
+                        : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+                    ].join(" ")}
+                    aria-label="最前面へ"
+                    title="最前面へ"
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </button>
 
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onMoveLayerForward?.(layer);
-                      }}
-                      disabled={isTop}
-                      className={[
-                        "rounded-lg border bg-white p-2 text-[11px] font-semibold",
-                        isTop
-                          ? "cursor-not-allowed border-zinc-100 text-zinc-300"
-                          : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
-                      ].join(" ")}
-                      aria-label="一段前へ"
-                      title="一段前へ"
-                    >
-                      +1
-                    </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMoveLayerForward?.(layer);
+                    }}
+                    disabled={isTop}
+                    className={[
+                      "rounded-lg border bg-white px-2 py-2 text-[11px] font-semibold",
+                      isTop
+                        ? "cursor-not-allowed border-zinc-100 text-zinc-300"
+                        : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+                    ].join(" ")}
+                    aria-label="一段前へ"
+                    title="一段前へ"
+                  >
+                    +1
+                  </button>
 
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onMoveLayerBackward?.(layer);
-                      }}
-                      disabled={isBottom}
-                      className={[
-                        "rounded-lg border bg-white p-2 text-[11px] font-semibold",
-                        isBottom
-                          ? "cursor-not-allowed border-zinc-100 text-zinc-300"
-                          : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
-                      ].join(" ")}
-                      aria-label="一段後ろへ"
-                      title="一段後ろへ"
-                    >
-                      -1
-                    </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMoveLayerBackward?.(layer);
+                    }}
+                    disabled={isBottom}
+                    className={[
+                      "rounded-lg border bg-white px-2 py-2 text-[11px] font-semibold",
+                      isBottom
+                        ? "cursor-not-allowed border-zinc-100 text-zinc-300"
+                        : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+                    ].join(" ")}
+                    aria-label="一段後ろへ"
+                    title="一段後ろへ"
+                  >
+                    -1
+                  </button>
 
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onMoveLayerBack?.(layer);
-                      }}
-                      disabled={isBottom}
-                      className={[
-                        "rounded-lg border bg-white p-2",
-                        isBottom
-                          ? "cursor-not-allowed border-zinc-100 text-zinc-300"
-                          : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
-                      ].join(" ")}
-                      aria-label="最背面へ"
-                      title="最背面へ"
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMoveLayerBack?.(layer);
+                    }}
+                    disabled={isBottom}
+                    className={[
+                      "rounded-lg border bg-white p-2",
+                      isBottom
+                        ? "cursor-not-allowed border-zinc-100 text-zinc-300"
+                        : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+                    ].join(" ")}
+                    aria-label="最背面へ"
+                    title="最背面へ"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
 
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteLayer?.(layer);
-                      }}
-                      className="rounded-lg border border-red-200 bg-white p-2 text-red-500 hover:bg-red-50"
-                      aria-label="削除"
-                      title="削除"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteLayer?.(layer);
+                    }}
+                    className="rounded-lg border border-red-200 bg-white p-2 text-red-500 hover:bg-red-50"
+                    aria-label="削除"
+                    title="削除"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
             );
