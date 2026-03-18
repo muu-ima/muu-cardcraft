@@ -67,6 +67,8 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     setActiveBlockId,
     onMoveLayerFront,
     onMoveLayerBack,
+    onMoveLayerForward,
+    onMoveLayerBackward,
     onDeleteLayer,
   } = props;
 
@@ -144,6 +146,8 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
             onSelectImage,
             onMoveLayerFront,
             onMoveLayerBack,
+            onMoveLayerForward,
+            onMoveLayerBackward,
             onDeleteLayer,
           }}
           designPanel={{

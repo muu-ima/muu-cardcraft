@@ -27,6 +27,8 @@ type Props = {
 
   onMoveLayerFront?: (layer: MixedLayerItem) => void;
   onMoveLayerBack?: (layer: MixedLayerItem) => void;
+  onMoveLayerForward?: (layer: MixedLayerItem) => void;
+  onMoveLayerBackward?: (layer: MixedLayerItem) => void;
   onDeleteLayer?: (layer: MixedLayerItem) => void;
 };
 
@@ -54,6 +56,8 @@ export default function LayerPanel({
   onSelectImage,
   onMoveLayerFront,
   onMoveLayerBack,
+  onMoveLayerForward,
+  onMoveLayerBackward,
   onDeleteLayer,
 }: Props) {
   const layers = useMemo(
@@ -197,10 +201,48 @@ export default function LayerPanel({
                           ? "cursor-not-allowed border-zinc-100 text-zinc-300"
                           : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
                       ].join(" ")}
-                      aria-label="前面へ"
-                      title="前面へ"
+                      aria-label="最前面へ"
+                      title="最前面へ"
                     >
                       <ChevronUp className="h-4 w-4" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onMoveLayerForward?.(layer);
+                      }}
+                      disabled={isTop}
+                      className={[
+                        "rounded-lg border bg-white p-2 text-[11px] font-semibold",
+                        isTop
+                          ? "cursor-not-allowed border-zinc-100 text-zinc-300"
+                          : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+                      ].join(" ")}
+                      aria-label="一段前へ"
+                      title="一段前へ"
+                    >
+                      +1
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onMoveLayerBackward?.(layer);
+                      }}
+                      disabled={isBottom}
+                      className={[
+                        "rounded-lg border bg-white p-2 text-[11px] font-semibold",
+                        isBottom
+                          ? "cursor-not-allowed border-zinc-100 text-zinc-300"
+                          : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+                      ].join(" ")}
+                      aria-label="一段後ろへ"
+                      title="一段後ろへ"
+                    >
+                      -1
                     </button>
 
                     <button
@@ -216,8 +258,8 @@ export default function LayerPanel({
                           ? "cursor-not-allowed border-zinc-100 text-zinc-300"
                           : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
                       ].join(" ")}
-                      aria-label="背面へ"
-                      title="背面へ"
+                      aria-label="最背面へ"
+                      title="最背面へ"
                     >
                       <ChevronDown className="h-4 w-4" />
                     </button>

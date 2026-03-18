@@ -212,6 +212,8 @@ export default function CardEditor({ code }: Props) {
     onMoveLayerFront: handlers.onMoveLayerFront,
     onMoveLayerBack: handlers.onMoveLayerBack,
     onDeleteLayer: handlers.onDeleteLayer,
+    onMoveLayerForward: handlers.onMoveLayerForward,
+    onMoveLayerBackward: handlers.onMoveLayerBackward,
   });
 
   // =========================

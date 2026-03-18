@@ -233,6 +233,14 @@ export function useCardEditorHandlers({
     handleMoveMixedLayer(layer.id, "back");
   };
 
+  const onMoveLayerForward = (layer: MixedLayerItem) => {
+    handleMoveMixedLayer(layer.id, "forward");
+  };
+
+  const onMoveLayerBackward = (layer: MixedLayerItem) => {
+    handleMoveMixedLayer(layer.id, "backward");
+  };
+
   const onDeleteLayer = (layer: MixedLayerItem) => {
     const result = removeLayerAndReorder({
       targetId: layer.id,
@@ -262,6 +270,8 @@ export function useCardEditorHandlers({
     sendSelectionBackwardOne,
     onMoveLayerFront,
     onMoveLayerBack,
+    onMoveLayerForward,
+    onMoveLayerBackward,
     onDeleteLayer,
   };
 }

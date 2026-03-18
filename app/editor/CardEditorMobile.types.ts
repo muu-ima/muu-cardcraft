@@ -18,12 +18,7 @@ import type {
   SheetSnap,
   Side,
 } from "./CardEditor.types";
-
-type MixedLayer = {
-  kind: "block" | "image";
-  id: string;
-  z: number;
-};
+import type { MixedLayerItem } from "@/shared/layers";
 
 export type CardEditorMobileProps = {
   code: string;
@@ -44,7 +39,7 @@ export type CardEditorMobileProps = {
 
   getBlocksFor: (side: Side) => Block[];
   getImagesFor: (side: Side) => CardImage[];
-  mixedLayers: MixedLayer[];
+  mixedLayers: MixedLayerItem[];
   moveImage: (id: string, x: number, y: number) => void;
   resizeImage: (id: string, w: number, h: number) => void;
   currentImageCount: number;
@@ -69,9 +64,11 @@ export type CardEditorMobileProps = {
   onSendSelectedImageToBack: () => void;
   setActiveBlockId: (id: string) => void;
 
-  onMoveLayerFront: (layer: MixedLayer) => void;
-  onMoveLayerBack: (layer: MixedLayer) => void;
-  onDeleteLayer: (layer: MixedLayer) => void;
+  onMoveLayerFront: (layer: MixedLayerItem) => void;
+  onMoveLayerBack: (layer: MixedLayerItem) => void;
+  onMoveLayerForward: (layer: MixedLayerItem) => void;
+  onMoveLayerBackward: (layer: MixedLayerItem) => void;
+  onDeleteLayer: (layer: MixedLayerItem) => void;
   exportRef: RefObject<HTMLDivElement | null>;
   downloadImage: (format: "png" | "jpeg", target: HTMLDivElement) => void;
 

@@ -99,6 +99,8 @@ type UseCardEditorLayoutPropsParams = {
 
   onMoveLayerFront: (layer: MixedLayerItem) => void;
   onMoveLayerBack: (layer: MixedLayerItem) => void;
+  onMoveLayerForward: (layer: MixedLayerItem) => void;
+  onMoveLayerBackward: (layer: MixedLayerItem) => void;
   onDeleteLayer: (layer: MixedLayerItem) => void;
   mixedLayers: MixedLayerItem[];
 };
@@ -162,6 +164,8 @@ export function useCardEditorLayoutProps({
   setActiveBlockId,
   onMoveLayerFront,
   onMoveLayerBack,
+  onMoveLayerForward,
+  onMoveLayerBackward,
   onDeleteLayer,
 }: UseCardEditorLayoutPropsParams) {
   const layoutState: EditorStateForLayout = {
@@ -236,6 +240,8 @@ export function useCardEditorLayoutProps({
     setActiveBlockId,
     onMoveLayerFront,
     onMoveLayerBack,
+    onMoveLayerForward,
+    onMoveLayerBackward,
     onDeleteLayer,
   };
 
@@ -295,6 +301,8 @@ export function useCardEditorLayoutProps({
     setActiveBlockId,
     onMoveLayerFront,
     onMoveLayerBack,
+    onMoveLayerForward,
+    onMoveLayerBackward,
     onDeleteLayer,
   };
 

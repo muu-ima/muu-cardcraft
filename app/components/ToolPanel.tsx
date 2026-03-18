@@ -144,6 +144,8 @@ export default function ToolPanel({
             onSelectImage={layerPanel.onSelectImage}
             onMoveLayerFront={layerPanel.onMoveLayerFront}
             onMoveLayerBack={layerPanel.onMoveLayerBack}
+            onMoveLayerForward={layerPanel.onMoveLayerForward}
+            onMoveLayerBackward={layerPanel.onMoveLayerBackward}
             onDeleteLayer={layerPanel.onDeleteLayer}
           />
         )}
