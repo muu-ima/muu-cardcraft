@@ -132,9 +132,6 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
             currentImageCount,
             maxImageCount,
             onDeleteImage,
-            selectedImageId,
-            onBringSelectedImageToFront,
-            onSendSelectedImageToBack,
           }}
           layerPanel={{
             mixedLayers,

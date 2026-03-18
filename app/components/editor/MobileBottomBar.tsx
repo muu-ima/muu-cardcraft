@@ -8,6 +8,7 @@ import {
   TextCursor,
   Image as ImageIcon,
   ImagePlus,
+  Layers,
   Download,
 } from "lucide-react";
 
@@ -96,6 +97,13 @@ export default function MobileBottomBar({
               tab="image"
               label="画像"
               Icon={ImagePlus}
+              activeTab={activeTab}
+              onChangeTab={onChangeTab}
+            />
+            <MobileBottomBarItem
+              tab="layers"
+              label="レイヤー"
+              Icon={Layers}
               activeTab={activeTab}
               onChangeTab={onChangeTab}
             />
