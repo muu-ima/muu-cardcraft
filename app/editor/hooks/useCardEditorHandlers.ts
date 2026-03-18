@@ -15,11 +15,15 @@ import {
   moveForwardOne,
   moveBackwardOne,
 } from "@/shared/layers";
+import {
+  reorderMixedLayers,
+  getSelectedLayerTarget,
+  type LayerMoveAction,
+} from "../utils/layerActions";
 
 import type { SheetSnap } from "../CardEditor.types";
 
 type EditingState = { id: string; initialText: string } | null;
-type LayerMoveAction = "front" | "back" | "forward" | "backward";
 
 type UseCardEditorHandlersParams = {
   state: {
@@ -55,52 +59,6 @@ type UseCardEditorHandlersParams = {
   setBlocks: (next: Block[] | ((prev: Block[]) => Block[])) => void;
   setImages: (next: CardImage[] | ((prev: CardImage[]) => CardImage[])) => void;
 };
-
-export function reorderMixedLayers(params: {
-  targetId: string;
-  action: LayerMoveAction;
-  currentBlocks: Block[];
-  currentImages: CardImage[];
-  side: Side;
-}) {
-  const { targetId, action, currentBlocks, currentImages, side } = params;
-
-  const sideBlocks = currentBlocks.filter((b) => b.side === side);
-  const otherBlocks = currentBlocks.filter((b) => b.side !== side);
-
-  const sideImages = currentImages.filter((img) => img.side === side);
-  const otherImages = currentImages.filter((img) => img.side !== side);
-
-  const mixedLayers = buildMixedLayers(sideBlocks, sideImages);
-
-  let nextLayers = mixedLayers;
-
-  switch (action) {
-    case "front":
-      nextLayers = moveToFront(mixedLayers, targetId);
-      break;
-    case "back":
-      nextLayers = moveToBack(mixedLayers, targetId);
-      break;
-    case "forward":
-      nextLayers = moveForwardOne(mixedLayers, targetId);
-      break;
-    case "backward":
-      nextLayers = moveBackwardOne(mixedLayers, targetId);
-      break;
-  }
-
-  const reordered = applyLayerOrderToBlocksAndImages(
-    sideBlocks,
-    sideImages,
-    nextLayers,
-  );
-
-  return {
-    blocks: [...otherBlocks, ...reordered.blocks],
-    images: [...otherImages, ...reordered.images],
-  };
-}
 
 export function useCardEditorHandlers({
   state,
@@ -228,17 +186,11 @@ export function useCardEditorHandlers({
     dragPointerDown(e, blockId, opts);
   };
 
-  const getSelectedLayerTarget = () => {
-    if (selectedImageId) {
-      return { kind: "image" as const, id: selectedImageId };
-    }
-
-    if (activeBlockId) {
-      return { kind: "block" as const, id: activeBlockId };
-    }
-
-    return null;
-  };
+  const getTarget = () =>
+    getSelectedLayerTarget({
+      activeBlockId,
+      selectedImageId,
+    });
 
   const handleMoveMixedLayer = (
     targetId: string,
@@ -257,25 +209,25 @@ export function useCardEditorHandlers({
   };
 
   const bringSelectionToFront = () => {
-    const target = getSelectedLayerTarget();
+    const target = getTarget();
     if (!target) return;
     handleMoveMixedLayer(target.id, "front");
   };
 
   const sendSelectionToBack = () => {
-    const target = getSelectedLayerTarget();
+    const target = getTarget();
     if (!target) return;
     handleMoveMixedLayer(target.id, "back");
   };
 
   const bringSelectionForwardOne = () => {
-    const target = getSelectedLayerTarget();
+    const target = getTarget();
     if (!target) return;
     handleMoveMixedLayer(target.id, "forward");
   };
 
   const sendSelectionBackwardOne = () => {
-    const target = getSelectedLayerTarget();
+    const target = getTarget();
     if (!target) return;
     handleMoveMixedLayer(target.id, "backward");
   };
