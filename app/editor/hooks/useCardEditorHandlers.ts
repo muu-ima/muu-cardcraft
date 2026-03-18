@@ -232,6 +232,23 @@ export function useCardEditorHandlers({
     handleMoveMixedLayer(target.id, "backward");
   };
 
+  const onMoveLayerFront = (layer: { id: string }) => {
+    handleMoveMixedLayer(layer.id, "front");
+  };
+
+  const onMoveLayerBack = (layer: { id: string }) => {
+    handleMoveMixedLayer(layer.id, "back");
+  };
+
+  const onDeleteLayer = (layer: { kind: "block" | "image"; id: string }) => {
+    if (layer.kind === "image") {
+      setImages((prev) => prev.filter((img) => img.id !== layer.id));
+      return;
+    }
+
+    setBlocks((prev) => prev.filter((block) => block.id !== layer.id));
+  };
+
   return {
     onUploadedImage,
     openTab,
@@ -246,5 +263,8 @@ export function useCardEditorHandlers({
     sendSelectionToBack,
     bringSelectionForwardOne,
     sendSelectionBackwardOne,
+    onMoveLayerFront,
+    onMoveLayerBack,
+    onDeleteLayer,
   };
 }
