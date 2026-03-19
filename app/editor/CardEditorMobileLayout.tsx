@@ -176,7 +176,13 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                 onChangeAlign={actions.onChangeAlign}
                 side={state.side}
                 onChangeSide={actions.setSide}
+                selectedImageId={selectedImageId}
                 showGuides={state.showGuides}
+                onBringSelectedImageFront={onBringSelectedImageToFront}
+                onSendSelectedImageToBack={onSendSelectedImageToBack}
+                onDeleteSelectedImage={() => {
+                  if (selectedImageId) onDeleteImage(selectedImageId);
+                }}
                 onToggleGuides={() => actions.setShowGuides((v) => !v)}
                 disabled={state.isPreview || state.side !== "front"}
                 visible={centerVisible}

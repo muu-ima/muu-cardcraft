@@ -183,6 +183,12 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                 side={state.side}
                 onChangeSide={actions.setSide}
                 showGuides={state.showGuides}
+                selectedImageId={selectedImageId}
+                onBringSelectedImageFront={onBringSelectedImageToFront}
+                onSendSelectedImageToBack={onSendSelectedImageToBack}
+                onDeleteSelectedImage={() => {
+                  if (selectedImageId) onDeleteImage(selectedImageId);
+                }}
                 onToggleGuides={() => actions.setShowGuides((v) => !v)}
                 disabled={state.isPreview || state.side !== "front"}
                 visible={centerVisible}
