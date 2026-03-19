@@ -67,6 +67,8 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     setActiveBlockId,
     onMoveLayerFront,
     onMoveLayerBack,
+    onMoveLayerForward,
+    onMoveLayerBackward,
     onDeleteLayer,
   } = props;
 
@@ -130,9 +132,6 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
             currentImageCount,
             maxImageCount,
             onDeleteImage,
-            selectedImageId,
-            onBringSelectedImageToFront,
-            onSendSelectedImageToBack,
           }}
           layerPanel={{
             mixedLayers,
@@ -144,6 +143,8 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
             onSelectImage,
             onMoveLayerFront,
             onMoveLayerBack,
+            onMoveLayerForward,
+            onMoveLayerBackward,
             onDeleteLayer,
           }}
           designPanel={{

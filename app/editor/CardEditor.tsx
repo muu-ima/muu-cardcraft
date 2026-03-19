@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useMemo } from "react";
 import ModalPreview from "@/app/components/ModalPreview";
 import CardSurface from "@/app/components/CardSurface";
 import ExportSurface from "@/app/components/ExportSurface";
@@ -19,15 +19,10 @@ import { CardEditorMobileLayout } from "@/app/editor/CardEditorMobileLayout";
 import { CardEditorDesktopLayout } from "@/app/editor/CardEditorDesktopLayout";
 import type { SheetSnap, Side } from "./CardEditor.types";
 import { useCardEditorLayoutProps } from "@/app/editor/hooks/useCardEditorLayoutProps";
+import { buildMixedLayers, type MixedLayerItem } from "@/shared/layers";
 
 type Props = {
   code: string;
-};
-
-type MixedLayer = {
-  kind: "block" | "image";
-  id: string;
-  z: number;
 };
 
 type EditingState = { id: string; initialText: string } | null;
@@ -120,24 +115,10 @@ export default function CardEditor({ code }: Props) {
   const getBlocksFor = (s: Side) =>
     s === "front" ? editableBlocks : CARD_FULL_DESIGNS[design].back.blocks;
 
-  const getMixedLayersFor = (side: Side) => {
-    const sideBlocks = getBlocksFor(side);
-    const sideImages = getImagesFor(side);
-
-    return [
-      ...sideImages.map((img) => ({
-        kind: "image" as const,
-        id: img.id,
-        z: img.z,
-      })),
-      ...sideBlocks.map((block) => ({
-        kind: "block" as const,
-        id: block.id,
-        z: block.z,
-      })),
-    ].sort((a, b) => a.z - b.z);
-  };
-
+  const mixedLayers = useMemo(
+    () => buildMixedLayers(getBlocksFor(state.side), getImagesFor(state.side)),
+    [state.side, editableBlocks, images, design, getImagesFor],
+  );
   // いま編集してる面
   const currentBlocks = getBlocksFor(state.side);
   const currentImages = getImagesFor(state.side);
@@ -171,53 +152,6 @@ export default function CardEditor({ code }: Props) {
   // 📦 Layout Props
   // =========================
 
-  const handleMoveLayerFront = useCallback(
-    (layer: MixedLayer) => {
-      const mixed = getMixedLayersFor(state.side);
-      const maxZ =
-        mixed.length > 0 ? Math.max(...mixed.map((item) => item.z)) : 1;
-
-      if (layer.kind === "block") {
-        updateBlockZ(layer.id, maxZ + 1);
-        return;
-      }
-
-      setImages((prev) =>
-        prev.map((img) =>
-          img.id === layer.id ? { ...img, z: maxZ + 1 } : img,
-        ),
-      );
-    },
-    [getMixedLayersFor, state.side, updateBlockZ, setImages],
-  );
-
-  const handleMoveLayerBack = useCallback(
-    (layer: MixedLayer) => {
-      if (layer.kind === "block") {
-        updateBlockZ(layer.id, 0);
-        return;
-      }
-
-      setImages((prev) =>
-        prev.map((img) => (img.id === layer.id ? { ...img, z: 0 } : img)),
-      );
-    },
-    [updateBlockZ, setImages],
-  );
-
-  const handleDeleteLayer = useCallback(
-    (layer: MixedLayer) => {
-      if (layer.kind === "image") {
-        removeImage(layer.id);
-        setSelectedImageId(null);
-        return;
-      }
-
-      removeBlock(layer.id);
-    },
-    [removeImage, removeBlock],
-  );
-
   const { desktopProps, mobileProps } = useCardEditorLayoutProps({
     code,
     state,
@@ -235,7 +169,7 @@ export default function CardEditor({ code }: Props) {
     scaleMobile,
     getBlocksFor,
     getImagesFor,
-    getMixedLayersFor,
+    mixedLayers,
     moveImage,
     resizeImage,
     editableBlocks,
@@ -275,9 +209,11 @@ export default function CardEditor({ code }: Props) {
     onBringSelectedImageToFront: handlers.bringSelectionToFront,
     onSendSelectedImageToBack: handlers.sendSelectionToBack,
     setActiveBlockId: actions.setActiveBlockId,
-    onMoveLayerFront: handleMoveLayerFront,
-    onMoveLayerBack: handleMoveLayerBack,
-    onDeleteLayer: handleDeleteLayer,
+    onMoveLayerFront: handlers.onMoveLayerFront,
+    onMoveLayerBack: handlers.onMoveLayerBack,
+    onDeleteLayer: handlers.onDeleteLayer,
+    onMoveLayerForward: handlers.onMoveLayerForward,
+    onMoveLayerBackward: handlers.onMoveLayerBackward,
   });
 
   // =========================
@@ -323,7 +259,7 @@ export default function CardEditor({ code }: Props) {
               <CardSurface
                 blocks={getBlocksFor(state.side)}
                 images={getImagesFor(state.side)}
-                mixedLayers={getMixedLayersFor(state.side)}
+                mixedLayers={mixedLayers}
                 onMoveImage={moveImage}
                 design={design}
                 w={CARD_BASE_W}

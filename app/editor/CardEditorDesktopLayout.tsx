@@ -61,6 +61,8 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     setActiveBlockId,
     onMoveLayerFront,
     onMoveLayerBack,
+    onMoveLayerForward,
+    onMoveLayerBackward,
     onDeleteLayer,
   } = props;
 
@@ -135,9 +137,6 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
               currentImageCount,
               maxImageCount,
               onDeleteImage,
-              selectedImageId,
-              onBringSelectedImageToFront,
-              onSendSelectedImageToBack,
             }}
             designPanel={{
               design,
@@ -153,6 +152,8 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
               onSelectImage,
               onMoveLayerFront,
               onMoveLayerBack,
+              onMoveLayerForward,
+              onMoveLayerBackward,
               onDeleteLayer,
             }}
             exportPanel={{

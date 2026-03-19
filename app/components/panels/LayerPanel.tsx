@@ -1,7 +1,10 @@
+// app/components/LayerPanel.tsx
 "use client";
 
+import { useMemo } from "react";
 import type { Block } from "@/shared/blocks";
 import type { CardImage } from "@/shared/images";
+import type { MixedLayerItem } from "@/shared/layers";
 import {
   Layers3,
   Type,
@@ -11,14 +14,8 @@ import {
   Trash2,
 } from "lucide-react";
 
-type MixedLayer = {
-  kind: "block" | "image";
-  id: string;
-  z: number;
-};
-
 type Props = {
-  mixedLayers: MixedLayer[];
+  mixedLayers: MixedLayerItem[];
   blocks: Block[];
   images: CardImage[];
 
@@ -28,9 +25,11 @@ type Props = {
   onSelectBlock?: (id: string) => void;
   onSelectImage?: (id: string | null) => void;
 
-  onMoveLayerFront?: (layer: MixedLayer) => void;
-  onMoveLayerBack?: (layer: MixedLayer) => void;
-  onDeleteLayer?: (layer: MixedLayer) => void;
+  onMoveLayerFront?: (layer: MixedLayerItem) => void;
+  onMoveLayerBack?: (layer: MixedLayerItem) => void;
+  onMoveLayerForward?: (layer: MixedLayerItem) => void;
+  onMoveLayerBackward?: (layer: MixedLayerItem) => void;
+  onDeleteLayer?: (layer: MixedLayerItem) => void;
 };
 
 function getBlockLabel(block?: Block) {
@@ -57,17 +56,38 @@ export default function LayerPanel({
   onSelectImage,
   onMoveLayerFront,
   onMoveLayerBack,
+  onMoveLayerForward,
+  onMoveLayerBackward,
   onDeleteLayer,
 }: Props) {
-  // 前面を上にする
-  const layers = [...mixedLayers].sort((a, b) => b.z - a.z);
+  const layers = useMemo(
+    () => [...mixedLayers].sort((a, b) => b.z - a.z),
+    [mixedLayers],
+  );
+
+  const blockMap = useMemo(
+    () => new Map(blocks.map((block) => [block.id, block])),
+    [blocks],
+  );
+
+  const imageMap = useMemo(
+    () => new Map(images.map((image) => [image.id, image])),
+    [images],
+  );
+
+  const imageIndexMap = useMemo(
+    () => new Map(images.map((image, index) => [image.id, index + 1])),
+    [images],
+  );
 
   return (
-    <section className="flex h-full min-h-0 flex-col rounded-2xl border border-zinc-200 bg-white">
+    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white">
       <header className="flex items-center gap-2 border-b border-zinc-100 px-4 py-3">
         <Layers3 className="h-4 w-4 text-zinc-700" />
         <div className="text-sm font-semibold text-zinc-800">レイヤー</div>
-        <div className="ml-auto text-xs text-zinc-400">{layers.length}件</div>
+        <div className="ml-auto rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-500">
+          {layers.length}
+        </div>
       </header>
 
       <div className="flex-1 space-y-2 overflow-y-auto p-3">
@@ -76,23 +96,25 @@ export default function LayerPanel({
             レイヤーがありません
           </div>
         ) : (
-          layers.map((layer, index) => {
+          layers.map((layer) => {
             let title = "レイヤー";
             let meta = "";
+            let kindLabel = "文字";
             let icon = <Type className="h-4 w-4" />;
 
             if (layer.kind === "image") {
-              const img = images.find((i) => i.id === layer.id);
-              const imageNumber = images.findIndex((i) => i.id === layer.id);
+              const image = imageMap.get(layer.id);
+              const imageNumber = imageIndexMap.get(layer.id);
 
-              title = `画像 ${imageNumber >= 0 ? imageNumber + 1 : index + 1}`;
+              title = `画像 ${imageNumber ?? "-"}`;
+              kindLabel = "画像";
               icon = <ImageIcon className="h-4 w-4" />;
 
-              if (img) {
-                meta = `${Math.round(img.w)} × ${Math.round(img.h)}`;
+              if (image) {
+                meta = `${Math.round(image.w)} × ${Math.round(image.h)}`;
               }
             } else {
-              const block = blocks.find((b) => b.id === layer.id);
+              const block = blockMap.get(layer.id);
               title = getBlockLabel(block);
 
               if (block?.type === "text") {
@@ -104,29 +126,28 @@ export default function LayerPanel({
               (layer.kind === "block" && activeBlockId === layer.id) ||
               (layer.kind === "image" && selectedImageId === layer.id);
 
+            const isTop = layer.z === mixedLayers.length;
+            const isBottom = layer.z === 1;
+
+            const handleSelect = () => {
+              if (layer.kind === "block") {
+                onSelectBlock?.(layer.id);
+                onSelectImage?.(null);
+              } else {
+                onSelectBlock?.("");
+                onSelectImage?.(layer.id);
+              }
+            };
             return (
               <div
                 key={layer.id}
                 role="button"
                 tabIndex={0}
-                onClick={() => {
-                  if (layer.kind === "block") {
-                    onSelectBlock?.(layer.id);
-                    onSelectImage?.(null);
-                  } else {
-                    onSelectImage?.(layer.id);
-                  }
-                }}
+                onClick={handleSelect}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-
-                    if (layer.kind === "block") {
-                      onSelectBlock?.(layer.id);
-                      onSelectImage?.(null);
-                    } else {
-                      onSelectImage?.(layer.id);
-                    }
+                    handleSelect();
                   }
                 }}
                 className={[
@@ -137,10 +158,10 @@ export default function LayerPanel({
                     : "border-zinc-200 bg-white hover:bg-zinc-50",
                 ].join(" ")}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3">
                   <div
                     className={[
-                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
+                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border",
                       isSelected
                         ? "border-blue-200 bg-white text-blue-700"
                         : "border-zinc-200 bg-zinc-50 text-zinc-600",
@@ -150,12 +171,12 @@ export default function LayerPanel({
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-medium text-zinc-800">
+                    <div className="line-clamp-2 break-all text-sm font-medium leading-5 text-zinc-800">
                       {title}
                     </div>
 
-                    <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
-                      <span>{layer.kind === "image" ? "画像" : "文字"}</span>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                      <span>{kindLabel}</span>
 
                       {meta && (
                         <>
@@ -163,52 +184,99 @@ export default function LayerPanel({
                           <span>{meta}</span>
                         </>
                       )}
-
-                      <span className="text-zinc-300">•</span>
-                      <span>z:{layer.z}</span>
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex shrink-0 items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onMoveLayerFront?.(layer);
-                      }}
-                      className="rounded-lg border border-zinc-200 bg-white p-2 text-zinc-600 hover:bg-zinc-50"
-                      aria-label="前面へ"
-                      title="前面へ"
-                    >
-                      <ChevronUp className="h-4 w-4" />
-                    </button>
+                <div className="mt-3 flex flex-wrap items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMoveLayerFront?.(layer);
+                    }}
+                    disabled={isTop}
+                    className={[
+                      "rounded-lg border bg-white p-2",
+                      isTop
+                        ? "cursor-not-allowed border-zinc-100 text-zinc-300"
+                        : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+                    ].join(" ")}
+                    aria-label="最前面へ"
+                    title="最前面へ"
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </button>
 
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onMoveLayerBack?.(layer);
-                      }}
-                      className="rounded-lg border border-zinc-200 bg-white p-2 text-zinc-600 hover:bg-zinc-50"
-                      aria-label="背面へ"
-                      title="背面へ"
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMoveLayerForward?.(layer);
+                    }}
+                    disabled={isTop}
+                    className={[
+                      "rounded-lg border bg-white px-2 py-2 text-[11px] font-semibold",
+                      isTop
+                        ? "cursor-not-allowed border-zinc-100 text-zinc-300"
+                        : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+                    ].join(" ")}
+                    aria-label="一段前へ"
+                    title="一段前へ"
+                  >
+                    +1
+                  </button>
 
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteLayer?.(layer);
-                      }}
-                      className="rounded-lg border border-red-200 bg-white p-2 text-red-500 hover:bg-red-50"
-                      aria-label="削除"
-                      title="削除"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMoveLayerBackward?.(layer);
+                    }}
+                    disabled={isBottom}
+                    className={[
+                      "rounded-lg border bg-white px-2 py-2 text-[11px] font-semibold",
+                      isBottom
+                        ? "cursor-not-allowed border-zinc-100 text-zinc-300"
+                        : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+                    ].join(" ")}
+                    aria-label="一段後ろへ"
+                    title="一段後ろへ"
+                  >
+                    -1
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMoveLayerBack?.(layer);
+                    }}
+                    disabled={isBottom}
+                    className={[
+                      "rounded-lg border bg-white p-2",
+                      isBottom
+                        ? "cursor-not-allowed border-zinc-100 text-zinc-300"
+                        : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+                    ].join(" ")}
+                    aria-label="最背面へ"
+                    title="最背面へ"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteLayer?.(layer);
+                    }}
+                    className="rounded-lg border border-red-200 bg-white p-2 text-red-500 hover:bg-red-50"
+                    aria-label="削除"
+                    title="削除"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
             );

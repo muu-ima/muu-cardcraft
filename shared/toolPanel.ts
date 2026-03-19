@@ -5,6 +5,7 @@ import type { DesignKey } from "@/shared/design";
 import type { FontKey, FontSizeDelta } from "@/shared/fonts";
 import type { CardImage } from "@/shared/images";
 import type { UploadImageAsset } from "@/hooks/card/useUploadImage";
+import type { MixedLayerItem } from "@/shared/layers";
 
 export type Side = "front" | "back";
 
@@ -44,19 +45,10 @@ export type ImagePanelSectionProps = {
   currentImageCount: number;
   maxImageCount: number;
   onDeleteImage: (id: string) => void;
-  selectedImageId: string | null;
-  onBringSelectedImageToFront: () => void;
-  onSendSelectedImageToBack: () => void;
-};
-
-export type MixedLayer = {
-  kind: "block" | "image";
-  id: string;
-  z: number;
 };
 
 type LayerPanelSectionProps = {
-  mixedLayers: MixedLayer[];
+  mixedLayers: MixedLayerItem[];
   blocks: Block[];
   images: CardImage[];
 
@@ -66,9 +58,11 @@ type LayerPanelSectionProps = {
   onSelectBlock?: (id: string) => void;
   onSelectImage?: (id: string | null) => void;
 
-  onMoveLayerFront?: (layer: MixedLayer) => void;
-  onMoveLayerBack?: (layer: MixedLayer) => void;
-  onDeleteLayer?: (layer: MixedLayer) => void;
+  onMoveLayerFront?: (layer: MixedLayerItem) => void;
+  onMoveLayerBack?: (layer: MixedLayerItem) => void;
+  onMoveLayerForward: (layer: MixedLayerItem) => void;
+  onMoveLayerBackward: (layer: MixedLayerItem) => void;
+  onDeleteLayer?: (layer: MixedLayerItem) => void;
 };
 
 export type DesignPanelSectionProps = {

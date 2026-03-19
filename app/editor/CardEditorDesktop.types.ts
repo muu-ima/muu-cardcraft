@@ -17,12 +17,7 @@ import type {
   EditorActionsForLayout,
   Side,
 } from "./CardEditor.types";
-
-type MixedLayer = {
-  kind: "block" | "image";
-  id: string;
-  z: number;
-};
+import type { MixedLayerItem } from "@/shared/layers";
 
 export type CardEditorDesktopProps = {
   // 画像アップロード
@@ -41,7 +36,7 @@ export type CardEditorDesktopProps = {
   // ---- blocks / デザイン
   getBlocksFor: (side: Side) => Block[];
   getImagesFor: (side: "front" | "back") => CardImage[];
-  mixedLayers: MixedLayer[];
+  mixedLayers: MixedLayerItem[];
   editableBlocks: Block[];
   addBlock: () => void;
   onChangeText: (id: string, value: string) => void;
@@ -64,9 +59,11 @@ export type CardEditorDesktopProps = {
   onSendSelectedImageToBack: () => void;
   setActiveBlockId: (id: string) => void;
 
-  onMoveLayerFront: (layer: MixedLayer) => void;
-  onMoveLayerBack: (layer: MixedLayer) => void;
-  onDeleteLayer: (layer: MixedLayer) => void;
+  onMoveLayerFront: (layer: MixedLayerItem) => void;
+  onMoveLayerBack: (layer: MixedLayerItem) => void;
+  onMoveLayerForward: (layer: MixedLayerItem) => void;
+  onMoveLayerBackward: (layer: MixedLayerItem) => void;
+  onDeleteLayer: (layer: MixedLayerItem) => void;
   // ---- export
   exportRef: RefObject<HTMLDivElement | null>;
   downloadImage: (format: "png" | "jpeg", target: HTMLDivElement) => void;

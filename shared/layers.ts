@@ -130,3 +130,11 @@ export function applyLayerOrderToBlocksAndImages<
     })),
   };
 }
+
+export function removeLayer<T extends LayerItem>(
+  items: T[],
+  targetId: string,
+): T[] {
+  const normalized = normalizeLayers(items);
+  return reindexLayers(normalized.filter((item) => item.id !== targetId));
+}

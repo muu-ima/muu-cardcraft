@@ -43,31 +43,28 @@ export default function ToolPanel({
                 : "編集";
 
   return (
-    // ✅ xl以上だけ「左固定パネル」、xl未満は「普通のコンテンツ」
     <aside
       className={[
-        "w-full",
+        "w-full flex flex-col min-h-0",
+        variant === "desktop" ? "h-[calc(100vh-56px)]" : "h-full",
         "xl:fixed xl:left-14 xl:top-14 xl:z-30",
-        "xl:h-[calc(100vh-56px)] xl:w-[360px]",
+        "xl:w-[360px]",
         "xl:bg-white/70 xl:backdrop-blur",
         "xl:shadow-[1px_0_0_rgba(0,0,0,0.06)]",
       ].join(" ")}
     >
-      {/* ✅ 見出し：BottomSheetでも上に残る */}
-      <div
-        className={[
-          "hidden xl:block", // ← これだけで解決
-          "sticky top-0 z-10 mb-3",
-          "bg-white/70 backdrop-blur",
-          "rounded-xl px-3 py-2",
-        ].join(" ")}
-      >
-        {/* ✅ showHeader のときだけ描画する */}
-        {showHeader && (
+      {showHeader && (
+        <div
+          className={[
+            "hidden xl:block shrink-0",
+            "bg-white/70 backdrop-blur",
+            "rounded-xl px-3 py-2",
+          ].join(" ")}
+        >
           <div
-            className="sticky top-0 z-10 px-4 py-3 xl:px-3 xl:py-2
-                  bg-white/60 backdrop-blur
-                  shadow-[0_1px_0_rgba(0,0,0,0.06)]"
+            className="px-4 py-3 xl:px-3 xl:py-2
+                       bg-white/60 backdrop-blur
+                       shadow-[0_1px_0_rgba(0,0,0,0.06)]"
           >
             <div className="flex items-center justify-between">
               <div className="text-sm font-semibold text-zinc-800">{title}</div>
@@ -80,14 +77,13 @@ export default function ToolPanel({
               </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* ✅ 本文：Desktopはパネル内スクロール、MobileはBottomSheet側でスクロール */}
       <div
         className={[
-          "overflow-y-auto p-4",
-          variant === "desktop" ? "h-[calc(100%-41px)]" : "h-full",
+          "flex-1 min-h-0 overflow-y-auto p-4",
+          variant === "sheet" ? "h-full" : "",
         ].join(" ")}
       >
         {activeTab === "text" && (
@@ -105,6 +101,7 @@ export default function ToolPanel({
             onDeleteBlock={textPanel.onDeleteBlock}
           />
         )}
+
         {activeTab === "font" && (
           <FontPanel
             blocks={fontPanel.blocks}
@@ -114,12 +111,14 @@ export default function ToolPanel({
             onPreviewColor={fontPanel.onPreviewColor}
           />
         )}
+
         {activeTab === "design" && (
           <DesignPanel
             design={designPanel.design}
             onChangeDesign={designPanel.onChangeDesign}
           />
         )}
+
         {activeTab === "image" && (
           <ImagePanel
             code={imagePanel.code}
@@ -128,11 +127,9 @@ export default function ToolPanel({
             currentCount={imagePanel.currentImageCount}
             maxCount={imagePanel.maxImageCount}
             onDeleteImage={imagePanel.onDeleteImage}
-            selectedImageId={imagePanel.selectedImageId}
-            onBringSelectedImageToFront={imagePanel.onBringSelectedImageToFront}
-            onSendSelectedImageToBack={imagePanel.onSendSelectedImageToBack}
           />
         )}
+
         {activeTab === "layers" && (
           <LayerPanel
             mixedLayers={layerPanel.mixedLayers}
@@ -144,9 +141,12 @@ export default function ToolPanel({
             onSelectImage={layerPanel.onSelectImage}
             onMoveLayerFront={layerPanel.onMoveLayerFront}
             onMoveLayerBack={layerPanel.onMoveLayerBack}
+            onMoveLayerForward={layerPanel.onMoveLayerForward}
+            onMoveLayerBackward={layerPanel.onMoveLayerBackward}
             onDeleteLayer={layerPanel.onDeleteLayer}
           />
         )}
+
         {activeTab === "export" && (
           <ExportPanel onDownload={exportPanel.onDownload} />
         )}
