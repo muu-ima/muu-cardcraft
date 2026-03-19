@@ -137,9 +137,6 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
               currentImageCount,
               maxImageCount,
               onDeleteImage,
-              selectedImageId,
-              onBringSelectedImageToFront,
-              onSendSelectedImageToBack,
             }}
             designPanel={{
               design,

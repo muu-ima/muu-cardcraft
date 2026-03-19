@@ -18,11 +18,20 @@ const DESIGN_CATEGORIES: Record<
   },
   illustration: {
     label: "イラスト",
-    keys: ["girl", "usaCarrot"],
+    keys: [
+      "girl",
+      "itigoSoda",
+      "usaCarrot",
+      "cityGirl",
+      "mocaGirl",
+      "nekoFusen",
+      "mirrorBoy",
+      "mirrorGirl",
+    ],
   },
   texture: {
     label: "素材・柄",
-    keys: ["kinmokusei"],
+    keys: ["kinmokusei", "circlePattern", "coffeeWood", "coffeeWoodCorner"],
   },
 };
 
@@ -37,8 +46,18 @@ const DESIGN_LABELS: Record<DesignKey, string> = {
   ultramarine: "ウルトラマリン",
 
   girl: "ガール",
-  kinmokusei: "金木犀",
+  itigoSoda: "いちごソーダ",
   usaCarrot: "うさぎ&にんじん",
+  cityGirl: "シティガール",
+  mocaGirl: "モカガール",
+  nekoFusen: "ねこ風船",
+  mirrorBoy: "鏡を見て自撮り少年",
+  mirrorGirl: "鏡を見て自撮り少女",
+
+  kinmokusei: "金木犀",
+  circlePattern: "サークルパターン",
+  coffeeWood: "コーヒーウッド",
+  coffeeWoodCorner: "コーヒーウッド右下",
 };
 export default function DesignPanel({
   design,
@@ -56,6 +75,8 @@ export default function DesignPanel({
     key,
     label: DESIGN_LABELS[key],
     bgColor: CARD_DESIGNS[key].bgColor,
+    image: CARD_DESIGNS[key].image,
+    mode: CARD_DESIGNS[key].mode,
   }));
 
   const variant = activeCategory === "simple" ? "swatch" : "default";

@@ -109,7 +109,7 @@ export default function TextPanel(props: TextPanelProps) {
             ＋ テキストを追加
           </button>
 
-          <div className="space-y-2 max-h-[260px] overflow-auto pr-1">
+          <div className="space-y-2 pr-1">
             {normalBlocks.map((b, index) => {
               const isActive = b.id === activeBlockId;
               return (

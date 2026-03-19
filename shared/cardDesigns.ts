@@ -114,8 +114,19 @@ export const CARD_FULL_DESIGNS: Record<DesignKey, cardDesign> = {
   snow: makeDesign("snow"),
   ultramarine: makeDesign("ultramarine"),
 
-  // illustration / texture
+  // illustration
   girl: makeDesign("girl"),
-  kinmokusei: makeDesign("kinmokusei"),
+  itigoSoda: makeDesign("itigoSoda"),
   usaCarrot: makeDesign("usaCarrot"),
+  cityGirl: makeDesign("cityGirl"),
+  mocaGirl: makeDesign("mocaGirl"),
+  nekoFusen: makeDesign("nekoFusen"),
+  mirrorBoy: makeDesign("mirrorBoy"),
+  mirrorGirl: makeDesign("mirrorGirl"),
+
+  // texture
+  circlePattern: makeDesign("circlePattern"),
+  kinmokusei: makeDesign("kinmokusei"),
+  coffeeWood: makeDesign("coffeeWood"),
+  coffeeWoodCorner: makeDesign("coffeeWoodCorner"),
 };
