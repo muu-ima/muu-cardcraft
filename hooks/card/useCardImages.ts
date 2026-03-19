@@ -17,6 +17,7 @@ import {
   IMAGE_MAX_H,
   clamp,
 } from "@/shared/images";
+import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
 
 // 依存なしで動く簡易ID（あとで randomId/uuid に差し替えOK）
 function makeId() {
@@ -126,21 +127,50 @@ export function useCardImages(initial: CardImage[] = []) {
 
   const moveImage = useCallback((id: string, x: number, y: number) => {
     setImages((prev) =>
-      prev.map((it) => (it.id === id ? { ...it, x, y } : it)),
+      prev.map((it) => {
+        if (it.id !== id) return it;
+
+        const nextX = clamp(Math.round(x), 0, Math.max(0, CARD_BASE_W - it.w));
+
+        const nextY = clamp(Math.round(y), 0, Math.max(0, CARD_BASE_H - it.h));
+
+        return {
+          ...it,
+          x: nextX,
+          y: nextY,
+        };
+      }),
     );
   }, []);
 
   const resizeImage = useCallback((id: string, w: number, h: number) => {
     setImages((prev) =>
-      prev.map((it) =>
-        it.id === id
-          ? {
-              ...it,
-              w: clamp(Math.round(w), IMAGE_MIN_W, IMAGE_MAX_W),
-              h: clamp(Math.round(h), IMAGE_MIN_H, IMAGE_MAX_H),
-            }
-          : it,
-      ),
+      prev.map((it) => {
+        if (it.id !== id) return it;
+
+        const nextW = clamp(Math.round(w), IMAGE_MIN_W, IMAGE_MAX_W);
+        const nextH = clamp(Math.round(h), IMAGE_MIN_H, IMAGE_MAX_H);
+
+        const safeX = clamp(
+          Math.round(it.x),
+          0,
+          Math.max(0, CARD_BASE_W - nextW),
+        );
+
+        const safeY = clamp(
+          Math.round(it.y),
+          0,
+          Math.max(0, CARD_BASE_H - nextH),
+        );
+
+        return {
+          ...it,
+          w: nextW,
+          h: nextH,
+          x: safeX,
+          y: safeY,
+        };
+      }),
     );
   }, []);
 

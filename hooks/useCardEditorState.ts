@@ -29,7 +29,7 @@ export function useCardEditorState(args: {
   dragPointerDown: (
     e: React.PointerEvent<Element>,
     id: string,
-    opts: { scale: number }
+    opts: { scale: number },
   ) => void;
 }) {
   const {
@@ -51,7 +51,7 @@ export function useCardEditorState(args: {
   const [showGuides, setShowGuides] = useState(true);
 
   // --- selection/editing ---
-  const [activeBlockId, setActiveBlockId] = useState<string>("name");
+  const [activeBlockId, setActiveBlockId] = useState<string>("");
   const [editing, setEditing] = useState<EditingState>(null);
 
   // --- refs ---
@@ -67,16 +67,14 @@ export function useCardEditorState(args: {
   const currentBlocks = getBlocksFor(side);
 
   const findTextBlock = (id: string): TextBlock | undefined =>
-    currentBlocks.find(
-      (b): b is TextBlock => b.id === id && b.type === "text"
-    );
+    currentBlocks.find((b): b is TextBlock => b.id === id && b.type === "text");
 
   const active = useMemo(
     () =>
       editableBlocks.find(
-        (b): b is TextBlock => b.id === activeBlockId && b.type === "text"
+        (b): b is TextBlock => b.id === activeBlockId && b.type === "text",
       ),
-    [editableBlocks, activeBlockId]
+    [editableBlocks, activeBlockId],
   );
 
   const centerVisible = !isPreview && side === "front" && !!active;
@@ -142,7 +140,7 @@ export function useCardEditorState(args: {
   const handleBlockPointerDown = (
     e: React.PointerEvent<Element>,
     blockId: string,
-    opts: { scale: number }
+    opts: { scale: number },
   ) => {
     if (editing) {
       e.preventDefault();
