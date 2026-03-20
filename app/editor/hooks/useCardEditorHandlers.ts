@@ -26,6 +26,7 @@ type UseCardEditorHandlersParams = {
     onChangeTab: (tab: TabKey) => void;
     setActiveTab: (tab: TabKey | null) => void;
     setActiveBlockId: (id: string) => void;
+    setSelectedImageId: (id: string | null) => void;
   };
   editing: EditingState;
   setEditing: Dispatch<SetStateAction<EditingState>>;
@@ -109,6 +110,14 @@ export function useCardEditorHandlers({
 
     setEditing(null);
     actions.setActiveBlockId("");
+    actions.setSelectedImageId(null);
+    actions.setActiveTab(null);
+  };
+
+  const clearSelection = () => {
+    setEditing(null);
+    actions.setActiveBlockId("");
+    actions.setSelectedImageId(null);
     actions.setActiveTab(null);
   };
 
@@ -116,23 +125,24 @@ export function useCardEditorHandlers({
     const cardEl = cardRef.current;
     if (!cardEl) return;
 
-    const target = e.target as Node;
+    const target = e.target as HTMLElement | null;
+    if (!target) return;
 
     if (centerWrapRef.current?.contains(target)) return;
 
-    if (!cardEl.contains(target)) {
-      if (editing) {
-        const b = currentBlocks.find((x) => x.id === editing.id);
-        if (b) {
-          commitText(editing.id, b.text);
-        }
-        setEditing(null);
-        return;
-      }
+    const clickedBlock = !!target.closest("[data-block-id]");
+    const clickedImage = !!target.closest("[data-image-id]");
 
-      actions.setActiveBlockId("");
-      actions.setActiveTab(null);
+    if (clickedBlock || clickedImage) return;
+
+    if (editing) {
+      const b = currentBlocks.find((x) => x.id === editing.id);
+      if (b) {
+        commitText(editing.id, b.text);
+      }
     }
+
+    clearSelection();
   };
 
   const onChangeText = (id: string, value: string) => {
@@ -154,6 +164,8 @@ export function useCardEditorHandlers({
     blockId: string,
     opts: { scale: number },
   ) => {
+    actions.setSelectedImageId(null);
+
     if (editing) {
       e.preventDefault();
       e.stopPropagation();

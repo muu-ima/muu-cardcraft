@@ -29,10 +29,11 @@ export function useCenterToolbarState({
 
   const selectionType: SelectionType = useMemo(() => {
     if (selectedItem?.kind === "image") return "image";
-    if (selectedItem?.kind === "block" && value) return "text";
+    if (selectedItem?.kind === "block") return "text";
     return "none";
   }, [selectedItem, value]);
 
+  const showDefaultTools = selectionType === "none";
   const isFontOpen = activeTab === "font";
   const isTextOpen = activeTab === "text";
   const compact = sidePanelOpen && isNarrow;
@@ -50,6 +51,8 @@ export function useCenterToolbarState({
     isFontOpen,
     isTextOpen,
     compact,
+
+    showDefaultTools,
     showCommonTools,
     showTextTools,
     showImageTools,

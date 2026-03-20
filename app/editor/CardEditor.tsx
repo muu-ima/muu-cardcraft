@@ -34,10 +34,7 @@ export default function CardEditor({ code }: Props) {
   // =========================
   const [editing, setEditing] = useState<EditingState>(null);
   const [design, setDesign] = useState<DesignKey>("mint");
-  const [selectedItem, setSelectedItem] = useState<SelectedItem>({
-    kind: "block",
-    id: "name",
-  });
+  const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
 
   const setSelectedImageIdCompat = (id: string | null) => {
     setSelectedItem(id ? { kind: "image", id } : null);
@@ -144,9 +141,15 @@ export default function CardEditor({ code }: Props) {
   const currentImages = getImagesFor(state.side);
   const centerWrapRef = useRef<HTMLDivElement | null>(null);
 
+  const handlerActions = {
+    ...actions,
+    setActiveBlockId: setActiveBlockIdCompat,
+    setSelectedImageId: setSelectedImageIdCompat,
+  };
+
   const handlers = useCardEditorHandlers({
     state,
-    actions,
+    actions: handlerActions,
     editing,
     setEditing,
     currentBlocks,

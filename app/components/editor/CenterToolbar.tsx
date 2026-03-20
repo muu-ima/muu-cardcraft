@@ -90,6 +90,7 @@ export default function CenterToolbar({
     isFontOpen,
     isTextOpen,
     compact,
+    showDefaultTools,
     showTextTools,
     showImageTools,
     textControlsDisabled,
@@ -144,6 +145,31 @@ export default function CenterToolbar({
             value === null && !selectedItem ? "opacity-70" : "",
           ].join(" ")}
         >
+          {showDefaultTools && (
+            <>
+              <GhostButton
+                ariaLabel="画像追加を開く"
+                disabled={disabled}
+                onClick={() => onOpenTab("image")}
+                title="画像追加"
+              >
+                <ImageIcon className="h-4 w-4" />
+                <span>画像追加</span>
+              </GhostButton>
+
+              <GhostButton
+                ariaLabel="デザインを開く"
+                disabled={disabled}
+                onClick={() => onOpenTab("design")}
+                title="デザイン"
+              >
+                <Palette className="h-4 w-4" />
+                <span>デザイン</span>
+              </GhostButton>
+
+              <Divider />
+            </>
+          )}
           {showTextTools && value && (
             <>
               <GhostButton

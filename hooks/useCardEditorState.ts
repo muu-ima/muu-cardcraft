@@ -84,10 +84,7 @@ export function useCardEditorState(args: {
     [editableBlocks, activeBlockId],
   );
 
-  const centerVisible =
-    !isPreview &&
-    side === "front" &&
-    (selectedItem?.kind === "block" || selectedItem?.kind === "image");
+  const centerVisible = !isPreview && side === "front";
 
   const centerToolbarValue = active
     ? {
