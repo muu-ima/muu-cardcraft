@@ -18,6 +18,7 @@ import type {
   Side,
 } from "./CardEditor.types";
 import type { MixedLayerItem } from "@/shared/layers";
+import type { SelectedItem } from "@/shared/selection";
 
 export type CardEditorDesktopProps = {
   // 画像アップロード
@@ -53,7 +54,7 @@ export type CardEditorDesktopProps = {
   currentImageCount: number;
   maxImageCount: number;
   onDeleteImage: (id: string) => void;
-  selectedImageId: string | null;
+  selectedItem: SelectedItem;
   onSelectImage: (id: string | null) => void;
   onBringSelectedImageToFront: () => void;
   onSendSelectedImageToBack: () => void;

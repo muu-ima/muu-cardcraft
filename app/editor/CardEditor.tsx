@@ -120,6 +120,7 @@ export default function CardEditor({ code }: Props) {
     dragPointerDown,
     activeBlockId,
     setActiveBlockId: setActiveBlockIdCompat,
+    selectedItem,
   });
 
   const { state, actions, selectors } = editor;
@@ -223,8 +224,8 @@ export default function CardEditor({ code }: Props) {
     undo,
     redo,
     removeBlock,
-    selectedImageId,
-    setSelectedImageId: setSelectedImageIdCompat,
+    selectedItem,
+    onSelectImage: setSelectedImageIdCompat,
     onBringSelectedImageToFront: handlers.bringSelectionToFront,
     onSendSelectedImageToBack: handlers.sendSelectionToBack,
     setActiveBlockId: setActiveBlockIdCompat,

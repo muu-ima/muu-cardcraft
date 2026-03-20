@@ -19,6 +19,7 @@ import type {
   Side,
 } from "./CardEditor.types";
 import type { MixedLayerItem } from "@/shared/layers";
+import type { SelectedItem } from "@/shared/selection";
 
 export type CardEditorMobileProps = {
   code: string;

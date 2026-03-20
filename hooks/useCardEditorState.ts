@@ -6,6 +6,7 @@ import type { TabKey } from "@/shared/editor";
 import type { DesignKey } from "@/shared/design";
 import { CARD_FULL_DESIGNS } from "@/shared/cardDesigns";
 import type { FontSizeDelta } from "@/shared/fonts"; // ★ 追加
+import type { SelectedItem } from "@/shared/selection";
 
 type Side = "front" | "back";
 type EditingState = { id: string; initialText: string } | null;
@@ -34,6 +35,7 @@ export function useCardEditorState(args: {
 
   activeBlockId: string;
   setActiveBlockId: (id: string) => void;
+  selectedItem: SelectedItem;
 }) {
   const {
     editableBlocks,
@@ -47,6 +49,7 @@ export function useCardEditorState(args: {
     dragPointerDown,
     activeBlockId,
     setActiveBlockId,
+    selectedItem,
   } = args;
 
   // --- UI state ---
@@ -81,7 +84,10 @@ export function useCardEditorState(args: {
     [editableBlocks, activeBlockId],
   );
 
-  const centerVisible = !isPreview && side === "front" && !!active;
+  const centerVisible =
+    !isPreview &&
+    side === "front" &&
+    (selectedItem?.kind === "block" || selectedItem?.kind === "image");
 
   const centerToolbarValue = active
     ? {

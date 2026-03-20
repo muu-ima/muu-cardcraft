@@ -4,12 +4,13 @@ import { useMemo } from "react";
 import { useIsNarrowScreen } from "@/hooks/useIsNarrowScreen";
 import type { TabKey } from "@/shared/editor";
 import type { CenterToolbarValue } from "./CenterToolbar";
+import type { SelectedItem } from "@/shared/selection";
 
 type SelectionType = "none" | "text" | "image";
 
 type Args = {
   value: CenterToolbarValue | null;
-  selectedImageId: string | null;
+  selectedItem: SelectedItem;
   activeTab: TabKey | null;
   side: "front" | "back";
   sidePanelOpen: boolean;
@@ -18,7 +19,7 @@ type Args = {
 
 export function useCenterToolbarState({
   value,
-  selectedImageId,
+  selectedItem,
   activeTab,
   side,
   sidePanelOpen,
@@ -27,10 +28,10 @@ export function useCenterToolbarState({
   const isNarrow = useIsNarrowScreen(1280);
 
   const selectionType: SelectionType = useMemo(() => {
-    if (selectedImageId) return "image";
-    if (value) return "text";
+    if (selectedItem?.kind === "image") return "image";
+    if (selectedItem?.kind === "block" && value) return "text";
     return "none";
-  }, [selectedImageId, value]);
+  }, [selectedItem, value]);
 
   const isFontOpen = activeTab === "font";
   const isTextOpen = activeTab === "text";

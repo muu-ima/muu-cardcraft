@@ -54,7 +54,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     redo,
     onChangeWidth,
     setTextColor: onChangeColor,
-    selectedImageId,
+    selectedItem,
     onSelectImage,
     onBringSelectedImageToFront,
     onSendSelectedImageToBack,
@@ -70,6 +70,8 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
 
   const blocksForSide = getBlocksFor(state.side);
 
+  const selectedImageId =
+    selectedItem?.kind === "image" ? selectedItem.id : null;
   const handleDeleteBlock = (id: string) => {
     actions.removeBlock(id);
   };
@@ -183,7 +185,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                 side={state.side}
                 onChangeSide={actions.setSide}
                 showGuides={state.showGuides}
-                selectedImageId={selectedImageId}
+                selectedItem={selectedItem}
                 onBringSelectedImageFront={onBringSelectedImageToFront}
                 onSendSelectedImageToBack={onSendSelectedImageToBack}
                 onDeleteSelectedImage={() => {

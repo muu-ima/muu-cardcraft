@@ -22,6 +22,7 @@ import {
   Divider,
 } from "@/app/components/editor/ToolbarPrimitives";
 import { useCenterToolbarState } from "@/app/components/editor/useCenterToolbarState";
+import type { SelectedItem } from "@/shared/selection";
 
 export type Align = "left" | "center" | "right";
 
@@ -55,7 +56,7 @@ type Props = {
   visible?: boolean;
   sidePanelOpen: boolean;
 
-  selectedImageId: string | null;
+  selectedItem: SelectedItem;
   onBringSelectedImageFront?: () => void;
   onSendSelectedImageToBack?: () => void;
   onDeleteSelectedImage?: () => void;
@@ -80,7 +81,7 @@ export default function CenterToolbar({
   topPx = 76,
   sidePanelOpen,
 
-  selectedImageId,
+  selectedItem,
   onBringSelectedImageFront = () => {},
   onSendSelectedImageToBack = () => {},
   onDeleteSelectedImage = () => {},
@@ -95,7 +96,7 @@ export default function CenterToolbar({
     imageControlsDisabled,
   } = useCenterToolbarState({
     value,
-    selectedImageId,
+    selectedItem,
     activeTab,
     side,
     sidePanelOpen,
@@ -140,7 +141,7 @@ export default function CenterToolbar({
             "shadow-[0_1px_2px_rgba(0,0,0,0.08),0_4px_12px_rgba(0,0,0,0.12)]",
             "justify-between whitespace-nowrap",
             compact ? "max-w-[640px]" : "max-w-[820px]",
-            value === null && !selectedImageId ? "opacity-70" : "",
+            value === null && !selectedItem ? "opacity-70" : "",
           ].join(" ")}
         >
           {showTextTools && value && (
