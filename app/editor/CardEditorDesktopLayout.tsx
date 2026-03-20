@@ -24,6 +24,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     moveImage,
     mixedLayers,
     resizeImage,
+    setBlockWidth,
     addBlock: onAddBlock,
     onUploadedImage,
     onChangeText,
@@ -210,6 +211,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                   images={getImagesFor(state.side)}
                   moveImage={moveImage}
                   resizeImage={resizeImage}
+                  onChangeWidth={onChangeWidth}
                   mixedLayers={mixedLayers}
                   design={design}
                   scale={scaleDesktop}

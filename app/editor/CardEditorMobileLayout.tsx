@@ -30,6 +30,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     onDeleteImage,
     moveImage,
     resizeImage,
+    setBlockWidth,
     mixedLayers,
     getBlocksFor,
     addBlock: onAddBlock,
@@ -199,6 +200,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                   mixedLayers={mixedLayers}
                   moveImage={moveImage}
                   resizeImage={resizeImage}
+                  onChangeWidth={onChangeWidth}
                   design={design}
                   scale={scaleMobile}
                   isPreview={state.isPreview}

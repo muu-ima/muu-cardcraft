@@ -195,6 +195,7 @@ export default function CardEditor({ code }: Props) {
     mixedLayers,
     moveImage,
     resizeImage,
+    setBlockWidth,
     editableBlocks,
     addBlock,
     onChangeText: handlers.onChangeText,

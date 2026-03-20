@@ -62,6 +62,7 @@ type UseCardEditorLayoutPropsParams = {
   design: DesignKey;
   setDesign: CardEditorDesktopProps["setDesign"];
   onChangeWidth: CardEditorDesktopProps["onChangeWidth"];
+  setBlockWidth: CardEditorDesktopProps["setBlockWidth"];
   setTextColor: CardEditorDesktopProps["setTextColor"];
   previewTextColor: CardEditorDesktopProps["previewTextColor"];
   onUploadedImage: CardEditorDesktopProps["onUploadedImage"];
@@ -126,6 +127,7 @@ export function useCardEditorLayoutProps({
   mixedLayers,
   moveImage,
   resizeImage,
+  setBlockWidth,
   editableBlocks,
   addBlock,
   onChangeText,
@@ -202,6 +204,7 @@ export function useCardEditorLayoutProps({
     getImagesFor,
     moveImage,
     resizeImage,
+    setBlockWidth,
     editableBlocks,
     addBlock,
     onChangeText,
@@ -275,6 +278,7 @@ export function useCardEditorLayoutProps({
     onUploadedImage,
     moveImage,
     resizeImage,
+    setBlockWidth,
     currentImageCount,
     maxImageCount,
     onDeleteImage,
