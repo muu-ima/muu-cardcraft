@@ -19,6 +19,7 @@ import type {
   Side,
 } from "./CardEditor.types";
 import type { MixedLayerItem } from "@/shared/layers";
+import type { SelectedItem } from "@/shared/selection";
 
 export type CardEditorMobileProps = {
   code: string;
@@ -58,7 +59,7 @@ export type CardEditorMobileProps = {
   setTextColor: (id: string, color: string) => void;
   previewTextColor: (id: string, color: string) => void;
   onUploadedImage: (asset: UploadImageAsset) => void;
-  selectedImageId: string | null;
+  selectedItem: SelectedItem;
   onSelectImage: (id: string | null) => void;
   onBringSelectedImageToFront: () => void;
   onSendSelectedImageToBack: () => void;

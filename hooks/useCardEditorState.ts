@@ -6,6 +6,7 @@ import type { TabKey } from "@/shared/editor";
 import type { DesignKey } from "@/shared/design";
 import { CARD_FULL_DESIGNS } from "@/shared/cardDesigns";
 import type { FontSizeDelta } from "@/shared/fonts"; // ★ 追加
+import type { SelectedItem } from "@/shared/selection";
 
 type Side = "front" | "back";
 type EditingState = { id: string; initialText: string } | null;
@@ -29,8 +30,12 @@ export function useCardEditorState(args: {
   dragPointerDown: (
     e: React.PointerEvent<Element>,
     id: string,
-    opts: { scale: number }
+    opts: { scale: number },
   ) => void;
+
+  activeBlockId: string;
+  setActiveBlockId: (id: string) => void;
+  selectedItem: SelectedItem;
 }) {
   const {
     editableBlocks,
@@ -42,6 +47,9 @@ export function useCardEditorState(args: {
     updateTextStyle,
     bumpFontSize,
     dragPointerDown,
+    activeBlockId,
+    setActiveBlockId,
+    selectedItem,
   } = args;
 
   // --- UI state ---
@@ -51,7 +59,6 @@ export function useCardEditorState(args: {
   const [showGuides, setShowGuides] = useState(true);
 
   // --- selection/editing ---
-  const [activeBlockId, setActiveBlockId] = useState<string>("name");
   const [editing, setEditing] = useState<EditingState>(null);
 
   // --- refs ---
@@ -67,19 +74,17 @@ export function useCardEditorState(args: {
   const currentBlocks = getBlocksFor(side);
 
   const findTextBlock = (id: string): TextBlock | undefined =>
-    currentBlocks.find(
-      (b): b is TextBlock => b.id === id && b.type === "text"
-    );
+    currentBlocks.find((b): b is TextBlock => b.id === id && b.type === "text");
 
   const active = useMemo(
     () =>
       editableBlocks.find(
-        (b): b is TextBlock => b.id === activeBlockId && b.type === "text"
+        (b): b is TextBlock => b.id === activeBlockId && b.type === "text",
       ),
-    [editableBlocks, activeBlockId]
+    [editableBlocks, activeBlockId],
   );
 
-  const centerVisible = !isPreview && side === "front" && !!active;
+  const centerVisible = !isPreview;
 
   const centerToolbarValue = active
     ? {
@@ -142,7 +147,7 @@ export function useCardEditorState(args: {
   const handleBlockPointerDown = (
     e: React.PointerEvent<Element>,
     blockId: string,
-    opts: { scale: number }
+    opts: { scale: number },
   ) => {
     if (editing) {
       e.preventDefault();

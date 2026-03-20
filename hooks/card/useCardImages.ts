@@ -1,7 +1,6 @@
-// hooks/card/useCardImages.ts
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   moveToBack,
   moveToFront,
@@ -17,6 +16,7 @@ import {
   IMAGE_MAX_H,
   clamp,
 } from "@/shared/images";
+import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
 
 // 依存なしで動く簡易ID（あとで randomId/uuid に差し替えOK）
 function makeId() {
@@ -41,6 +41,16 @@ type AddFromUploadArgs = {
   h?: number;
 };
 
+type AddFromUploadResult =
+  | {
+      ok: true;
+      image: CardImage;
+    }
+  | {
+      ok: false;
+      reason: "limit";
+    };
+
 export function useCardImages(initial: CardImage[] = []) {
   const [images, setImages] = useState<CardImage[]>(initial);
 
@@ -50,58 +60,67 @@ export function useCardImages(initial: CardImage[] = []) {
   );
 
   const addFromUpload = useCallback(
-    (args: AddFromUploadArgs) => {
-      const currentCount = images.filter((it) => it.side === args.side).length;
-      const nextZ =
-        images
-          .filter((it) => it.side === args.side)
-          .reduce((max, it) => Math.max(max, it.z), 0) + 1;
+    (args: AddFromUploadArgs): AddFromUploadResult => {
+      let result: AddFromUploadResult = {
+        ok: false,
+        reason: "limit",
+      };
 
-      if (currentCount >= MAX_IMAGES_PER_SIDE) {
-        return {
-          ok: false as const,
-          reason: "limit" as const,
+      setImages((prev) => {
+        const sameSide = prev.filter((it) => it.side === args.side);
+        const currentCount = sameSide.length;
+
+        if (currentCount >= MAX_IMAGES_PER_SIDE) {
+          result = {
+            ok: false,
+            reason: "limit",
+          };
+          return prev;
+        }
+
+        const nextZ = sameSide.reduce((max, it) => Math.max(max, it.z), 0) + 1;
+
+        let initialW = args.w ?? IMAGE_MIN_W;
+        let initialH = args.h ?? IMAGE_MIN_H;
+
+        if (!args.w && !args.h && args.naturalWidth && args.naturalHeight) {
+          const scale = Math.min(
+            IMAGE_MIN_W / args.naturalWidth,
+            IMAGE_MIN_H / args.naturalHeight,
+            1,
+          );
+
+          initialW = Math.round(args.naturalWidth * scale);
+          initialH = Math.round(args.naturalHeight * scale);
+        }
+
+        initialW = clamp(Math.round(initialW), IMAGE_MIN_W, IMAGE_MAX_W);
+        initialH = clamp(Math.round(initialH), IMAGE_MIN_H, IMAGE_MAX_H);
+
+        const img: CardImage = {
+          id: makeId(),
+          assetId: args.assetId,
+          url: args.url,
+          side: args.side,
+          x: args.x ?? 80,
+          y: args.y ?? 80,
+          z: nextZ,
+          w: initialW,
+          h: initialH,
+          rotate: 0,
         };
-      }
 
-      let initialW = args.w ?? IMAGE_MIN_W;
-      let initialH = args.h ?? IMAGE_MIN_H;
+        result = {
+          ok: true,
+          image: img,
+        };
 
-      if (!args.w && !args.h && args.naturalWidth && args.naturalHeight) {
-        const scale = Math.min(
-          IMAGE_MIN_W / args.naturalWidth,
-          IMAGE_MIN_H / args.naturalHeight,
-          1,
-        );
+        return [...prev, img];
+      });
 
-        initialW = Math.round(args.naturalWidth * scale);
-        initialH = Math.round(args.naturalHeight * scale);
-      }
-
-      initialW = clamp(Math.round(initialW), IMAGE_MIN_W, IMAGE_MAX_W);
-      initialH = clamp(Math.round(initialH), IMAGE_MIN_H, IMAGE_MAX_H);
-
-      const img: CardImage = {
-        id: makeId(),
-        assetId: args.assetId,
-        url: args.url,
-        side: args.side,
-        x: args.x ?? 80,
-        y: args.y ?? 80,
-        z: nextZ,
-        w: initialW,
-        h: initialH,
-        rotate: 0,
-      };
-
-      setImages((prev) => [...prev, img]);
-
-      return {
-        ok: true as const,
-        image: img,
-      };
+      return result;
     },
-    [images],
+    [],
   );
 
   const updateImage = useCallback(
@@ -126,21 +145,49 @@ export function useCardImages(initial: CardImage[] = []) {
 
   const moveImage = useCallback((id: string, x: number, y: number) => {
     setImages((prev) =>
-      prev.map((it) => (it.id === id ? { ...it, x, y } : it)),
+      prev.map((it) => {
+        if (it.id !== id) return it;
+
+        const nextX = clamp(Math.round(x), 0, Math.max(0, CARD_BASE_W - it.w));
+        const nextY = clamp(Math.round(y), 0, Math.max(0, CARD_BASE_H - it.h));
+
+        return {
+          ...it,
+          x: nextX,
+          y: nextY,
+        };
+      }),
     );
   }, []);
 
   const resizeImage = useCallback((id: string, w: number, h: number) => {
     setImages((prev) =>
-      prev.map((it) =>
-        it.id === id
-          ? {
-              ...it,
-              w: clamp(Math.round(w), IMAGE_MIN_W, IMAGE_MAX_W),
-              h: clamp(Math.round(h), IMAGE_MIN_H, IMAGE_MAX_H),
-            }
-          : it,
-      ),
+      prev.map((it) => {
+        if (it.id !== id) return it;
+
+        const nextW = clamp(Math.round(w), IMAGE_MIN_W, IMAGE_MAX_W);
+        const nextH = clamp(Math.round(h), IMAGE_MIN_H, IMAGE_MAX_H);
+
+        const safeX = clamp(
+          Math.round(it.x),
+          0,
+          Math.max(0, CARD_BASE_W - nextW),
+        );
+
+        const safeY = clamp(
+          Math.round(it.y),
+          0,
+          Math.max(0, CARD_BASE_H - nextH),
+        );
+
+        return {
+          ...it,
+          w: nextW,
+          h: nextH,
+          x: safeX,
+          y: safeY,
+        };
+      }),
     );
   }, []);
 

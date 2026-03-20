@@ -10,6 +10,7 @@ import type { CardEditorMobileProps } from "../CardEditorMobile.types";
 import type { TabKey } from "@/shared/editor";
 import type { DesignKey } from "@/shared/design";
 import type { MixedLayerItem } from "@/shared/layers";
+import type { SelectedItem } from "@/shared/selection";
 
 type UseCardEditorLayoutPropsParams = {
   code: string;
@@ -90,8 +91,8 @@ type UseCardEditorLayoutPropsParams = {
   redo: CardEditorDesktopProps["redo"];
 
   removeBlock: EditorActionsForLayout["removeBlock"];
-  selectedImageId: string | null;
-  setSelectedImageId: (id: string | null) => void;
+  selectedItem: SelectedItem;
+  onSelectImage: (id: string | null) => void;
   onBringSelectedImageToFront: () => void;
   onSendSelectedImageToBack: () => void;
 
@@ -157,8 +158,8 @@ export function useCardEditorLayoutProps({
   undo,
   redo,
   removeBlock,
-  selectedImageId,
-  setSelectedImageId,
+  selectedItem,
+  onSelectImage,
   onBringSelectedImageToFront,
   onSendSelectedImageToBack,
   setActiveBlockId,
@@ -232,8 +233,8 @@ export function useCardEditorLayoutProps({
     onChangeWidth,
     setTextColor,
     previewTextColor,
-    selectedImageId,
-    onSelectImage: setSelectedImageId,
+    selectedItem,
+    onSelectImage,
     onBringSelectedImageToFront,
     onSendSelectedImageToBack,
     mixedLayers,
@@ -293,8 +294,8 @@ export function useCardEditorLayoutProps({
     snapGuide,
     undo,
     redo,
-    selectedImageId,
-    onSelectImage: setSelectedImageId,
+    selectedItem,
+    onSelectImage,
     onBringSelectedImageToFront,
     onSendSelectedImageToBack,
     mixedLayers,

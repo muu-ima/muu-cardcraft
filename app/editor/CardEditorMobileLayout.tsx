@@ -60,7 +60,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
     onChangeWidth,
     setTextColor,
     onUploadedImage,
-    selectedImageId,
+    selectedItem,
     onSelectImage,
     onBringSelectedImageToFront,
     onSendSelectedImageToBack,
@@ -76,6 +76,9 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
   const handleDeleteBlock = (id: string) => {
     actions.removeBlock(id);
   };
+
+  const selectedImageId =
+    selectedItem?.kind === "image" ? selectedItem.id : null;
 
   return (
     <div className="xl:hidden">
@@ -176,7 +179,13 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                 onChangeAlign={actions.onChangeAlign}
                 side={state.side}
                 onChangeSide={actions.setSide}
+                selectedItem={selectedItem}
                 showGuides={state.showGuides}
+                onBringSelectedImageFront={onBringSelectedImageToFront}
+                onSendSelectedImageToBack={onSendSelectedImageToBack}
+                onDeleteSelectedImage={() => {
+                  if (selectedImageId) onDeleteImage(selectedImageId);
+                }}
                 onToggleGuides={() => actions.setShowGuides((v) => !v)}
                 disabled={state.isPreview || state.side !== "front"}
                 visible={centerVisible}

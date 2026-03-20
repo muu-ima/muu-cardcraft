@@ -10,14 +10,19 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  Image as ImageIcon,
+  Layers,
+  Trash2,
+  Palette,
 } from "lucide-react";
-import { useIsNarrowScreen } from "@/hooks/useIsNarrowScreen";
 import {
   GhostButton,
   Segmented,
   MoreMenu,
   Divider,
 } from "@/app/components/editor/ToolbarPrimitives";
+import { useCenterToolbarState } from "@/app/components/editor/useCenterToolbarState";
+import type { SelectedItem } from "@/shared/selection";
 
 export type Align = "left" | "center" | "right";
 
@@ -29,39 +34,32 @@ export type CenterToolbarValue = {
 };
 
 type Props = {
-  /** テキスト選択中だけ表示（nullなら非表示） */
+  /** テキスト選択中だけ値が入る */
   value: CenterToolbarValue | null;
 
-  // ✅ 追加（Canvas状態）
   side: "front" | "back";
   onChangeSide: (side: "front" | "back") => void;
 
   showGuides: boolean;
   onToggleGuides: () => void;
 
-  /** どのパネルが開いてるか（ハイライト用） */
   activeTab: TabKey | null;
-
-  /** ツールバー操作で左パネルを開く */
   onOpenTab: (tab: TabKey) => void;
 
-  /** クイック操作 */
   onChangeFontSize: (next: number) => void;
   onToggleBold: () => void;
   onChangeAlign: (align: Align) => void;
 
-  /** プレビュー中など */
   disabled?: boolean;
-
-  /** 固定位置の微調整など */
   className?: string;
-
-  /** ヘッダー高さに合わせた top（デフォ 76px） */
   topPx?: number;
-
-  /** 表示するか（透明にするだけで高さは確保） */
   visible?: boolean;
   sidePanelOpen: boolean;
+
+  selectedItem: SelectedItem;
+  onBringSelectedImageFront?: () => void;
+  onSendSelectedImageToBack?: () => void;
+  onDeleteSelectedImage?: () => void;
 };
 
 export default function CenterToolbar({
@@ -72,7 +70,6 @@ export default function CenterToolbar({
   onToggleBold,
   onChangeAlign,
 
-  // ✅ 追加（表/裏・ガイド）
   side,
   onChangeSide,
   showGuides,
@@ -83,17 +80,33 @@ export default function CenterToolbar({
   visible = true,
   topPx = 76,
   sidePanelOpen,
-}: Props) {
-  const isFontOpen = activeTab === "font";
-  const isTextOpen = activeTab === "text";
-  const isNarrow = useIsNarrowScreen(1280); // xl 未満で true
-  const compact = sidePanelOpen && isNarrow;
 
-  // ✅ 右側に出したい「表裏トグル＋ガイド」をまとめておく
+  selectedItem,
+  onBringSelectedImageFront = () => {},
+  onSendSelectedImageToBack = () => {},
+  onDeleteSelectedImage = () => {},
+}: Props) {
+  const {
+    isFontOpen,
+    isTextOpen,
+    compact,
+    showDefaultTools,
+    showTextTools,
+    showImageTools,
+    textControlsDisabled,
+    imageControlsDisabled,
+  } = useCenterToolbarState({
+    value,
+    selectedItem,
+    activeTab,
+    side,
+    sidePanelOpen,
+    disabled,
+  });
+
   const secondaryControls = (
     <>
       <Segmented
-        disabled={disabled}
         value={side}
         options={[
           { value: "front", label: "表面" },
@@ -102,18 +115,13 @@ export default function CenterToolbar({
         onChange={onChangeSide}
       />
 
-      <GhostButton
-        disabled={disabled}
-        pressed={showGuides}
-        onClick={onToggleGuides}
-      >
+      <GhostButton pressed={showGuides} onClick={onToggleGuides}>
         ガイド {showGuides ? "ON" : "OFF"}
       </GhostButton>
     </>
   );
 
   return (
-    // ① stickyの席（高さ固定）
     <div
       className={[
         "sticky z-40 flex justify-center h-15 w-full",
@@ -121,7 +129,6 @@ export default function CenterToolbar({
       ].join(" ")}
       style={{ top: topPx }}
     >
-      {/* ② 透明化レイヤー */}
       <div
         className={[
           "transition-opacity duration-150",
@@ -129,22 +136,45 @@ export default function CenterToolbar({
           visible ? "pointer-events-auto" : "pointer-events-none",
         ].join(" ")}
       >
-        {/* ③ ツールバー本体（見た目はここ1回） */}
         <div
           className={[
             "flex items-center gap-1 rounded-2xl bg-white/85 px-2 py-2 backdrop-blur",
             "shadow-[0_1px_2px_rgba(0,0,0,0.08),0_4px_12px_rgba(0,0,0,0.12)]",
             "justify-between whitespace-nowrap",
             compact ? "max-w-[640px]" : "max-w-[820px]",
-            value === null ? "opacity-70" : "",
+            value === null && !selectedItem ? "opacity-70" : "",
           ].join(" ")}
         >
-          {/* ✅ ① テキスト系 */}
-          {value && (
+          {showDefaultTools && (
+            <>
+              <GhostButton
+                ariaLabel="画像追加を開く"
+                disabled={disabled}
+                onClick={() => onOpenTab("image")}
+                title="画像追加"
+              >
+                <ImageIcon className="h-4 w-4" />
+                <span>画像追加</span>
+              </GhostButton>
+
+              <GhostButton
+                ariaLabel="デザインを開く"
+                disabled={disabled}
+                onClick={() => onOpenTab("design")}
+                title="デザイン"
+              >
+                <Palette className="h-4 w-4" />
+                <span>デザイン</span>
+              </GhostButton>
+
+              <Divider />
+            </>
+          )}
+          {showTextTools && value && (
             <>
               <GhostButton
                 pressed={isFontOpen}
-                disabled={disabled}
+                disabled={textControlsDisabled}
                 onClick={() => onOpenTab("font")}
                 className="max-w-[220px]"
                 title="フォントを開く"
@@ -159,7 +189,7 @@ export default function CenterToolbar({
 
               <GhostButton
                 ariaLabel="文字サイズを下げる"
-                disabled={disabled}
+                disabled={textControlsDisabled}
                 onClick={() =>
                   onChangeFontSize(clamp(value.fontSize - 1, 6, 200))
                 }
@@ -169,7 +199,7 @@ export default function CenterToolbar({
 
               <GhostButton
                 pressed={isTextOpen}
-                disabled={disabled}
+                disabled={textControlsDisabled}
                 onClick={() => onOpenTab("text")}
                 className="min-w-14 justify-center border"
                 title="テキスト設定を開く"
@@ -179,7 +209,7 @@ export default function CenterToolbar({
 
               <GhostButton
                 ariaLabel="文字サイズを上げる"
-                disabled={disabled}
+                disabled={textControlsDisabled}
                 onClick={() =>
                   onChangeFontSize(clamp(value.fontSize + 1, 6, 200))
                 }
@@ -192,7 +222,7 @@ export default function CenterToolbar({
               <GhostButton
                 ariaLabel="太字"
                 pressed={value.bold}
-                disabled={disabled}
+                disabled={textControlsDisabled}
                 onClick={onToggleBold}
               >
                 <BoldIcon className="h-4 w-4" />
@@ -202,7 +232,7 @@ export default function CenterToolbar({
                 <GhostButton
                   ariaLabel="左揃え"
                   pressed={value.align === "left"}
-                  disabled={disabled}
+                  disabled={textControlsDisabled}
                   onClick={() => onChangeAlign("left")}
                 >
                   <AlignLeft className="h-4 w-4" />
@@ -211,7 +241,7 @@ export default function CenterToolbar({
                 <GhostButton
                   ariaLabel="中央揃え"
                   pressed={value.align === "center"}
-                  disabled={disabled}
+                  disabled={textControlsDisabled}
                   onClick={() => onChangeAlign("center")}
                 >
                   <AlignCenter className="h-4 w-4" />
@@ -220,7 +250,7 @@ export default function CenterToolbar({
                 <GhostButton
                   ariaLabel="右揃え"
                   pressed={value.align === "right"}
-                  disabled={disabled}
+                  disabled={textControlsDisabled}
                   onClick={() => onChangeAlign("right")}
                 >
                   <AlignRight className="h-4 w-4" />
@@ -229,7 +259,62 @@ export default function CenterToolbar({
             </>
           )}
 
-          {/* ✅ 右側：表裏 & ガイド → compactのときだけ More に入れる */}
+          {showImageTools && (
+            <>
+              <GhostButton
+                ariaLabel="画像設定を開く"
+                disabled={imageControlsDisabled}
+                onClick={() => onOpenTab("image")}
+                title="画像設定を開く"
+              >
+                <ImageIcon className="h-4 w-4" />
+                <span>画像設定</span>
+              </GhostButton>
+
+              <Divider />
+
+              <GhostButton
+                ariaLabel="デザインを開く"
+                disabled={imageControlsDisabled}
+                onClick={() => onOpenTab("design")}
+                title="デザイン設定を開く"
+              >
+                <Palette className="h-4 w-4" />
+                <span>デザイン</span>
+              </GhostButton>
+
+              <GhostButton
+                ariaLabel="画像を前面へ"
+                disabled={imageControlsDisabled}
+                onClick={onBringSelectedImageFront}
+                title="前面へ"
+              >
+                <Layers className="h-4 w-4" />
+                <span>前面へ</span>
+              </GhostButton>
+
+              <GhostButton
+                ariaLabel="画像を背面へ"
+                disabled={imageControlsDisabled}
+                onClick={onSendSelectedImageToBack}
+                title="背面へ"
+              >
+                <Layers className="h-4 w-4 rotate-180" />
+                <span>背面へ</span>
+              </GhostButton>
+
+              <GhostButton
+                ariaLabel="画像を削除"
+                disabled={imageControlsDisabled}
+                onClick={onDeleteSelectedImage}
+                title="削除"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span>削除</span>
+              </GhostButton>
+            </>
+          )}
+
           <div className="flex items-center gap-1">
             {compact ? (
               <MoreMenu>{secondaryControls}</MoreMenu>
@@ -243,7 +328,6 @@ export default function CenterToolbar({
   );
 }
 
-/* ---------------- helpers ---------------- */
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
