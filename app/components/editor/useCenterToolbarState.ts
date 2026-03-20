@@ -33,14 +33,14 @@ export function useCenterToolbarState({
     return "none";
   }, [selectedItem, value]);
 
-  const showDefaultTools = selectionType === "none";
+  const showDefaultTools = selectionType === "none" && side === "front";
   const isFontOpen = activeTab === "font";
   const isTextOpen = activeTab === "text";
   const compact = sidePanelOpen && isNarrow;
 
   const showCommonTools = true;
   const showTextTools = selectionType === "text" && side === "front";
-  const showImageTools = selectionType === "image";
+  const showImageTools = selectionType === "image" && side === "front";
 
   const textControlsDisabled = disabled || side !== "front";
   const imageControlsDisabled = disabled;
