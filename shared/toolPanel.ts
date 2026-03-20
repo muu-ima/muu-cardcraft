@@ -17,10 +17,8 @@ export type ToolPanelBaseProps = {
 };
 
 export type TextPanelSectionProps = {
-  side: Side;
-  onChangeSide: (side: Side) => void;
   blocks: Block[];
-  activeBlockId: string;
+  activeBlockId?: string | null;
   onAddBlock: () => void;
   isPreview: boolean;
   onChangeText: (id: string, value: string) => void;

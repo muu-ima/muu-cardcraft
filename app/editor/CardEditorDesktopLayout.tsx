@@ -113,8 +113,6 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
             onClose={() => actions.setActiveTab(null)}
             activeTab={state.activeTab}
             textPanel={{
-              side: state.side,
-              onChangeSide: actions.setSide,
               blocks: blocksForSide,
               activeBlockId: state.activeBlockId,
               onAddBlock,

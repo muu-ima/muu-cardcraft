@@ -109,8 +109,6 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
           onClose={closeSheet}
           activeTab={state.activeTab}
           textPanel={{
-            side: state.side,
-            onChangeSide: actions.setSide,
             blocks: blocksForSide,
             activeBlockId: state.activeBlockId,
             onAddBlock,

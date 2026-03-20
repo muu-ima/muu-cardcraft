@@ -88,8 +88,6 @@ export default function ToolPanel({
       >
         {activeTab === "text" && (
           <TextPanel
-            side={textPanel.side}
-            onChangeSide={textPanel.onChangeSide}
             blocks={textPanel.blocks}
             onAddBlock={textPanel.onAddBlock}
             isPreview={textPanel.isPreview}

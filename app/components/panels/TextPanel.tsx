@@ -6,11 +6,7 @@ import type { FontSizeDelta } from "@/shared/fonts";
 import PanelSection from "@/app/components/panels/PanelSection";
 import { Trash2 } from "lucide-react";
 
-type Side = "front" | "back";
-
 type TextPanelProps = {
-  side: Side;
-  onChangeSide: (s: Side) => void;
   blocks: Block[];
   onAddBlock: () => void;
   isPreview: boolean;
@@ -24,50 +20,8 @@ type TextPanelProps = {
   onDeleteBlock?: (id: string) => void;
 };
 
-function SideToggle({
-  side,
-  onChangeSide,
-}: {
-  side: Side;
-  onChangeSide: (s: Side) => void;
-}) {
-  return (
-    <div
-      className="inline-flex rounded-xl bg-white/60 backdrop-blur p-1
-      shadow-[0_1px_0_rgba(0,0,0,0.08)]"
-    >
-      <button
-        type="button"
-        onClick={() => onChangeSide("front")}
-        className={[
-          "px-3 py-1.5 text-sm rounded-lg transition",
-          side === "front"
-            ? "bg-pink-500/15 text-pink-700"
-            : "text-zinc-600 hover:bg-zinc-900/5",
-        ].join(" ")}
-      >
-        表面
-      </button>
-      <button
-        type="button"
-        onClick={() => onChangeSide("back")}
-        className={[
-          "px-3 py-1.5 text-sm rounded-lg transition",
-          side === "back"
-            ? "bg-pink-500/15 text-pink-700"
-            : "text-zinc-600 hover:bg-zinc-900/5",
-        ].join(" ")}
-      >
-        裏面
-      </button>
-    </div>
-  );
-}
-
 export default function TextPanel(props: TextPanelProps) {
   const {
-    side,
-    onChangeSide,
     blocks,
     onAddBlock,
     onBumpFontSize,
@@ -76,8 +30,8 @@ export default function TextPanel(props: TextPanelProps) {
     onDeleteBlock, // ✅ ここで受け取る
   } = props;
 
-  // この面のブロックだけ
-  const normalBlocks = blocks.filter((b) => (b.side ? b.side === side : true));
+  // 親から現在面の blocks を受け取る前提
+  const normalBlocks = blocks;
 
   const activeBlock =
     activeBlockId != null
@@ -90,11 +44,6 @@ export default function TextPanel(props: TextPanelProps) {
 
   return (
     <div className="space-y-4">
-      {/* 表/裏の切り替え */}
-      <PanelSection title="編集する面" desc="表面 / 裏面 を切り替えます。">
-        <SideToggle side={side} onChangeSide={onChangeSide} />
-      </PanelSection>
-
       {/* テキスト一覧＋追加 */}
       <PanelSection
         title="テキスト"
