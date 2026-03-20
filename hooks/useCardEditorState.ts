@@ -57,6 +57,18 @@ export function useCardEditorState(args: {
   const [activeTab, setActiveTab] = useState<TabKey | null>(null);
   const [isPreview, setIsPreview] = useState(false);
   const [showGuides, setShowGuides] = useState(true);
+  const DISABLED_TABS_ON_BACK: TabKey[] = [
+    "text",
+    "font",
+    "design",
+    "image",
+    "layers",
+  ];
+
+  const isBlockedTabOnBack = (tab: TabKey | null) => {
+    if (tab == null) return false;
+    return side === "back" && DISABLED_TABS_ON_BACK.includes(tab);
+  };
 
   // --- selection/editing ---
   const [editing, setEditing] = useState<EditingState>(null);
@@ -97,6 +109,13 @@ export function useCardEditorState(args: {
 
   // --- actions ---
   const onChangeTab = (tab: TabKey) => {
+    if (
+      side === "back" &&
+      ["text", "font", "design", "image", "layers"].includes(tab)
+    ) {
+      return;
+    }
+
     setActiveTab((prev) => (prev === tab ? null : tab));
   };
 
@@ -179,6 +198,18 @@ export function useCardEditorState(args: {
     commitText(id, value);
   };
 
+  const onChangeSide = (nextSide: Side) => {
+    setSide(nextSide);
+
+    if (
+      nextSide === "back" &&
+      activeTab &&
+      ["text", "font", "design", "image", "layers"].includes(activeTab)
+    ) {
+      setActiveTab(null);
+    }
+  };
+
   return {
     state: {
       side,
@@ -189,7 +220,7 @@ export function useCardEditorState(args: {
       editing,
     },
     actions: {
-      setSide,
+      setSide: onChangeSide,
       setActiveTab,
       setIsPreview,
       setShowGuides,
