@@ -31,6 +31,9 @@ export function useCardEditorState(args: {
     id: string,
     opts: { scale: number },
   ) => void;
+
+  activeBlockId: string;
+  setActiveBlockId: (id: string) => void;
 }) {
   const {
     editableBlocks,
@@ -42,6 +45,8 @@ export function useCardEditorState(args: {
     updateTextStyle,
     bumpFontSize,
     dragPointerDown,
+    activeBlockId,
+    setActiveBlockId,
   } = args;
 
   // --- UI state ---
@@ -51,7 +56,6 @@ export function useCardEditorState(args: {
   const [showGuides, setShowGuides] = useState(true);
 
   // --- selection/editing ---
-  const [activeBlockId, setActiveBlockId] = useState<string>("");
   const [editing, setEditing] = useState<EditingState>(null);
 
   // --- refs ---

@@ -20,6 +20,7 @@ import { CardEditorDesktopLayout } from "@/app/editor/CardEditorDesktopLayout";
 import type { SheetSnap, Side } from "./CardEditor.types";
 import { useCardEditorLayoutProps } from "@/app/editor/hooks/useCardEditorLayoutProps";
 import { buildMixedLayers, type MixedLayerItem } from "@/shared/layers";
+import type { SelectedItem } from "@/shared/selection";
 
 type Props = {
   code: string;
@@ -33,7 +34,23 @@ export default function CardEditor({ code }: Props) {
   // =========================
   const [editing, setEditing] = useState<EditingState>(null);
   const [design, setDesign] = useState<DesignKey>("mint");
-  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<SelectedItem>({
+    kind: "block",
+    id: "name",
+  });
+
+  const setSelectedImageIdCompat = (id: string | null) => {
+    setSelectedItem(id ? { kind: "image", id } : null);
+  };
+
+  const activeBlockId = selectedItem?.kind === "block" ? selectedItem.id : "";
+
+  const selectedImageId =
+    selectedItem?.kind === "image" ? selectedItem.id : null;
+
+  const setActiveBlockIdCompat = (id: string) => {
+    setSelectedItem(id ? { kind: "block", id } : null);
+  };
 
   const exportRef = useRef<HTMLDivElement | null>(null);
 
@@ -101,6 +118,8 @@ export default function CardEditor({ code }: Props) {
     updateTextStyle,
     bumpFontSize,
     dragPointerDown,
+    activeBlockId,
+    setActiveBlockId: setActiveBlockIdCompat,
   });
 
   const { state, actions, selectors } = editor;
@@ -205,10 +224,10 @@ export default function CardEditor({ code }: Props) {
     redo,
     removeBlock,
     selectedImageId,
-    setSelectedImageId,
+    setSelectedImageId: setSelectedImageIdCompat,
     onBringSelectedImageToFront: handlers.bringSelectionToFront,
     onSendSelectedImageToBack: handlers.sendSelectionToBack,
-    setActiveBlockId: actions.setActiveBlockId,
+    setActiveBlockId: setActiveBlockIdCompat,
     onMoveLayerFront: handlers.onMoveLayerFront,
     onMoveLayerBack: handlers.onMoveLayerBack,
     onDeleteLayer: handlers.onDeleteLayer,
