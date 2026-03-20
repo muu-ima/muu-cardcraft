@@ -64,6 +64,7 @@ type Props = {
   onChangeEditingText?: (text: string) => void;
   selectedImageId: string | null;
   onSelectImage: (id: string | null) => void;
+  onChangeWidth?: (id: string, width: number) => void;
 };
 
 export default function EditorCanvas({
@@ -71,6 +72,7 @@ export default function EditorCanvas({
   images,
   moveImage,
   resizeImage,
+  onChangeWidth,
   design,
   scale,
   isPreview,
@@ -101,6 +103,13 @@ export default function EditorCanvas({
     startH: number;
   } | null>(null);
 
+  const [resizeBlockState, setResizeBlockState] = useState<{
+    id: string;
+    pointerId: number;
+    startX: number;
+    startWidth: number;
+  } | null>(null);
+
   const onResizeStart = (
     e: React.PointerEvent,
     image: { id: string; w: number; h: number },
@@ -113,6 +122,21 @@ export default function EditorCanvas({
       startY: e.clientY,
       startW: image.w,
       startH: image.h,
+    });
+  };
+
+  const onResizeBlockStart = (
+    e: React.PointerEvent,
+    block: { id: string; width?: number },
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setResizeBlockState({
+      id: block.id,
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startWidth: block.width ?? 160,
     });
   };
 
@@ -179,6 +203,35 @@ export default function EditorCanvas({
     };
   }, [resizeState, resizeImage, scale]);
 
+  useEffect(() => {
+    if (!resizeBlockState) return;
+    if (!onChangeWidth) return;
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (e.pointerId !== resizeBlockState.pointerId) return;
+
+      const dx = (e.clientX - resizeBlockState.startX) / scale;
+      const nextWidth = resizeBlockState.startWidth + dx;
+
+      onChangeWidth(resizeBlockState.id, nextWidth);
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      if (e.pointerId !== resizeBlockState.pointerId) return;
+      setResizeBlockState(null);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointercancel", handlePointerUp);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointercancel", handlePointerUp);
+    };
+  }, [resizeBlockState, scale, onChangeWidth]);
+
   return (
     <section className="flex flex-col items-center gap-3">
       <div className="w-full flex justify-center">
@@ -211,6 +264,7 @@ export default function EditorCanvas({
               selectedImageId={selectedImageId}
               onSelectImage={onSelectImage}
               onResizeImageStart={onResizeStart}
+              onResizeBlockStart={onResizeBlockStart}
               design={design}
               w={CARD_BASE_W}
               h={CARD_BASE_H}

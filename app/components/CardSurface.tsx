@@ -65,6 +65,11 @@ type CardSurfaceProps = {
     e: React.PointerEvent,
     image: { id: string; w: number; h: number },
   ) => void;
+
+  onResizeBlockStart?: (
+    e: React.PointerEvent,
+    block: { id: string; width?: number },
+  ) => void;
 };
 
 type DragImageState = {
@@ -102,6 +107,7 @@ export default function CardSurface({
   selectedImageId,
   onSelectImage,
   onResizeImageStart,
+  onResizeBlockStart,
   design,
   w,
   h,
@@ -302,6 +308,13 @@ export default function CardSurface({
             data-block-id={block.id}
             onPointerDown={(e) => {
               if (!interactive) return;
+
+              const target = e.target as HTMLElement;
+              const isResizeHandle = target.closest(
+                "[data-block-resize-handle='true']",
+              );
+              if (isResizeHandle) return;
+
               e.stopPropagation();
               onBlockPointerDown?.(e, block.id);
             }}
@@ -335,30 +348,59 @@ export default function CardSurface({
                 fontFamily:
                   FONT_DEFINITIONS[block.fontKey]?.css ??
                   FONT_DEFINITIONS.sans.css,
-                whiteSpace: "pre",
-                width: "max-content",
-                maxWidth: "none",
-                overflowWrap: "normal",
-                wordBreak: "normal",
+                whiteSpace: "pre-wrap",
+                width: "100%",
+                maxWidth: "100%",
+                overflowWrap: "break-word",
+                wordBreak: "break-word",
               }}
             >
               {block.type === "text" &&
                 (editingBlockId === block.id ? null : block.text)}
             </div>
 
-            {showSelection && typeof block.width === "number" && (
-              <div
-                className="
-            pointer-events-none
-            absolute -top-4 right-0
-            text-[10px]
-            rounded-full border border-zinc-200
-            bg-white/90 px-2 py-0.5
-            text-zinc-500 shadow-sm
-          "
-              >
-                {Math.round(block.width)}px
-              </div>
+            {showSelection && (
+              <>
+                <button
+                  type="button"
+                  data-block-resize-handle="true"
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                    onResizeBlockStart?.(e, {
+                      id: block.id,
+                      width: block.width,
+                    });
+                  }}
+                  style={{
+                    position: "absolute",
+                    right: -8,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: 16,
+                    height: 16,
+                    borderRadius: 9999,
+                    border: "2px solid white",
+                    background: "#2563eb",
+                    cursor: "ew-resize",
+                    pointerEvents: "auto",
+                  }}
+                />
+
+                {typeof block.width === "number" && (
+                  <div
+                    className="
+              pointer-events-none
+              absolute -top-4 right-0
+              text-[10px]
+              rounded-full border border-zinc-200
+              bg-white/90 px-2 py-0.5
+              text-zinc-500 shadow-sm
+            "
+                  >
+                    {Math.round(block.width)}px
+                  </div>
+                )}
+              </>
             )}
           </div>
         );
