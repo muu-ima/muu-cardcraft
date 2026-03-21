@@ -164,7 +164,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
       </BottomSheet>
 
       {/* Canvas (mobile/tablet) */}
-      <div className="pt-8">
+      <div className="pt-6">
         <CanvasArea innerRef={canvasAreaRef}>
           <div onPointerDownCapture={onAnyPointerDownCapture}>
             {/* CenterToolbar: md以上で表示（モバイルは別UI運用） */}

@@ -6,7 +6,7 @@ import React, { useEffect, useRef } from "react";
 export type SheetSnap = "collapsed" | "half" | "full";
 
 const SHEET_HEIGHT: Record<Exclude<SheetSnap, "collapsed">, string> = {
-  half: "40dvh",
+  half: "45dvh",
   full: "85dvh",
 };
 
