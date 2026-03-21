@@ -17,6 +17,7 @@ export type Block = {
   side: "front" | "back";
   isBraille?: boolean;
   color?: string;
+  manualWidth?: boolean;
 };
 
 // ✅ カードの初期状態をここに集約

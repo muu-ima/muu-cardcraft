@@ -47,7 +47,7 @@ export default function ModalPreview({
     const s = Math.min(
       (wrapSize.w - PREVIEW_PAD) / CARD_BASE_W,
       (wrapSize.h - PREVIEW_PAD) / CARD_BASE_H,
-      1
+      1,
     );
     return Math.max(0.1, s);
   }, [wrapSize.w, wrapSize.h]);
