@@ -93,8 +93,6 @@ export default function EditorCanvas({
   onSelectImage,
   mixedLayers,
 }: Props) {
-  const taRef = useRef<HTMLTextAreaElement | null>(null);
-
   const [resizeState, setResizeState] = useState<{
     id: string;
     startX: number;
@@ -140,29 +138,15 @@ export default function EditorCanvas({
     });
   };
 
-  useLayoutEffect(() => {
-    if (isPreview) return;
+  const taRef = useRef<HTMLTextAreaElement | null>(null);
 
+  useLayoutEffect(() => {
     const ta = taRef.current;
     if (!ta) return;
-    if (!editingBlockId) return;
 
-    // 一旦 1px にして測る（0px はやめる）
-    ta.style.width = "1px";
-    ta.style.height = "1px";
-
-    // 重要：wrap off（Canva系 1行伸び）
-    ta.wrap = "off";
-
-    const sw = ta.scrollWidth;
-    const sh = ta.scrollHeight;
-
-    const padX = 12; // 2px 6px の左右合計
-    const padY = 4;
-
-    ta.style.width = `${Math.max(20, sw + padX)}px`;
-    ta.style.height = `${Math.max(20, sh + padY)}px`;
-  }, [isPreview, editingBlockId, editingText]);
+    ta.style.height = "auto";
+    ta.style.height = `${ta.scrollHeight}px`;
+  }, [editingText, editingBlockId]);
 
   useEffect(() => {
     if (!resizeState) return;
@@ -307,11 +291,9 @@ export default function EditorCanvas({
 
                 return (
                   <textarea
-                    ref={taRef}
                     key={b.id}
+                    ref={taRef}
                     autoFocus
-                    wrap="off"
-                    rows={1}
                     value={editingText ?? ""}
                     onPointerDown={(e) => e.stopPropagation()}
                     onChange={(e) =>
@@ -331,6 +313,9 @@ export default function EditorCanvas({
                       position: "absolute",
                       left: b.x,
                       top: b.y,
+                      width: b.width ?? 160,
+                      minHeight: b.fontSize * 1.2 + 8,
+
                       fontSize: `${b.fontSize}px`,
                       fontWeight: b.fontWeight,
                       fontFamily: fontFamilyFromKey(b.fontKey),
@@ -338,8 +323,9 @@ export default function EditorCanvas({
                       padding: "2px 6px",
                       lineHeight: 1.2,
 
-                      whiteSpace: "pre", // 折り返し無し（Canvaっぽい）
-                      overflow: "hidden",
+                      whiteSpace: "pre-wrap",
+                      overflowWrap: "break-word",
+                      wordBreak: "break-word",
                       boxSizing: "border-box",
 
                       background: "transparent",

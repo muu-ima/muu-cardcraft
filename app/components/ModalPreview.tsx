@@ -1,97 +1,115 @@
-// app/components/ModalPreview.tsx
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import type { ReactNode } from "react";
-import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-type ModalProps = {
-  open: boolean;
-  onClose: () => void;
-  title?: string;
-  children: (opts: { scale: number }) => ReactNode;
+type Props = {
+  text: string;
+  targetEl: HTMLDivElement | null;
+  width: number;
+  onChangeText: (next: string) => void;
+  onCommit: () => void;
+  onCancel: () => void;
 };
 
-export default function ModalPreview({
-  open,
-  onClose,
-  title,
-  children,
-}: ModalProps) {
-  // ✅ Hooks は常に呼ばれる（ここ重要）
-  const wrapRef = useRef<HTMLDivElement | null>(null);
-  const [wrapSize, setWrapSize] = useState({ w: 0, h: 0 });
+export default function InlineTextEditor({
+  text,
+  targetEl,
+  width,
+  onChangeText,
+  onCommit,
+  onCancel,
+}: Props) {
+  const [rect, setRect] = useState<DOMRect | null>(null);
+  const ref = useRef<HTMLTextAreaElement | null>(null);
+  const composingRef = useRef(false);
 
-  useEffect(() => {
-    if (!open) return; // ← effect の中でガードするのはOK
+  useLayoutEffect(() => {
+    if (!targetEl) return;
 
-    const el = wrapRef.current;
-    if (!el) return;
-
-    const update = () => {
-      const r = el.getBoundingClientRect();
-      setWrapSize({ w: r.width, h: r.height });
-    };
-
+    const update = () => setRect(targetEl.getBoundingClientRect());
     update();
 
     const ro = new ResizeObserver(update);
-    ro.observe(el);
+    ro.observe(targetEl);
 
-    return () => ro.disconnect();
-  }, [open]);
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
 
-  const PREVIEW_PAD = 24;
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [targetEl]);
 
-  const scale = useMemo(() => {
-    const s = Math.min(
-      (wrapSize.w - PREVIEW_PAD) / CARD_BASE_W,
-      (wrapSize.h - PREVIEW_PAD) / CARD_BASE_H,
-      1
-    );
-    return Math.max(0.1, s);
-  }, [wrapSize.w, wrapSize.h]);
+  useEffect(() => {
+    if (!targetEl) return;
 
-  // ✅ return null は Hooks の「後」
-  if (!open) return null;
+    const el = ref.current;
+    if (!el) return;
+
+    el.focus();
+
+    const n = el.value.length;
+    el.setSelectionRange(n, n);
+  }, [targetEl]);
+
+  if (!rect) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-6">
-      <div className="w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-xl max-h-[85vh] flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b px-4 py-3">
-          <h2 className="text-sm font-semibold sm:text-base">
-            {title ?? "プレビュー"}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-xl leading-none text-zinc-500 hover:text-zinc-800"
-            aria-label="閉じる"
-          >
-            ×
-          </button>
-        </div>
+    <>
+      <div
+        className="fixed inset-0 z-[9998]"
+        onPointerDown={(e) => {
+          e.preventDefault();
+          onCommit();
+        }}
+      />
 
-        {/* Body */}
-        <div className="flex-1 overflow-auto px-3 py-3 sm:px-4 sm:py-4">
-          <div
-            ref={wrapRef}
-            className="w-full min-h-60 flex items-center justify-center"
-          >
-            {children({ scale })}
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="border-t px-4 py-3 flex justify-end">
-          <button
-            onClick={onClose}
-            className="rounded-full border px-4 py-2 text-sm hover:bg-zinc-100"
-          >
-            閉じる
-          </button>
-        </div>
+      <div
+        className="fixed z-[9999]"
+        style={{
+          left: rect.left,
+          top: rect.top,
+          width,
+          minHeight: rect.height,
+        }}
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        <textarea
+          ref={ref}
+          value={text}
+          onChange={(e) => onChangeText(e.target.value)}
+          onCompositionStart={() => (composingRef.current = true)}
+          onCompositionEnd={() => (composingRef.current = false)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              e.preventDefault();
+              onCancel();
+              return;
+            }
+            if (e.key === "Enter" && !e.shiftKey) {
+              if (composingRef.current) return;
+              e.preventDefault();
+              onCommit();
+            }
+          }}
+          className="w-full resize-none rounded-md border border-pink-300 bg-white/95 p-0 outline-none"
+          style={{
+            minHeight: rect.height,
+            font: "inherit",
+            color: "inherit",
+            letterSpacing: "inherit",
+            lineHeight: "inherit",
+            textAlign: "inherit",
+            background: "transparent",
+            boxSizing: "border-box",
+            whiteSpace: "pre-wrap",
+            overflowWrap: "break-word",
+            wordBreak: "break-word",
+          }}
+        />
       </div>
-    </div>
+    </>
   );
 }
