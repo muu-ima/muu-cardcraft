@@ -6,7 +6,7 @@ import React, { useEffect, useRef } from "react";
 export type SheetSnap = "collapsed" | "half" | "full";
 
 const SHEET_HEIGHT: Record<Exclude<SheetSnap, "collapsed">, string> = {
-  half: "45dvh",
+  half: "48dvh",
   full: "85dvh",
 };
 
@@ -84,12 +84,12 @@ export default function BottomSheet({
             type="button"
             aria-label="Resize bottom sheet"
             onClick={toggleSnap}
-            className="flex w-full justify-center pt-2"
+            className="flex w-full justify-center pt-1"
           >
             <span className="h-1.5 w-12 rounded-full bg-zinc-300" />
           </button>
 
-          <div className="flex items-center justify-between px-4 pt-2 pb-3">
+          <div className="flex items-center justify-between px-4 pt-1 pb-2">
             <div className="text-sm font-semibold text-zinc-800">
               {title ?? "編集"}
             </div>
@@ -105,7 +105,7 @@ export default function BottomSheet({
           <div className="h-px bg-zinc-200" />
         </div>
 
-        <div className="h-[calc(100%-56px)] overflow-y-auto px-4 pt-3 pb-24">
+        <div className="h-[calc(100%-48px)] overflow-y-auto px-3 pt-3 pb-12">
           {children}
         </div>
       </div>

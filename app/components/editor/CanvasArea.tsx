@@ -25,7 +25,7 @@ export default function CanvasArea({
         "overflow-y-auto overflow-x-hidden",
 
         // ✅ 余白（見た目）
-        "px-3 sm:px-6 lg:px-10 py-8",
+        "px-3 sm:px-6 lg:px-10 py-6",
         "pb-24 xl:pb-0",
 
         // ✅ 中央寄せ
