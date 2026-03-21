@@ -62,6 +62,7 @@ export function useBlockActions(history: HistoryApi) {
         return {
           ...b,
           width: w,
+          manualWidth: true,
           x: nextX,
         };
       }),
@@ -109,6 +110,8 @@ export function useBlockActions(history: HistoryApi) {
           fontSize: 16,
           fontWeight: "normal",
           fontKey: "sans",
+          width: 160,
+          manualWidth: false,
           side,
         },
       ];

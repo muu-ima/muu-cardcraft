@@ -18,6 +18,8 @@ export type TextBlock = BaseBlock & {
   fontSize?: number;
   fontWeight?: "normal" | "bold";
   align?: Align;
+  width?: number;
+  manualWidth?: boolean;
 };
 
 export type ImageBlock = BaseBlock & {
