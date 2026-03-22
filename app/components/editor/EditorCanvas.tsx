@@ -130,11 +130,16 @@ export default function EditorCanvas({
     e.preventDefault();
     e.stopPropagation();
 
+    const el = blockRefs.current[block.id];
+    const renderedWidth = el
+      ? el.getBoundingClientRect().width / scale
+      : undefined;
+
     setResizeBlockState({
       id: block.id,
       pointerId: e.pointerId,
       startX: e.clientX,
-      startWidth: block.width ?? 160,
+      startWidth: block.width ?? renderedWidth ?? 40,
     });
   };
 
@@ -203,29 +208,15 @@ export default function EditorCanvas({
     ta.style.width = `${naturalWidth}px`;
     ta.style.height = `${ta.scrollHeight}px`;
   }, [editingText, editingBlockId, blocks]);
-
   useEffect(() => {
     if (!resizeState) return;
 
     const handlePointerMove = (e: PointerEvent) => {
       const dx = (e.clientX - resizeState.startX) / scale;
+      const dy = (e.clientY - resizeState.startY) / scale;
 
-      const ratio = resizeState.startH / resizeState.startW;
-
-      let nextW = resizeState.startW + dx;
-      nextW = clamp(nextW, IMAGE_MIN_W, IMAGE_MAX_W);
-
-      let nextH = nextW * ratio;
-
-      if (nextH > IMAGE_MAX_H) {
-        nextH = IMAGE_MAX_H;
-        nextW = nextH / ratio;
-      }
-
-      if (nextH < IMAGE_MIN_H) {
-        nextH = IMAGE_MIN_H;
-        nextW = nextH / ratio;
-      }
+      const nextW = clamp(resizeState.startW + dx, IMAGE_MIN_W, IMAGE_MAX_W);
+      const nextH = clamp(resizeState.startH + dy, IMAGE_MIN_H, IMAGE_MAX_H);
 
       resizeImage(resizeState.id, nextW, nextH);
     };
@@ -236,12 +227,14 @@ export default function EditorCanvas({
 
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointercancel", handlePointerUp);
 
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointercancel", handlePointerUp);
     };
-  }, [resizeState, resizeImage, scale]);
+  }, [resizeState, scale, resizeImage]);
 
   useEffect(() => {
     if (!resizeBlockState) return;
@@ -251,7 +244,7 @@ export default function EditorCanvas({
       if (e.pointerId !== resizeBlockState.pointerId) return;
 
       const dx = (e.clientX - resizeBlockState.startX) / scale;
-      const nextWidth = resizeBlockState.startWidth + dx;
+      const nextWidth = Math.max(40, resizeBlockState.startWidth + dx);
 
       onChangeWidth(resizeBlockState.id, nextWidth);
     };

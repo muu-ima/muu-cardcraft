@@ -45,10 +45,30 @@ export function reorderMixedLayers(params: {
       break;
   }
 
+  console.log("action:", action);
+  console.log("targetId:", targetId);
+  console.log(
+    "before mixed:",
+    mixedLayers.map((x) => ({ id: x.id, kind: x.kind, z: x.z })),
+  );
+  console.log(
+    "after mixed:",
+    nextLayers.map((x) => ({ id: x.id, kind: x.kind, z: x.z })),
+  );
+
   const reordered = applyLayerOrderToBlocksAndImages(
     sideBlocks,
     sideImages,
     nextLayers,
+  );
+
+  console.log(
+    "after blocks:",
+    reordered.blocks.map((b) => ({ id: b.id, z: b.z, text: b.text })),
+  );
+  console.log(
+    "after images:",
+    reordered.images.map((img) => ({ id: img.id, z: img.z })),
   );
 
   return {

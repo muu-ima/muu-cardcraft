@@ -110,7 +110,6 @@ export function useBlockActions(history: HistoryApi) {
           fontSize: 16,
           fontWeight: "normal",
           fontKey: "sans",
-          width: 160,
           manualWidth: false,
           side,
         },

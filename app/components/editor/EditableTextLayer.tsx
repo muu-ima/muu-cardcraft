@@ -39,6 +39,7 @@ export default function EditableTextLayer({
         left: block.x,
         zIndex: block.z,
         width: block.width ?? "auto",
+        minWidth: 0,
         textAlign: block.align ?? "left",
         cursor: interactive ? "move" : "default",
         padding: 0,
@@ -53,7 +54,7 @@ export default function EditableTextLayer({
     >
       <div
         ref={contentRef}
-        className="inline-block rounded px-1 py-0.5"
+        className="block rounded px-1 py-0.5"
         style={{
           fontSize: `${block.fontSize}px`,
           fontWeight: block.fontWeight,
@@ -62,7 +63,9 @@ export default function EditableTextLayer({
           whiteSpace: "pre-wrap",
           width: "100%",
           maxWidth: "100%",
-          overflowWrap: "break-word",
+          minWidth: 0,
+          boxSizing: "border-box",
+          overflowWrap: "anywhere",
           wordBreak: "break-word",
         }}
       >
