@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, useMemo } from "react";
+import { useCallback, useRef, useState, useMemo, useEffect } from "react";
 import ModalPreview from "@/app/components/ModalPreview";
 import CardSurface from "@/app/components/CardSurface";
 import ExportSurface from "@/app/components/ExportSurface";
@@ -164,8 +164,8 @@ export default function CardEditor({ code }: Props) {
     centerWrapRef,
     activeBlockId: state.activeBlockId,
     selectedImageId,
-    setBlocks,
     setImages,
+    setBlocks,
   });
 
   const centerVisible = selectors.centerVisible;
@@ -239,6 +239,31 @@ export default function CardEditor({ code }: Props) {
     onMoveLayerForward: handlers.onMoveLayerForward,
     onMoveLayerBackward: handlers.onMoveLayerBackward,
   });
+
+  useEffect(() => {
+    console.log(
+      "blocks",
+      editableBlocks.map((b) => ({
+        id: b.id,
+        text: b.type === "text" ? b.text : "",
+        z: b.z,
+        side: b.side,
+      })),
+    );
+
+    console.log(
+      "images",
+      images.map((img) => ({
+        id: img.id,
+        z: img.z,
+        side: img.side,
+        w: img.w,
+        h: img.h,
+      })),
+    );
+
+    console.log("mixedLayers", mixedLayers);
+  }, [editableBlocks, images, mixedLayers]);
 
   // =========================
   // 🎨 2. レイアウト描画

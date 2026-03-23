@@ -49,8 +49,8 @@ type UseCardEditorHandlersParams = {
   selectedImageId?: string | null;
 
   currentBlocks: Block[];
-  currentImages: CardImage[];
   setBlocks: (next: Block[] | ((prev: Block[]) => Block[])) => void;
+  currentImages: CardImage[];
   setImages: (next: CardImage[] | ((prev: CardImage[]) => CardImage[])) => void;
 };
 
@@ -70,8 +70,8 @@ export function useCardEditorHandlers({
   activeBlockId,
   selectedImageId,
   currentBlocks,
-  currentImages,
   setBlocks,
+  currentImages,
   setImages,
 }: UseCardEditorHandlersParams) {
   const { side } = state;
