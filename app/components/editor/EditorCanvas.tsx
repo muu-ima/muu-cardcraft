@@ -1,13 +1,13 @@
 // app/components/editor/EditorCanvas.tsx
 "use client";
 
-import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import CardSurface from "@/app/components/CardSurface";
+import InlineTextareaOverlay from "@/app/components/editor/InlineTextareaOverlay";
 import PrintGuides from "@/app/components/editor/PrintGuides";
 import type { Block } from "@/shared/blocks";
 import type { DesignKey } from "@/shared/design";
 import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
-import { FONT_DEFINITIONS, type FontKey } from "@/shared/fonts";
 import type { CardImage } from "@/shared/images";
 import {
   IMAGE_MIN_W,
@@ -143,71 +143,6 @@ export default function EditorCanvas({
     });
   };
 
-  const taRef = useRef<HTMLTextAreaElement | null>(null);
-
-  function fontFamilyFromKey(fontKey: FontKey): string {
-    switch (fontKey) {
-      case "serif":
-        return FONT_DEFINITIONS.serif.css;
-      case "maru":
-        return FONT_DEFINITIONS.maru.css;
-      case "script1":
-        return FONT_DEFINITIONS.script1.css;
-      case "script2":
-        return FONT_DEFINITIONS.script2.css;
-      case "sans":
-      default:
-        return FONT_DEFINITIONS.sans.css;
-    }
-  }
-
-  useLayoutEffect(() => {
-    const ta = taRef.current;
-    if (!ta) return;
-    if (!editingBlockId) return;
-
-    const editingBlock = blocks.find((block) => block.id === editingBlockId);
-    if (!editingBlock || editingBlock.type !== "text") return;
-
-    ta.style.height = "auto";
-
-    if (editingBlock.manualWidth) {
-      ta.style.width = `${editingBlock.width ?? 160}px`;
-      ta.style.height = `${ta.scrollHeight}px`;
-      return;
-    }
-
-    // 未調整時は hidden span で自然幅を測る
-    const measure = document.createElement("span");
-    measure.style.position = "fixed";
-    measure.style.left = "-9999px";
-    measure.style.top = "-9999px";
-    measure.style.visibility = "hidden";
-    measure.style.whiteSpace = "pre";
-    measure.style.fontSize = `${editingBlock.fontSize ?? 16}px`;
-    measure.style.fontWeight = editingBlock.fontWeight ?? "normal";
-    measure.style.fontFamily = fontFamilyFromKey(editingBlock.fontKey);
-    measure.style.lineHeight = "1.2";
-    measure.style.padding = "2px 6px";
-    measure.style.boxSizing = "border-box";
-
-    measure.textContent =
-      editingText && editingText.length > 0
-        ? editingText
-        : editingBlock.text || " ";
-
-    document.body.appendChild(measure);
-
-    const naturalWidth = Math.max(
-      48,
-      Math.ceil(measure.getBoundingClientRect().width) + 16,
-    );
-
-    document.body.removeChild(measure);
-
-    ta.style.width = `${naturalWidth}px`;
-    ta.style.height = `${ta.scrollHeight}px`;
-  }, [editingText, editingBlockId, blocks]);
   useEffect(() => {
     if (!resizeState) return;
 
@@ -316,70 +251,16 @@ export default function EditorCanvas({
             />
 
             {/* ✅ Inline editor overlay（CardSurface と同じ scale 階層） */}
-            {!isPreview &&
-              editingBlockId &&
-              (() => {
-                const b = blocks.find((x) => x.id === editingBlockId);
-                if (!b || b.type !== "text") return null;
-
-                const isManualWidth =
-                  b.type === "text" && b.manualWidth === true;
-                const editWidth = isManualWidth ? (b.width ?? 160) : undefined;
-
-                return (
-                  <textarea
-                    key={b.id}
-                    ref={taRef}
-                    autoFocus
-                    rows={1}
-                    value={editingText ?? ""}
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onChange={(e) =>
-                      onChangeEditingText?.(e.currentTarget.value)
-                    }
-                    onBlur={() => {
-                      onCommitText?.(b.id, editingText ?? "");
-                      onStopEditing?.();
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Escape") {
-                        e.preventDefault();
-                        onStopEditing?.();
-                      }
-                    }}
-                    style={{
-                      position: "absolute",
-                      left: b.x,
-                      top: b.y,
-                      width: editWidth,
-                      minWidth: isManualWidth ? undefined : 40,
-                      minHeight: (b.fontSize ?? 16) * 1.2 + 8,
-                      display: "inline-block",
-
-                      fontSize: `${b.fontSize}px`,
-                      fontWeight: b.fontWeight ?? "normal",
-                      fontFamily: fontFamilyFromKey(b.fontKey),
-                      textAlign: b.align ?? "left",
-                      padding: "2px 6px",
-                      lineHeight: 1.2,
-
-                      whiteSpace: isManualWidth ? "pre-wrap" : "pre",
-                      overflowWrap: isManualWidth ? "break-word" : "normal",
-                      wordBreak: isManualWidth ? "break-word" : "normal",
-                      boxSizing: "border-box",
-
-                      background: "transparent",
-                      borderRadius: 6,
-                      border: "1px solid rgba(236, 72, 153, 0.45)",
-
-                      outline: "none",
-                      resize: "none",
-                      overflow: "hidden",
-                      zIndex: 50,
-                    }}
-                  />
-                );
-              })()}
+            {!isPreview && (
+              <InlineTextareaOverlay
+                blocks={blocks}
+                editingBlockId={editingBlockId}
+                editingText={editingText}
+                onChangeEditingText={onChangeEditingText}
+                onCommitText={onCommitText}
+                onStopEditing={onStopEditing}
+              />
+            )}
           </div>
 
           {showGuides && (
