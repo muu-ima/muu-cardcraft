@@ -4,8 +4,8 @@
 import React from "react";
 import CardSurface from "@/app/components/CardSurface";
 import TextEditingOverlayLayer from "@/app/components/editor/TextEditingOverlayLayer";
+import CanvasFrame from "@/app/components/editor/CanvasFrame";
 import { useCanvasResize } from "@/app/components/editor/useCanvasResize";
-import PrintGuides from "@/app/components/editor/PrintGuides";
 import type { Block } from "@/shared/blocks";
 import type { DesignKey } from "@/shared/design";
 import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
@@ -95,81 +95,49 @@ export default function EditorCanvas({
   });
 
   return (
-    <section className="flex flex-col items-center gap-3">
-      <div className="w-full flex justify-center">
-        <div
-          className="relative mx-auto"
-          style={{
-            width: CARD_BASE_W * scale,
-            height: CARD_BASE_H * scale,
-          }}
-        >
-          {/* ✅ scaleする箱（ここが Card + textarea の共通親） */}
-          <div
-            ref={cardRef} // ✅ ここに付けるのが重要
-            className={[
-              "relative",
-              isPreview ? "overflow-hidden" : "overflow-visible",
-            ].join(" ")}
-            style={{
-              width: CARD_BASE_W,
-              height: CARD_BASE_H,
-              transform: `scale(${scale})`,
-              transformOrigin: "top left",
-            }}
-          >
-            <CardSurface
-              blocks={blocks}
-              images={images}
-              mixedLayers={mixedLayers}
-              onMoveImage={moveImage}
-              selectedImageId={selectedImageId}
-              onSelectImage={onSelectImage}
-              onResizeImageStart={onResizeStart}
-              onResizeBlockStart={onResizeBlockStart}
-              design={design}
-              w={CARD_BASE_W}
-              h={CARD_BASE_H}
-              interactive={!isPreview}
-              onSurfacePointerDown={(e) => {
-                onSurfacePointerDown?.();
-                onSelectImage(null);
-              }}
-              onBlockPointerDown={(e, id) => onPointerDown?.(e, id, { scale })}
-              onStartInlineEdit={onStartInlineEdit}
-              activeBlockId={editingBlockId ? undefined : activeBlockId}
-              editingBlockId={editingBlockId} // ✅ 二重文字防止
-              blockRefs={blockRefs}
-              snapGuide={snapGuide}
-              className={isPreview ? "shadow-lg" : ""}
-            />
+    <CanvasFrame
+      cardRef={cardRef}
+      scale={scale}
+      cardW={CARD_BASE_W}
+      cardH={CARD_BASE_H}
+      isPreview={isPreview}
+      showGuides={showGuides}
+    >
+      <CardSurface
+        blocks={blocks}
+        images={images}
+        mixedLayers={mixedLayers}
+        onMoveImage={moveImage}
+        selectedImageId={selectedImageId}
+        onSelectImage={onSelectImage}
+        onResizeImageStart={onResizeStart}
+        onResizeBlockStart={onResizeBlockStart}
+        design={design}
+        w={CARD_BASE_W}
+        h={CARD_BASE_H}
+        interactive={!isPreview}
+        onSurfacePointerDown={(e) => {
+          onSurfacePointerDown?.();
+          onSelectImage(null);
+        }}
+        onBlockPointerDown={(e, id) => onPointerDown?.(e, id, { scale })}
+        onStartInlineEdit={onStartInlineEdit}
+        activeBlockId={editingBlockId ? undefined : activeBlockId}
+        editingBlockId={editingBlockId}
+        blockRefs={blockRefs}
+        snapGuide={snapGuide}
+        className={isPreview ? "shadow-lg" : ""}
+      />
 
-            {/* ✅ Inline editor overlay（CardSurface と同じ scale 階層） */}
-            <TextEditingOverlayLayer
-              isPreview={isPreview}
-              blocks={blocks}
-              editingBlockId={editingBlockId}
-              editingText={editingText}
-              onChangeEditingText={onChangeEditingText}
-              onCommitText={onCommitText}
-              onStopEditing={onStopEditing}
-            />
-          </div>
-
-          {showGuides && (
-            <PrintGuides
-              scale={scale}
-              cardW={CARD_BASE_W}
-              cardH={CARD_BASE_H}
-            />
-          )}
-        </div>
-      </div>
-      {!isPreview && (
-        <p className="w-full max-w-[480px] text-xs text-zinc-500">
-          ※プレビュー時はドラッグできません。編集モードで配置を調整してください。
-        </p>
-      )}
-    </section>
+      <TextEditingOverlayLayer
+        isPreview={isPreview}
+        blocks={blocks}
+        editingBlockId={editingBlockId}
+        editingText={editingText}
+        onChangeEditingText={onChangeEditingText}
+        onCommitText={onCommitText}
+        onStopEditing={onStopEditing}
+      />
+    </CanvasFrame>
   );
 }
