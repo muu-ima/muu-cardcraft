@@ -5,6 +5,7 @@ import React from "react";
 import CardSurface from "@/app/components/CardSurface";
 import TextEditingOverlayLayer from "@/app/components/editor/TextEditingOverlayLayer";
 import CanvasFrame from "@/app/components/editor/CanvasFrame";
+import { useEditorCanvasHandlers } from "@/app/components/editor/useEditorCanvasHandlers";
 import { useCanvasResize } from "@/app/components/editor/useCanvasResize";
 import type { Block } from "@/shared/blocks";
 import type { DesignKey } from "@/shared/design";
@@ -94,6 +95,14 @@ export default function EditorCanvas({
     blockRefs,
   });
 
+  const { handleSurfacePointerDown, handleBlockPointerDown } =
+    useEditorCanvasHandlers({
+      scale,
+      onSurfacePointerDown,
+      onSelectImage,
+      onPointerDown,
+    });
+
   return (
     <CanvasFrame
       cardRef={cardRef}
@@ -116,11 +125,8 @@ export default function EditorCanvas({
         w={CARD_BASE_W}
         h={CARD_BASE_H}
         interactive={!isPreview}
-        onSurfacePointerDown={(e) => {
-          onSurfacePointerDown?.();
-          onSelectImage(null);
-        }}
-        onBlockPointerDown={(e, id) => onPointerDown?.(e, id, { scale })}
+        onSurfacePointerDown={handleSurfacePointerDown}
+        onBlockPointerDown={handleBlockPointerDown}
         onStartInlineEdit={onStartInlineEdit}
         activeBlockId={editingBlockId ? undefined : activeBlockId}
         editingBlockId={editingBlockId}
