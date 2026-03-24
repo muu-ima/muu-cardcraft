@@ -3,6 +3,7 @@
 
 import React, { useRef, useState, useCallback } from "react";
 import EditableTextLayer from "@/app/components/editor/EditableTextLayer";
+import { useImageDrag } from "@/app/components/cardSurface/useImageDrag";
 import ImageLayer from "@/app/components/cardSurface/ImageLayer";
 import { getCardSurfaceStyle } from "@/app/components/cardSurface/getCardSurfaceStyle";
 import type { CSSProperties, RefObject } from "react";
@@ -73,15 +74,6 @@ type CardSurfaceProps = {
   ) => void;
 };
 
-type DragImageState = {
-  id: string;
-  pointerId: number;
-  startClientX: number;
-  startClientY: number;
-  startX: number;
-  startY: number;
-} | null;
-
 export default function CardSurface({
   blocks,
   images = [],
@@ -107,7 +99,6 @@ export default function CardSurface({
   style,
 }: CardSurfaceProps) {
   const lastClickedBlockIdRef = useRef<string | null>(null);
-  const [dragImage, setDragImage] = useState<DragImageState>(null);
 
   const handleBlockClick = (block: Block) => {
     if (!interactive) return;
@@ -126,55 +117,11 @@ export default function CardSurface({
     }
   };
 
-  const handleImagePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>, img: CardImage) => {
-      const target = e.target as HTMLElement;
-      const isResizeHandle = target.closest("[data-resize-handle='true']");
-      if (isResizeHandle) return;
-
-      if (!interactive) return;
-      if (!onMoveImage) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      setDragImage({
-        id: img.id,
-        pointerId: e.pointerId,
-        startClientX: e.clientX,
-        startClientY: e.clientY,
-        startX: img.x,
-        startY: img.y,
-      });
-    },
-    [interactive, onMoveImage],
-  );
-
-  const handlePointerMove = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      if (!dragImage) return;
-      if (!onMoveImage) return;
-      if (e.pointerId !== dragImage.pointerId) return;
-
-      const dx = e.clientX - dragImage.startClientX;
-      const dy = e.clientY - dragImage.startClientY;
-
-      const nextX = dragImage.startX + dx;
-      const nextY = dragImage.startY + dy;
-
-      onMoveImage(dragImage.id, nextX, nextY);
-    },
-    [dragImage, onMoveImage],
-  );
-
-  const endImageDrag = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
-      if (!dragImage) return;
-      if (e.pointerId !== dragImage.pointerId) return;
-      setDragImage(null);
-    },
-    [dragImage],
-  );
+  const { dragImage, handleImagePointerDown, handlePointerMove, endImageDrag } =
+    useImageDrag({
+      interactive,
+      onMoveImage,
+    });
 
   return (
     <div
