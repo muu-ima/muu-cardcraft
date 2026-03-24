@@ -3,11 +3,12 @@
 
 import React, { useRef, useState, useCallback } from "react";
 import EditableTextLayer from "@/app/components/editor/EditableTextLayer";
+import ImageLayer from "@/app/components/cardSurface/ImageLayer";
+import { getCardSurfaceStyle } from "@/app/components/cardSurface/getCardSurfaceStyle";
 import type { CSSProperties, RefObject } from "react";
 import type { Block } from "@/shared/blocks";
 import type { CardImage } from "@/shared/images";
 import type { DesignKey } from "@/shared/design";
-import { CARD_FULL_DESIGNS } from "@/shared/cardDesigns";
 
 type MixedLayer = {
   kind: "block" | "image";
@@ -80,24 +81,6 @@ type DragImageState = {
   startX: number;
   startY: number;
 } | null;
-
-function getCardStyle(design: DesignKey): CSSProperties {
-  // どれか必ず存在するキー（自分の環境に合わせて）
-  const fallbackKey: DesignKey = "mint"; // ← 実際に存在するキー名にする
-
-  const full = CARD_FULL_DESIGNS[design] ?? CARD_FULL_DESIGNS[fallbackKey];
-  const bg = full.bg;
-
-  if (!bg.image) return { backgroundColor: bg.color };
-
-  return {
-    backgroundImage: `url(${bg.image})`,
-    backgroundSize: bg.mode === "contain" ? "contain" : "cover",
-    backgroundRepeat: "no-repeat",
-    backgroundPosition: "center",
-    backgroundColor: bg.color ?? "#ffffff",
-  };
-}
 
 export default function CardSurface({
   blocks,
@@ -212,7 +195,7 @@ export default function CardSurface({
         width: w,
         height: h,
         position: "relative",
-        ...getCardStyle(design),
+        ...getCardSurfaceStyle(design),
         ...style,
         touchAction: "none",
       }}
@@ -223,71 +206,27 @@ export default function CardSurface({
         if (layer.kind === "image") {
           const img = images.find((x) => x.id === layer.id);
           if (!img) return null;
+
           const isDragging = dragImage?.id === img.id;
           const isSelected = selectedImageId === img.id;
 
           return (
-            <div
+            <ImageLayer
               key={img.id}
-              data-image-id={img.id}
+              image={img}
+              interactive={interactive}
+              isSelected={isSelected}
+              isDragging={isDragging}
               onPointerDown={(e) => {
                 e.stopPropagation();
                 onSelectImage?.(img.id);
                 handleImagePointerDown(e, img);
               }}
-              style={{
-                position: "absolute",
-                left: img.x,
-                top: img.y,
-                width: img.w,
-                height: img.h,
-                zIndex: img.z,
-                transform: `rotate(${img.rotate ?? 0}deg)`,
-                transformOrigin: "center",
-                cursor: interactive
-                  ? isDragging
-                    ? "grabbing"
-                    : "grab"
-                  : "default",
-                userSelect: "none",
-                border: isSelected ? "2px solid #2563eb" : "none",
-                boxSizing: "border-box",
+              onResizeHandlePointerDown={(e) => {
+                e.stopPropagation();
+                onResizeImageStart?.(e, img);
               }}
-            >
-              <img
-                src={img.url}
-                alt=""
-                draggable={false}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-                  userSelect: "none",
-                }}
-              />
-              {interactive && isSelected && (
-                <button
-                  type="button"
-                  data-resize-handle="true"
-                  onPointerDown={(e) => {
-                    e.stopPropagation();
-                    onResizeImageStart?.(e, img);
-                  }}
-                  style={{
-                    position: "absolute",
-                    right: -8,
-                    bottom: -8,
-                    width: 16,
-                    height: 16,
-                    borderRadius: 9999,
-                    border: "2px solid white",
-                    background: "#2563eb",
-                    cursor: "nwse-resize",
-                  }}
-                />
-              )}
-            </div>
+            />
           );
         }
 

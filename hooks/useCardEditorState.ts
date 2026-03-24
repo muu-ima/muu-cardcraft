@@ -256,14 +256,6 @@ export function useCardEditorState(args: {
 
         const delta: FontSizeDelta = diff > 0 ? 1 : -1;
 
-        console.log("[onChangeFontSize]", {
-          next,
-          current,
-          diff,
-          delta,
-          activeBlockId,
-        });
-
         bumpFontSize(activeBlockId, delta);
       },
 
