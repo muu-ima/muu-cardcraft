@@ -28,6 +28,8 @@ export default function EditableTextLayer({
   const textColor =
     block.type === "text" ? (block.color ?? "#111827") : undefined;
 
+  const hasFixedWidth = typeof block.width === "number";
+
   return (
     <div
       data-block-id={block.id}
@@ -38,7 +40,7 @@ export default function EditableTextLayer({
         top: block.y,
         left: block.x,
         zIndex: block.z,
-        width: block.width ?? "auto",
+        width: hasFixedWidth ? block.width : undefined,
         minWidth: 0,
         textAlign: block.align ?? "left",
         cursor: interactive ? "move" : "default",
@@ -53,16 +55,19 @@ export default function EditableTextLayer({
       ].join(" ")}
     >
       <div
-        ref={contentRef}
+        ref={(el) => {
+          contentRef?.(el);
+        }}
         className="block rounded px-1 py-0.5"
         style={{
+          display: "inline-block",
           fontSize: `${block.fontSize}px`,
           fontWeight: block.fontWeight,
           fontFamily:
             FONT_DEFINITIONS[block.fontKey]?.css ?? FONT_DEFINITIONS.sans.css,
           whiteSpace: "pre-wrap",
-          width: "100%",
-          maxWidth: "100%",
+          width: hasFixedWidth ? "100%" : "fit-content",
+          maxWidth: hasFixedWidth ? "100%" : "none",
           minWidth: 0,
           boxSizing: "border-box",
           overflowWrap: "anywhere",
@@ -96,13 +101,13 @@ export default function EditableTextLayer({
           {typeof block.width === "number" && (
             <div
               className="
-                pointer-events-none
-                absolute -top-4 right-0
-                text-[10px]
-                rounded-full border border-zinc-200
-                bg-white/90 px-2 py-0.5
-                text-zinc-500 shadow-sm
-              "
+              pointer-events-none
+              absolute -top-4 right-0
+              text-[10px]
+              rounded-full border border-zinc-200
+              bg-white/90 px-2 py-0.5
+              text-zinc-500 shadow-sm
+            "
             >
               {Math.round(block.width)}px
             </div>

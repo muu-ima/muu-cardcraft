@@ -245,12 +245,25 @@ export function useCardEditorState(args: {
       // 🔽 ここを FontSizeDelta 前提で変換する
       onChangeFontSize: (next: number) => {
         if (!centerToolbarValue) return;
+        if (!Number.isFinite(next)) {
+          console.log("[onChangeFontSize] invalid next", { next });
+          return;
+        }
 
         const current = centerToolbarValue.fontSize;
         const diff = next - current;
         if (diff === 0) return;
 
         const delta: FontSizeDelta = diff > 0 ? 1 : -1;
+
+        console.log("[onChangeFontSize]", {
+          next,
+          current,
+          diff,
+          delta,
+          activeBlockId,
+        });
+
         bumpFontSize(activeBlockId, delta);
       },
 

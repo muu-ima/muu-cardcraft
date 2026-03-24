@@ -320,7 +320,17 @@ export default function CardSurface({
             }}
             onClick={() => handleBlockClick(block)}
             contentRef={(el) => {
-              if (blockRefs) blockRefs.current[block.id] = el;
+              if (!blockRefs) return;
+
+              if (!el) {
+                blockRefs.current[block.id] = null;
+                return;
+              }
+
+              const width = el.getBoundingClientRect().width;
+              if (width > 0) {
+                blockRefs.current[block.id] = el;
+              }
             }}
             onResizeHandlePointerDown={(e) => {
               e.stopPropagation();

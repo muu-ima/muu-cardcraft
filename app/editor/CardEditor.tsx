@@ -240,31 +240,6 @@ export default function CardEditor({ code }: Props) {
     onMoveLayerBackward: handlers.onMoveLayerBackward,
   });
 
-  useEffect(() => {
-    console.log(
-      "blocks",
-      editableBlocks.map((b) => ({
-        id: b.id,
-        text: b.type === "text" ? b.text : "",
-        z: b.z,
-        side: b.side,
-      })),
-    );
-
-    console.log(
-      "images",
-      images.map((img) => ({
-        id: img.id,
-        z: img.z,
-        side: img.side,
-        w: img.w,
-        h: img.h,
-      })),
-    );
-
-    console.log("mixedLayers", mixedLayers);
-  }, [editableBlocks, images, mixedLayers]);
-
   // =========================
   // 🎨 2. レイアウト描画
   // =========================

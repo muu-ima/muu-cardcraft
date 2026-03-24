@@ -57,8 +57,6 @@ export default function InlineTextEditor({
 
   if (!rect) return null;
 
-  if (!rect) return null;
-
   return (
     <>
       {/* ✅ 画面全体オーバーレイ：外クリックで commit */}
