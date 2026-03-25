@@ -81,7 +81,8 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     <div className="flex w-full h-[calc(100dvh-56px)] bg-transparent">
       {" "}
       {/* 左：縦ツール */}
-      <aside className="w-19 shrink-0 border-r border-black/5 backdrop-blur-md h-full min-h-0">
+      <aside className="w-[56px] xl:w-[76px] shrink-0 border-r border-black/5 backdrop-blur-md h-full min-h-0">
+        {" "}
         <Toolbar
           activeTab={state.activeTab}
           isPreview={state.isPreview}
@@ -164,7 +165,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
         </aside>
       )}
       {/* 右：キャンバス領域 */}
-      <main className="flex-1 min-w-0 min-h-0 px-4 md:px-6 lg:px-8">
+      <main className="flex-1 min-w-0 min-h-0 lg:px-8">
         {" "}
         <CanvasArea innerRef={canvasAreaRef}>
           <div onPointerDownCapture={onAnyPointerDownCapture}>

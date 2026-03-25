@@ -5,8 +5,8 @@ import type { Block } from "@/shared/blocks";
 /**
  * 1つのデザインは
  * - 背景 (bg)
- * - 表面(front): 基本固定（editable:false）
- * - 裏面(back): 編集可能（editable:true）
+ * - 表面(front): 編集可能（editable:true）
+ * - 裏面(back): 基本固定（editable:false）
  * を持つ
  */
 export type cardDesign = {
@@ -16,11 +16,11 @@ export type cardDesign = {
     mode?: "cover" | "contain";
   };
   front: {
-    editable: false;
+    editable: true;
     blocks: Block[];
   };
   back: {
-    editable: true;
+    editable: false;
     blocks: Block[];
   };
 };
@@ -58,7 +58,7 @@ const BASE_BACK_BLOCKS: Block[] = [
     id: "name",
     type: "text",
     text: "山田 太郎",
-    side: "front",
+    side: "back",
     x: 100,
     y: 120,
     z: 2,
@@ -70,7 +70,7 @@ const BASE_BACK_BLOCKS: Block[] = [
     id: "title",
     type: "text",
     text: "デザイナー / Designer",
-    side: "front",
+    side: "back",
     x: 100,
     y: 80,
     z: 1,
@@ -90,11 +90,11 @@ function makeDesign(key: DesignKey): cardDesign {
       mode: bg.mode,
     },
     front: {
-      editable: false,
+      editable: true,
       blocks: BASE_FRONT_BLOCKS,
     },
     back: {
-      editable: true,
+      editable: false,
       blocks: BASE_BACK_BLOCKS,
     },
   };
