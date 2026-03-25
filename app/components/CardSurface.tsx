@@ -6,6 +6,7 @@ import { useImageDrag } from "@/app/components/cardSurface/useImageDrag";
 import { renderLayer } from "@/app/components/cardSurface/renderLayer";
 import { getCardSurfaceStyle } from "@/app/components/cardSurface/getCardSurfaceStyle";
 import { useBlockInlineEditTrigger } from "@/app/components/cardSurface/useBlockInlineEditTrigger";
+import { createSurfacePointerDownHandler } from "@/app/components/cardSurface/createSurfacePointerDownHandler";
 import type { CSSProperties, RefObject } from "react";
 import type { Block } from "@/shared/blocks";
 import type { CardImage } from "@/shared/images";
@@ -110,21 +111,18 @@ export default function CardSurface({
       onMoveImage,
     });
 
+  const handleSurfacePointerDown = createSurfacePointerDownHandler({
+    interactive,
+    onSurfacePointerDown,
+  });
+
   return (
     <div
       ref={cardRef}
       onPointerMove={handlePointerMove}
       onPointerUp={endImageDrag}
       onPointerCancel={endImageDrag}
-      onPointerDown={(e) => {
-        if (!interactive) return;
-
-        const target = e.target as HTMLElement;
-        const hitBlock = target.closest("[data-block-id]");
-        const hitImage = target.closest("[data-image-id]");
-
-        if (!hitBlock && !hitImage) onSurfacePointerDown?.(e);
-      }}
+      onPointerDown={handleSurfacePointerDown}
       style={{
         width: w,
         height: h,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, useMemo, useEffect } from "react";
+import { useRef, useState, useMemo } from "react";
 import ModalPreview from "@/app/components/ModalPreview";
 import CardSurface from "@/app/components/CardSurface";
 import ExportSurface from "@/app/components/ExportSurface";
