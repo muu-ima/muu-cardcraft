@@ -49,8 +49,8 @@ export default function ToolPanel({
         variant === "desktop" ? "h-[calc(100vh-56px)]" : "h-full",
         "xl:fixed xl:left-14 xl:top-14 xl:z-30",
         "xl:w-[360px]",
-        "xl:bg-white/70 xl:backdrop-blur",
-        "xl:shadow-[1px_0_0_rgba(0,0,0,0.06)]",
+        "xl:bg-white/28 xl:backdrop-blur-sm",
+        "xl:shadow-[1px_0_0_rgba(0,0,0,0.04)]",
       ].join(" ")}
     >
       {showHeader && (
@@ -63,8 +63,8 @@ export default function ToolPanel({
         >
           <div
             className="px-4 py-3 xl:px-3 xl:py-2
-                       bg-white/60 backdrop-blur
-                       shadow-[0_1px_0_rgba(0,0,0,0.06)]"
+           bg-white/22 backdrop-blur-sm
+           shadow-[0_1px_0_rgba(0,0,0,0.04)]"
           >
             <div className="flex items-center justify-between">
               <div className="text-sm font-semibold text-zinc-800">{title}</div>

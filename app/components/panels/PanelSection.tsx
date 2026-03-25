@@ -12,8 +12,8 @@ export default function PanelSection({
 }) {
   return (
     <section
-      className="rounded-2xl bg-white/70 backdrop-blur p-4
-        shadow-[0_1px_0_rgba(0,0,0,0.06),0_8px_18px_rgba(0,0,0,0.06)]"
+      className="rounded-2xl border border-white/30 bg-white/12 backdrop-blur-sm p-4
+    shadow-[0_1px_0_rgba(0,0,0,0.03),0_8px_18px_rgba(0,0,0,0.03)]"
     >
       <div className="mb-3">
         <p className="text-sm font-medium text-zinc-900">{title}</p>

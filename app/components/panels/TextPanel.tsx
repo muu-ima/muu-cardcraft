@@ -53,7 +53,7 @@ export default function TextPanel(props: TextPanelProps) {
           <button
             type="button"
             onClick={onAddBlock}
-            className="w-full rounded-lg border border-zinc-300 py-1.5 text-sm hover:bg-zinc-50"
+            className="w-full rounded-lg border border-zinc-300/70 bg-white/20 py-1.5 text-sm hover:bg-white/30 backdrop-blur-sm"
           >
             ＋ テキストを追加
           </button>
@@ -67,8 +67,8 @@ export default function TextPanel(props: TextPanelProps) {
                   className={[
                     "rounded-lg border px-3 py-2 text-xs relative",
                     isActive
-                      ? "border-pink-400 bg-pink-50/60"
-                      : "border-zinc-200 bg-white",
+                      ? "border-pink-300 bg-white/35 backdrop-blur-sm"
+                      : "border-zinc-200/70 bg-white/20 backdrop-blur-sm",
                   ].join(" ")}
                 >
                   {/* ✅ 上部：タイトル＋フォントサイズ＋削除ボタン */}
@@ -88,7 +88,7 @@ export default function TextPanel(props: TextPanelProps) {
                             if (!ok) return;
                             onDeleteBlock(b.id);
                           }}
-                          className="rounded-full p-1 hover:bg-zinc-100 text-zinc-400 hover:text-zinc-700"
+                          className="rounded-full p-1 hover:bg-white/40 text-zinc-400 hover:text-zinc-700"
                         >
                           <Trash2 className="h-3 w-3" />
                         </button>

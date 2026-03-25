@@ -78,13 +78,10 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
   };
 
   return (
-    <div className="flex w-full h-[calc(100dvh-56px)]">
+    <div className="flex w-full h-[calc(100dvh-56px)] bg-transparent">
+      {" "}
       {/* 左：縦ツール */}
-      <aside
-        className="w-14 shrink-0 
-         shadow-[2px_0_20px_-8px_rgba(0,0,0,0.25)]
-       bg-white/40 backdrop-blur h-full min-h-0"
-      >
+      <aside className="w-14 shrink-0 border-r border-black/5 backdrop-blur-md h-full min-h-0">
         <Toolbar
           activeTab={state.activeTab}
           isPreview={state.isPreview}
@@ -94,7 +91,6 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
           onTogglePreview={actions.togglePreview}
         />
       </aside>
-
       {/* 左：詳細パネル */}
       {isPanelOpen && (
         <aside
@@ -167,13 +163,16 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
           />
         </aside>
       )}
-
       {/* 右：キャンバス領域 */}
-      <main className="flex-1 min-w-0 min-h-0">
+      <main className="flex-1 min-w-0 min-h-0 px-4 md:px-6 lg:px-8">
+        {" "}
         <CanvasArea innerRef={canvasAreaRef}>
           <div onPointerDownCapture={onAnyPointerDownCapture}>
             {/* CenterToolbar は常時表示 */}
-            <div ref={centerWrapRef} className="relative z-50">
+            <div
+              ref={centerWrapRef}
+              className="relative z-50 mt-6 md:mt-10 xl:mt-14"
+            >
               <CenterToolbar
                 value={centerToolbarValue}
                 activeTab={state.activeTab}

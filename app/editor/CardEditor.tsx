@@ -244,13 +244,7 @@ export default function CardEditor({ code }: Props) {
   // 🎨 2. レイアウト描画
   // =========================
   return (
-    <div
-      className="relative h-dvh w-full"
-      style={{
-        background:
-          "linear-gradient(135deg, #eef3f8 0%, #f7eef2 55%, #eef4ff 100%)",
-      }}
-    >
+    <div className="relative h-dvh w-full">
       {/* ---------- Mobile (<768px) ---------- */}
       <div className="md:hidden">
         <CardEditorMobileLayout {...mobileProps} />

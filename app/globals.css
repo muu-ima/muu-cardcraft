@@ -1,42 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --bg-gradient: linear-gradient(180deg, #fdf6ee 0%, #f7efe6 50%, #f3ece3 100%);
-  --foreground: #171717;
+  --glass-bg: rgba(255, 255, 255, 0.58);
+  --glass-bg-soft: rgba(255, 255, 255, 0.44);
+  --glass-border: rgba(255, 255, 255, 0.42);
+  --glass-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --glass-shadow-soft: 0 4px 14px rgba(15, 23, 42, 0.06);
+  --glass-blur: 10px;
+  --glass-radius: 20px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer utilities {
+  .ui-glass {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--glass-radius);
   }
-}
 
-body {
-  background-image: linear-gradient(
-    180deg,
-    #cfe1ff 0%,   /* 上：はっきり青 */
-    #e6efff 35%,
-    #f3f7ff 65%,
-    #ffffff 100% /* 下：ほぼ白 */
-  ); 
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-color: transparent !important;
-  color: var(--foreground);
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  .ui-glass-soft {
+    background: var(--glass-bg-soft);
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: var(--glass-shadow-soft);
+    border-radius: 16px;
+  }
 }
