@@ -1,10 +1,11 @@
 // app/components/CardSurface.tsx
 "use client";
 
-import React, { useRef } from "react";
+import React from "react";
 import { useImageDrag } from "@/app/components/cardSurface/useImageDrag";
 import { renderLayer } from "@/app/components/cardSurface/renderLayer";
 import { getCardSurfaceStyle } from "@/app/components/cardSurface/getCardSurfaceStyle";
+import { useBlockInlineEditTrigger } from "@/app/components/cardSurface/useBlockInlineEditTrigger";
 import type { CSSProperties, RefObject } from "react";
 import type { Block } from "@/shared/blocks";
 import type { CardImage } from "@/shared/images";
@@ -97,24 +98,11 @@ export default function CardSurface({
   snapGuide,
   style,
 }: CardSurfaceProps) {
-  const lastClickedBlockIdRef = useRef<string | null>(null);
-
-  const handleBlockClick = (block: Block) => {
-    if (!interactive) return;
-    if (!onStartInlineEdit) return;
-    if (block.type !== "text") return;
-
-    const last = lastClickedBlockIdRef.current;
-
-    if (last === block.id && editingBlockId !== block.id) {
-      // ✅ 同じブロックを 2 回連続でクリック → 編集開始
-      onStartInlineEdit(block.id);
-      lastClickedBlockIdRef.current = null; // 1回使ったらリセットしておく
-    } else {
-      // ✅ 1回目クリック（または別ブロックに切り替え）
-      lastClickedBlockIdRef.current = block.id;
-    }
-  };
+  const { handleBlockClick } = useBlockInlineEditTrigger({
+    interactive,
+    editingBlockId,
+    onStartInlineEdit,
+  });
 
   const { dragImage, handleImagePointerDown, handlePointerMove, endImageDrag } =
     useImageDrag({
