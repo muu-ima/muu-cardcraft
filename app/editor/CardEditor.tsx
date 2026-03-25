@@ -1,6 +1,8 @@
 "use client";
 
-import { useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
+import { saveEditorDraft } from "@/shared/editorDraftStorage";
+import { loadEditorDraft } from "@/shared/editorDraftStorage";
 import ModalPreview from "@/app/components/ModalPreview";
 import CardSurface from "@/app/components/CardSurface";
 import ExportSurface from "@/app/components/ExportSurface";
@@ -167,6 +169,43 @@ export default function CardEditor({ code }: Props) {
     setImages,
     setBlocks,
   });
+
+  const restoredCodeRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!code) return;
+    if (restoredCodeRef.current === code) return;
+
+    restoredCodeRef.current = code;
+
+    const draft = loadEditorDraft(code);
+    if (!draft) return;
+
+    setBlocks(draft.blocks);
+    setImages(draft.images);
+    setDesign(draft.design);
+
+    // actions は依存に入れず、この1回だけ使う
+    actions.setSide(draft.activeSide);
+    actions.setShowGuides(draft.showGuides);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code]);
+
+  useEffect(() => {
+    if (!code) return;
+    if (restoredCodeRef.current !== code) return;
+
+    saveEditorDraft({
+      version: 1,
+      code,
+      updatedAt: Date.now(),
+      activeSide: state.side,
+      design,
+      blocks: editableBlocks,
+      images,
+      showGuides: state.showGuides,
+    });
+  }, [code, state.side, state.showGuides, design, editableBlocks, images]);
 
   const centerVisible = selectors.centerVisible;
   const centerToolbarValue = selectors.centerToolbarValue;
