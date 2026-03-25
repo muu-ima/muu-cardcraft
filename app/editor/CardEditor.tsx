@@ -171,29 +171,48 @@ export default function CardEditor({ code }: Props) {
   });
 
   const restoredCodeRef = useRef<string | null>(null);
+  const isHydratingRef = useRef(false);
+  const hasHydratedRef = useRef(false);
+
+  const setSideRef = useRef(actions.setSide);
+  const setShowGuidesRef = useRef(actions.setShowGuides);
+
+  useEffect(() => {
+    setSideRef.current = actions.setSide;
+  }, [actions.setSide]);
+
+  useEffect(() => {
+    setShowGuidesRef.current = actions.setShowGuides;
+  }, [actions.setShowGuides]);
 
   useEffect(() => {
     if (!code) return;
     if (restoredCodeRef.current === code) return;
 
     restoredCodeRef.current = code;
+    isHydratingRef.current = true;
+    hasHydratedRef.current = false;
 
     const draft = loadEditorDraft(code);
-    if (!draft) return;
 
-    setBlocks(draft.blocks);
-    setImages(draft.images);
-    setDesign(draft.design);
+    if (draft) {
+      setBlocks(draft.blocks ?? []);
+      setImages(draft.images ?? []);
+      setDesign(draft.design ?? "mint");
+      setSideRef.current?.(draft.activeSide ?? "front");
+      setShowGuidesRef.current?.(draft.showGuides ?? false);
+    }
 
-    // actions は依存に入れず、この1回だけ使う
-    actions.setSide(draft.activeSide);
-    actions.setShowGuides(draft.showGuides);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code]);
+    queueMicrotask(() => {
+      isHydratingRef.current = false;
+      hasHydratedRef.current = true;
+    });
+  }, [code, setBlocks, setImages, setDesign]);
 
   useEffect(() => {
     if (!code) return;
-    if (restoredCodeRef.current !== code) return;
+    if (!hasHydratedRef.current) return;
+    if (isHydratingRef.current) return;
 
     saveEditorDraft({
       version: 1,
@@ -205,7 +224,7 @@ export default function CardEditor({ code }: Props) {
       images,
       showGuides: state.showGuides,
     });
-  }, [code, state.side, state.showGuides, design, editableBlocks, images]);
+  }, [code, state.side, design, editableBlocks, images, state.showGuides]);
 
   const centerVisible = selectors.centerVisible;
   const centerToolbarValue = selectors.centerToolbarValue;
