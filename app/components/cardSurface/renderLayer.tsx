@@ -3,44 +3,9 @@
 import React from "react";
 import EditableTextLayer from "@/app/components/editor/EditableTextLayer";
 import ImageLayer from "@/app/components/cardSurface/ImageLayer";
+import type { RenderLayerArgs } from "@/app/components/cardSurface/renderLayer.types";
 import type { Block } from "@/shared/blocks";
 import type { CardImage } from "@/shared/images";
-
-type MixedLayer = {
-  kind: "block" | "image";
-  id: string;
-  z: number;
-};
-
-type Args = {
-  layer: MixedLayer;
-  blocks: Block[];
-  images: CardImage[];
-  interactive: boolean;
-  activeBlockId?: string;
-  editingBlockId?: string | null;
-  selectedImageId?: string | null;
-  dragImageId?: string | null;
-  blockRefs?: React.MutableRefObject<Record<string, HTMLDivElement | null>>;
-  onSelectImage?: (id: string | null) => void;
-  onImagePointerDown: (
-    e: React.PointerEvent<HTMLDivElement>,
-    img: CardImage,
-  ) => void;
-  onResizeImageStart?: (
-    e: React.PointerEvent,
-    image: { id: string; w: number; h: number },
-  ) => void;
-  onBlockPointerDown?: (
-    e: React.PointerEvent<HTMLDivElement>,
-    blockId: string,
-  ) => void;
-  onBlockClick: (block: Block) => void;
-  onResizeBlockStart?: (
-    e: React.PointerEvent,
-    block: { id: string; width?: number },
-  ) => void;
-};
 
 export function renderLayer({
   layer,
@@ -58,7 +23,7 @@ export function renderLayer({
   onBlockPointerDown,
   onBlockClick,
   onResizeBlockStart,
-}: Args) {
+}: RenderLayerArgs) {
   if (layer.kind === "image") {
     const img = images.find((x) => x.id === layer.id);
     if (!img) return null;

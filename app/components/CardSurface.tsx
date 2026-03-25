@@ -6,6 +6,7 @@ import { renderLayer } from "@/app/components/cardSurface/renderLayer";
 import { getCardSurfaceStyle } from "@/app/components/cardSurface/getCardSurfaceStyle";
 import { useBlockInlineEditTrigger } from "@/app/components/cardSurface/useBlockInlineEditTrigger";
 import { createSurfacePointerDownHandler } from "@/app/components/cardSurface/createSurfacePointerDownHandler";
+import { SurfaceSnapGuide } from "@/app/components/cardSurface/SurfaceSnapGuide";
 import type { CardSurfaceProps } from "@/app/components/cardSurface/CardSurface.types";
 
 export default function CardSurface({
@@ -87,30 +88,7 @@ export default function CardSurface({
         }),
       )}
       {/* ===== Snap Guide Line ===== */}
-      {snapGuide && (
-        <div
-          style={{
-            position: "absolute",
-            pointerEvents: "none",
-            background: "rgba(0,0,0,0.4)",
-            zIndex: 50,
-
-            ...(snapGuide.type === "centerX" || snapGuide.type === "left"
-              ? {
-                  left: snapGuide.pos,
-                  top: 0,
-                  width: 1,
-                  height: "100%",
-                }
-              : {
-                  top: snapGuide.pos,
-                  left: 0,
-                  height: 1,
-                  width: "100%",
-                }),
-          }}
-        />
-      )}
+      <SurfaceSnapGuide snapGuide={snapGuide} />
     </div>
   );
 }
