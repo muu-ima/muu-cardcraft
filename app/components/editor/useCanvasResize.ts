@@ -60,15 +60,29 @@ export function useCanvasResize({
     e.stopPropagation();
 
     const el = blockRefs.current[block.id];
-    const renderedWidth = el
-      ? el.getBoundingClientRect().width / scale
-      : undefined;
+    const rect = el?.getBoundingClientRect();
+    const rectWidth = rect?.width;
+    const renderedWidth = rectWidth ? rectWidth / scale : undefined;
 
+    const startWidth =
+      typeof renderedWidth === "number" && renderedWidth > 0
+        ? renderedWidth
+        : typeof block.width === "number"
+          ? block.width
+          : 120;
+
+    console.log("[resizeBlockStart]", {
+      id: block.id,
+      blockWidth: block.width,
+      rectWidth,
+      scale,
+      renderedWidth,
+    });
     setResizeBlockState({
       id: block.id,
       pointerId: e.pointerId,
       startX: e.clientX,
-      startWidth: block.width ?? renderedWidth ?? 40,
+      startWidth,
     });
   };
 
@@ -108,7 +122,7 @@ export function useCanvasResize({
       if (e.pointerId !== resizeBlockState.pointerId) return;
 
       const dx = (e.clientX - resizeBlockState.startX) / scale;
-      const nextWidth = Math.max(40, resizeBlockState.startWidth + dx);
+      const nextWidth = clamp(resizeBlockState.startWidth + dx, 40, 480);
 
       onChangeWidth(resizeBlockState.id, nextWidth);
     };
