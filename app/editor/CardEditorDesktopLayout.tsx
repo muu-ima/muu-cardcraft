@@ -81,7 +81,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     <div className="flex w-full h-[calc(100dvh-56px)] bg-transparent">
       {" "}
       {/* 左：縦ツール */}
-      <aside className="w-14 shrink-0 border-r border-black/5 backdrop-blur-md h-full min-h-0">
+      <aside className="w-19 shrink-0 border-r border-black/5 backdrop-blur-md h-full min-h-0">
         <Toolbar
           activeTab={state.activeTab}
           isPreview={state.isPreview}

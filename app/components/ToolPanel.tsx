@@ -12,7 +12,6 @@ import type { ToolPanelProps } from "@/shared/toolPanel";
 export default function ToolPanel({
   open,
   onClose,
-
   activeTab,
   variant = "desktop",
   textPanel,
@@ -22,10 +21,9 @@ export default function ToolPanel({
   designPanel,
   exportPanel,
 }: ToolPanelProps) {
-  // ✅ open と activeTab を一致させる（事故防止）
   if (!open || !activeTab) return null;
 
-  const showHeader = variant !== "sheet"; // ✅ sheet の時はヘッダー無し
+  const showHeader = variant !== "sheet";
 
   const title =
     activeTab === "design"
@@ -45,33 +43,20 @@ export default function ToolPanel({
   return (
     <aside
       className={[
-        "w-full flex flex-col min-h-0",
-        variant === "desktop" ? "h-[calc(100vh-56px)]" : "h-full",
-        "xl:fixed xl:left-14 xl:top-14 xl:z-30",
-        "xl:w-[360px]",
-        "xl:bg-white/28 xl:backdrop-blur-sm",
-        "xl:shadow-[1px_0_0_rgba(0,0,0,0.04)]",
+        "w-full min-h-0 flex flex-col",
+        variant === "desktop" ? "h-full" : "h-full",
       ].join(" ")}
     >
       {showHeader && (
-        <div
-          className={[
-            "hidden xl:block shrink-0",
-            "bg-white/70 backdrop-blur",
-            "rounded-xl px-3 py-2",
-          ].join(" ")}
-        >
-          <div
-            className="px-4 py-3 xl:px-3 xl:py-2
-           bg-white/22 backdrop-blur-sm
-           shadow-[0_1px_0_rgba(0,0,0,0.04)]"
-          >
-            <div className="flex items-center justify-between">
+        <div className="hidden xl:block shrink-0 px-2 pt-2 pb-1">
+          <div className="rounded-xl bg-white/70 backdrop-blur shadow-[0_1px_0_rgba(0,0,0,0.04)]">
+            <div className="flex items-center justify-between px-3 py-2">
               <div className="text-sm font-semibold text-zinc-800">{title}</div>
+
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg px-3 py-1.5 text-sm text-zinc-600 hover:bg-zinc-900/5"
+                className="rounded-lg px-2.5 py-1.5 text-sm text-zinc-600 transition hover:bg-zinc-900/5 hover:text-zinc-900"
               >
                 閉じる
               </button>
@@ -82,8 +67,8 @@ export default function ToolPanel({
 
       <div
         className={[
-          "flex-1 min-h-0 overflow-y-auto p-4",
-          variant === "sheet" ? "h-full" : "",
+          "min-h-0 flex-1 overflow-y-auto",
+          variant === "sheet" ? "h-full p-4" : "p-3 xl:p-4",
         ].join(" ")}
       >
         {activeTab === "text" && (

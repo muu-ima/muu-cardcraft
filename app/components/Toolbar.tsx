@@ -34,22 +34,6 @@ const tools: { key: TabKey; label: string; Icon: React.ElementType }[] = [
   { key: "export", label: "書き出し", Icon: Download },
 ];
 
-function Tooltip({ label }: { label: string }) {
-  return (
-    <span
-      className={[
-        "pointer-events-none absolute left-14 top-1/2 -translate-y-1/2",
-        "whitespace-nowrap rounded-md",
-        "bg-zinc-900 px-2 py-1 text-xs text-white shadow",
-        "opacity-0 translate-x-1",
-        "transition group-hover:opacity-100 group-hover:translate-x-0",
-      ].join(" ")}
-    >
-      {label}
-    </span>
-  );
-}
-
 function ToolButton({
   active,
   label,
@@ -69,7 +53,7 @@ function ToolButton({
       aria-current={active ? "page" : undefined}
       className={[
         "group relative",
-        "flex h-11 w-11 items-center justify-center rounded-xl",
+        "flex w-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2.5",
         "transition",
         active
           ? "bg-pink-500/15 text-pink-700"
@@ -77,8 +61,8 @@ function ToolButton({
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500/35",
       ].join(" ")}
     >
-      {children}
-      <Tooltip label={label} />
+      <span className="flex h-5 items-center justify-center">{children}</span>
+      <span className="text-[10px] leading-none">{label}</span>
     </button>
   );
 }
@@ -99,14 +83,14 @@ function ActionButton({
       aria-label={label}
       className={[
         "group relative",
-        "flex h-11 w-11 items-center justify-center rounded-xl",
+        "flex w-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2.5",
         "transition",
         "text-zinc-500 hover:bg-zinc-900/5 hover:text-zinc-800",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40",
       ].join(" ")}
     >
-      {children}
-      <Tooltip label={label} />
+      <span className="flex h-5 items-center justify-center">{children}</span>
+      <span className="text-[10px] leading-none">{label}</span>
     </button>
   );
 }

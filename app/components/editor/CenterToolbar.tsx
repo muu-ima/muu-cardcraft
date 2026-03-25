@@ -138,8 +138,10 @@ export default function CenterToolbar({
       >
         <div
           className={[
-            "flex items-center gap-1 rounded-2xl bg-white/85 px-2 py-2 backdrop-blur",
-            "shadow-[0_1px_2px_rgba(0,0,0,0.08),0_4px_12px_rgba(0,0,0,0.12)]",
+            "ui-glass",
+            "flex items-center gap-1 px-2 py-2 backdrop-blur",
+            "rounded-2xl border border-white/45 bg-white/72 backdrop-blur-md",
+            "shadow-[0_1px_2px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.08)]",
             "justify-between whitespace-nowrap",
             compact ? "max-w-[640px]" : "max-w-[820px]",
             value === null && !selectedItem ? "opacity-70" : "",

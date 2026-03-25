@@ -18,18 +18,25 @@ export default function RootLayout({
         className="min-h-screen overflow-hidden text-gray-900"
         style={{
           background: `
-      radial-gradient(circle at 50% 42%, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0) 36%),
-      linear-gradient(180deg, #f9e8ef 0%, #f7f0f6 50%, #edf4ff 100%)
-    `,
+              radial-gradient(circle at 50% 38%, rgba(255,255,255,0.52) 0%, rgba(255,255,255,0) 34%),
+              linear-gradient(
+                180deg,
+                #e6f2ff 0%,
+                #eaf1ff 24%,
+                #edf0ff 52%,
+                #eef0ff 76%,
+                #e7ecfb 100%
+              )
+            `,
         }}
       >
         {" "}
         {/* 共通ヘッダー */}
         <header
-          className="w-full border-b border-black/5"
+          className="w-full border-b border-white/30"
           style={{
-            background: "rgba(255,255,255,0.18)",
-            backdropFilter: "blur(6px)",
+            background: "rgba(255,255,255,0.24)",
+            backdropFilter: "blur(10px)",
           }}
         >
           {" "}
