@@ -27,7 +27,7 @@ const FONT_CATEGORIES: Record<
   FontCategory,
   { label: string; keys: FontKey[] }
 > = {
-  basic: { label: "ベーシック", keys: ["sans", "maru", "serif"] },
+  basic: { label: "ベーシック", keys: ["sans", "zenKaku", "maru", "serif"] },
   script: {
     label: "筆記体",
     keys: ["script1", "script2", "script3"].filter(

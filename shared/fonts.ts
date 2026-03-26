@@ -9,6 +9,10 @@ export const FONT_DEFINITIONS = {
     label: "丸ゴシック",
     css: "var(--font-zen-maru-gothic), system-ui, sans-serif",
   },
+  zenKaku: {
+    label: "やわらかゴシック",
+    css: "var(--font-zen-kaku-gothic-new), system-ui, sans-serif",
+  },
   serif: {
     label: "明朝",
     css: "var(--font-noto-serif-jp), serif",
@@ -29,7 +33,7 @@ export const FONT_DEFINITIONS = {
     label: "ポップ (Chicle / 英字のみ)",
     css: "var(--font-chicle), system-ui, sans-serif",
   },
-   pop3: {
+  pop3: {
     label: "ポップ (Potta_One / 日本語)",
     css: "var(--font-potta_one), system-ui, sans-serif",
   },
