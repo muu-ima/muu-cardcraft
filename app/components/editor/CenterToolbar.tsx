@@ -203,7 +203,7 @@ export default function CenterToolbar({
                 pressed={isTextOpen}
                 disabled={textControlsDisabled}
                 onClick={() => onOpenTab("text")}
-                className="min-w-14 justify-center border"
+                className="min-w-14 justify-center"
                 title="テキスト設定を開く"
               >
                 <span className="tabular-nums">{value.fontSize}</span>
