@@ -25,7 +25,7 @@ export function useCenterToolbarState({
   sidePanelOpen,
   disabled = false,
 }: Args) {
-  const isNarrow = useIsNarrowScreen(1280);
+  const isNarrow = useIsNarrowScreen(1024);
 
   const selectionType: SelectionType = useMemo(() => {
     if (selectedItem?.kind === "image") return "image";

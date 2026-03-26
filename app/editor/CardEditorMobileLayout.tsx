@@ -202,6 +202,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                   resizeImage={resizeImage}
                   onChangeWidth={onChangeWidth}
                   design={design}
+                  side={state.side}
                   scale={scaleMobile}
                   isPreview={state.isPreview}
                   showGuides={state.showGuides}

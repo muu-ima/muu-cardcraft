@@ -1,6 +1,8 @@
 "use client";
 
-import { useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
+import { saveEditorDraft } from "@/shared/editorDraftStorage";
+import { loadEditorDraft } from "@/shared/editorDraftStorage";
 import ModalPreview from "@/app/components/ModalPreview";
 import CardSurface from "@/app/components/CardSurface";
 import ExportSurface from "@/app/components/ExportSurface";
@@ -168,6 +170,60 @@ export default function CardEditor({ code }: Props) {
     setBlocks,
   });
 
+  const restoredCodeRef = useRef<string | null>(null);
+  const isHydratingRef = useRef(false);
+  const hasHydratedRef = useRef(false);
+
+  const setSideRef = useRef(actions.setSide);
+  const setShowGuidesRef = useRef(actions.setShowGuides);
+
+  useEffect(() => {
+    setSideRef.current = actions.setSide;
+  }, [actions.setSide]);
+
+  useEffect(() => {
+    setShowGuidesRef.current = actions.setShowGuides;
+  }, [actions.setShowGuides]);
+
+  useEffect(() => {
+    if (!code) return;
+    if (restoredCodeRef.current === code) return;
+
+    restoredCodeRef.current = code;
+    isHydratingRef.current = true;
+    hasHydratedRef.current = false;
+
+    const draft = loadEditorDraft(code);
+
+    if (draft) {
+      setBlocks(draft.blocks ?? []);
+      setDesign(draft.design ?? "mint");
+      setSideRef.current?.(draft.activeSide ?? "front");
+      setShowGuidesRef.current?.(draft.showGuides ?? false);
+    }
+
+    queueMicrotask(() => {
+      isHydratingRef.current = false;
+      hasHydratedRef.current = true;
+    });
+  }, [code, setBlocks, setImages, setDesign]);
+
+  useEffect(() => {
+    if (!code) return;
+    if (!hasHydratedRef.current) return;
+    if (isHydratingRef.current) return;
+
+    saveEditorDraft({
+      version: 2,
+      code,
+      updatedAt: Date.now(),
+      activeSide: state.side,
+      design,
+      blocks: editableBlocks,
+      showGuides: state.showGuides,
+    });
+  }, [code, state.side, design, editableBlocks, state.showGuides]);
+
   const centerVisible = selectors.centerVisible;
   const centerToolbarValue = selectors.centerToolbarValue;
 
@@ -280,6 +336,7 @@ export default function CardEditor({ code }: Props) {
                 mixedLayers={mixedLayers}
                 onMoveImage={moveImage}
                 design={design}
+                side={state.side}
                 w={CARD_BASE_W}
                 h={CARD_BASE_H}
                 interactive={false}
@@ -298,6 +355,7 @@ export default function CardEditor({ code }: Props) {
         blocks={getBlocksFor(state.side)}
         images={getImagesFor(state.side)}
         design={design}
+        side={state.side}
       />
       {editing && (
         <InlineTextEditor
