@@ -4,13 +4,12 @@ import type { DesignKey } from "@/shared/design";
 import type { CardImage, Side } from "@/shared/images";
 
 export type StoredEditorDraft = {
-  version: 1;
+  version: 2;
   code: string;
   updatedAt: number;
   activeSide: Side;
   design: DesignKey;
   blocks: Block[];
-  images: CardImage[];
   showGuides: boolean;
 };
 
@@ -37,7 +36,7 @@ export function loadEditorDraft(code: string): StoredEditorDraft | null {
 
     const parsed = JSON.parse(raw) as StoredEditorDraft;
 
-    if (parsed?.version !== 1) return null;
+    if (parsed?.version !== 2) return null;
     if (!parsed?.code) return null;
 
     return parsed;

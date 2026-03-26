@@ -197,7 +197,6 @@ export default function CardEditor({ code }: Props) {
 
     if (draft) {
       setBlocks(draft.blocks ?? []);
-      setImages(draft.images ?? []);
       setDesign(draft.design ?? "mint");
       setSideRef.current?.(draft.activeSide ?? "front");
       setShowGuidesRef.current?.(draft.showGuides ?? false);
@@ -215,16 +214,15 @@ export default function CardEditor({ code }: Props) {
     if (isHydratingRef.current) return;
 
     saveEditorDraft({
-      version: 1,
+      version: 2,
       code,
       updatedAt: Date.now(),
       activeSide: state.side,
       design,
       blocks: editableBlocks,
-      images,
       showGuides: state.showGuides,
     });
-  }, [code, state.side, design, editableBlocks, images, state.showGuides]);
+  }, [code, state.side, design, editableBlocks, state.showGuides]);
 
   const centerVisible = selectors.centerVisible;
   const centerToolbarValue = selectors.centerToolbarValue;
