@@ -18,14 +18,14 @@ export default function RootLayout({
         className="min-h-screen overflow-hidden text-gray-900"
         style={{
           background: `
-            radial-gradient(circle at 50% 20%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 28%),
-            linear-gradient(
-              180deg,
-              #fffdfd 0%,
-              #fff7fa 45%,
-              #fff1f5 100%
-            )
-          `,
+      radial-gradient(circle at 50% 18%, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0) 30%),
+      linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #fffdfd 52%,
+        #fff9fb 100%
+      )
+    `,
         }}
       >
         {" "}
