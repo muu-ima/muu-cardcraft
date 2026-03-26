@@ -338,6 +338,7 @@ export default function CardEditor({ code }: Props) {
                 mixedLayers={mixedLayers}
                 onMoveImage={moveImage}
                 design={design}
+                side={state.side}
                 w={CARD_BASE_W}
                 h={CARD_BASE_H}
                 interactive={false}
@@ -356,6 +357,7 @@ export default function CardEditor({ code }: Props) {
         blocks={getBlocksFor(state.side)}
         images={getImagesFor(state.side)}
         design={design}
+        side={state.side}
       />
       {editing && (
         <InlineTextEditor

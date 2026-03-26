@@ -19,6 +19,7 @@ export default function CardSurface({
   onResizeImageStart,
   onResizeBlockStart,
   design,
+  side,
   w,
   h,
   editingBlockId,
@@ -61,7 +62,7 @@ export default function CardSurface({
         width: w,
         height: h,
         position: "relative",
-        ...getCardSurfaceStyle(design),
+        ...getCardSurfaceStyle(design, side),
         ...style,
         touchAction: "none",
       }}

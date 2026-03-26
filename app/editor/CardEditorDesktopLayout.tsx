@@ -214,6 +214,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                   onChangeWidth={onChangeWidth}
                   mixedLayers={mixedLayers}
                   design={design}
+                  side={state.side}
                   scale={scaleDesktop}
                   isPreview={state.isPreview}
                   showGuides={state.showGuides}

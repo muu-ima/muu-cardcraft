@@ -7,15 +7,17 @@ import type { Block } from "@/shared/blocks";
 import type { DesignKey } from "@/shared/design";
 import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
 import type { CardImage } from "@/shared/images";
+import type { Side } from "@/app/editor/CardEditor.types";
 
 type Props = {
   blocks: Block[];
   images?: CardImage[];
   design: DesignKey;
+  side: Side;
 };
 
 const ExportSurface = forwardRef<HTMLDivElement, Props>(function ExportSurface(
-  { blocks, images = [], design },
+  { blocks, images = [], design, side },
   ref,
 ) {
   const mixedLayers = [
@@ -50,6 +52,7 @@ const ExportSurface = forwardRef<HTMLDivElement, Props>(function ExportSurface(
           images={images}
           mixedLayers={mixedLayers}
           design={design}
+          side={side}
           w={CARD_BASE_W}
           h={CARD_BASE_H}
           interactive={false}

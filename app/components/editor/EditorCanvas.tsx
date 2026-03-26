@@ -11,6 +11,7 @@ import type { Block } from "@/shared/blocks";
 import type { DesignKey } from "@/shared/design";
 import { CARD_BASE_W, CARD_BASE_H } from "@/shared/print";
 import type { CardImage } from "@/shared/images";
+import type { Side } from "@/app/editor/CardEditor.types";
 
 type MixedLayer = {
   kind: "block" | "image";
@@ -23,6 +24,7 @@ type Props = {
   images: CardImage[];
   mixedLayers: MixedLayer[];
   design: DesignKey;
+  side: Side;
   moveImage: (id: string, x: number, y: number) => void;
   resizeImage: (id: string, w: number, h: number) => void;
   scale: number;
@@ -69,6 +71,7 @@ export default function EditorCanvas({
   resizeImage,
   onChangeWidth,
   design,
+  side,
   scale,
   isPreview,
   showGuides,
@@ -122,6 +125,7 @@ export default function EditorCanvas({
         onResizeImageStart={onResizeStart}
         onResizeBlockStart={onResizeBlockStart}
         design={design}
+        side={side}
         w={CARD_BASE_W}
         h={CARD_BASE_H}
         interactive={!isPreview}

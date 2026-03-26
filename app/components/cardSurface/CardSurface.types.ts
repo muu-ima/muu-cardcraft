@@ -3,6 +3,7 @@ import type { CSSProperties, RefObject } from "react";
 import type { Block } from "@/shared/blocks";
 import type { CardImage } from "@/shared/images";
 import type { DesignKey } from "@/shared/design";
+import type { Side } from "@/app/editor/CardEditor.types";
 
 export type MixedLayer = {
   kind: "block" | "image";
@@ -22,7 +23,7 @@ export type CardSurfaceProps = {
 
   onMoveImage?: (id: string, x: number, y: number) => void;
   design: DesignKey;
-
+  side: Side;
   w: number;
   h: number;
 

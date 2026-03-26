@@ -2,110 +2,87 @@
 import { CARD_DESIGNS, type DesignKey } from "./design";
 import type { Block } from "@/shared/blocks";
 
-/**
- * 1つのデザインは
- * - 背景 (bg)
- * - 表面(front): 編集可能（editable:true）
- * - 裏面(back): 基本固定（editable:false）
- * を持つ
- */
-export type cardDesign = {
-  bg: {
-    color: string;
-    image?: string;
-    mode?: "cover" | "contain";
-  };
-  front: {
-    editable: true;
-    blocks: Block[];
-  };
+type CardBg = {
+  color: string;
+  image?: string;
+  mode?: "cover" | "contain";
+};
+
+export type CardDesign = {
+  frontBg: CardBg;
+  backBg: CardBg;
   back: {
     editable: false;
     blocks: Block[];
   };
 };
 
-// 🌟 表面・裏面の共通テンプレート
-const BASE_FRONT_BLOCKS: Block[] = [
+const BASE_BACK_BLOCKS: Block[] = [
   {
-    id: "brand",
+    id: "support-title",
     type: "text",
-    text: "Cocco",
-    side: "front",
+    side: "back",
+    text: "サポート窓口",
     x: 40,
-    y: 40,
+    y: 60,
     z: 1,
     fontSize: 20,
     fontWeight: "bold",
     fontKey: "sans",
   },
   {
-    id: "url",
+    id: "support-mail",
     type: "text",
-    text: "cocco.example",
-    side: "front",
+    side: "back",
+    text: "support@example.com",
     x: 40,
-    y: 80,
+    y: 100,
     z: 2,
     fontSize: 14,
     fontWeight: "normal",
     fontKey: "sans",
   },
-];
-
-const BASE_BACK_BLOCKS: Block[] = [
   {
-    id: "name",
+    id: "support-note",
     type: "text",
-    text: "山田 太郎",
     side: "back",
-    x: 100,
-    y: 120,
-    z: 2,
-    fontSize: 24,
-    fontWeight: "bold",
-    fontKey: "sans",
-  },
-  {
-    id: "title",
-    type: "text",
-    text: "デザイナー / Designer",
-    side: "back",
-    x: 100,
-    y: 80,
-    z: 1,
-    fontSize: 18,
+    text: "受付時間: 平日 10:00〜18:00",
+    x: 40,
+    y: 130,
+    z: 3,
+    fontSize: 12,
     fontWeight: "normal",
     fontKey: "sans",
   },
 ];
 
-// 🌟 CARD_DESIGNS から背景をコピーして cardDesign を作るヘルパー
-function makeDesign(key: DesignKey): cardDesign {
+function cloneBlocks(blocks: Block[]): Block[] {
+  return blocks.map((b) => ({ ...b }));
+}
+
+function makeDesign(key: DesignKey): CardDesign {
   const bg = CARD_DESIGNS[key];
+
   return {
-    bg: {
+    frontBg: {
       color: bg.bgColor,
       image: bg.image,
       mode: bg.mode,
     },
-    front: {
-      editable: true,
-      blocks: BASE_FRONT_BLOCKS,
+    backBg: {
+      color: "#ffffff",
+      // 固定背景画像を入れたいならここに追加
+      // image: "/designs/back/support-bg.png",
+      // mode: "cover",
     },
     back: {
       editable: false,
-      blocks: BASE_BACK_BLOCKS,
+      blocks: cloneBlocks(BASE_BACK_BLOCKS),
     },
   };
 }
 
-/**
- * ここを DesignKey に合わせて全部定義する
- * （例：mint / urtraMarin / ... / girl / kinmokusei / usaCarrot）
- */
-export const CARD_FULL_DESIGNS: Record<DesignKey, cardDesign> = {
-  // simple（Pastel）
+export const CARD_FULL_DESIGNS: Record<DesignKey, CardDesign> = {
   mint: makeDesign("mint"),
   peach: makeDesign("peach"),
   sky: makeDesign("sky"),
@@ -114,7 +91,6 @@ export const CARD_FULL_DESIGNS: Record<DesignKey, cardDesign> = {
   snow: makeDesign("snow"),
   ultramarine: makeDesign("ultramarine"),
 
-  // illustration
   girl: makeDesign("girl"),
   itigoSoda: makeDesign("itigoSoda"),
   usaCarrot: makeDesign("usaCarrot"),
@@ -124,7 +100,6 @@ export const CARD_FULL_DESIGNS: Record<DesignKey, cardDesign> = {
   mirrorBoy: makeDesign("mirrorBoy"),
   mirrorGirl: makeDesign("mirrorGirl"),
 
-  // texture
   circlePattern: makeDesign("circlePattern"),
   kinmokusei: makeDesign("kinmokusei"),
   coffeeWood: makeDesign("coffeeWood"),
