@@ -180,57 +180,61 @@ export default function FontPanel({
 
   return (
     <PanelSection title="フォント" desc="文字のフォントを選択します。">
-      <div className="mb-3 flex gap-2 text-xs">
-        <button
-          type="button"
-          onClick={() => setTab("font")}
-          className={[
-            "rounded-full px-3 py-1 border transition",
-            tab === "font"
-              ? "bg-pink-50 border-pink-300 text-pink-700"
-              : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50",
-          ].join(" ")}
-        >
-          フォント
-        </button>
+      <div className="mb-4 border-b border-zinc-200/80">
+        <div className="flex gap-1 text-xs">
+          <button
+            type="button"
+            onClick={() => setTab("font")}
+            className={[
+              "relative -mb-px rounded-t-xl border px-4 py-2 text-sm font-medium transition-all duration-200",
+              tab === "font"
+                ? "border-zinc-300 border-b-white bg-white text-pink-500 shadow-[0_-1px_0_rgba(255,255,255,0.9),0_6px_18px_rgba(15,23,42,0.05)]"
+                : "border-transparent bg-transparent text-zinc-500 hover:text-zinc-700 hover:bg-white/50",
+            ].join(" ")}
+          >
+            フォント
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setTab("color")}
-          className={[
-            "rounded-full px-3 py-1 border transition",
-            tab === "color"
-              ? "bg-pink-50 border-pink-300 text-pink-700"
-              : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50",
-          ].join(" ")}
-        >
-          色
-        </button>
+          <button
+            type="button"
+            onClick={() => setTab("color")}
+            className={[
+              "relative -mb-px rounded-t-xl border px-4 py-2 text-sm font-medium transition-all duration-200",
+              tab === "color"
+                ? "border-zinc-300 border-b-white bg-white text-pink-500 shadow-[0_-1px_0_rgba(255,255,255,0.9),0_6px_18px_rgba(15,23,42,0.05)]"
+                : "border-transparent bg-transparent text-zinc-500 hover:text-zinc-700 hover:bg-white/50",
+            ].join(" ")}
+          >
+            色
+          </button>
+        </div>
       </div>
 
       {tab === "font" && (
         <>
-          <div className="mb-2 flex gap-2 text-xs">
-            {(
-              Object.entries(FONT_CATEGORIES) as [
-                FontCategory,
-                (typeof FONT_CATEGORIES)[FontCategory],
-              ][]
-            ).map(([catKey, cat]) => (
-              <button
-                key={catKey}
-                type="button"
-                onClick={() => setActiveCategory(catKey)}
-                className={[
-                  "rounded-full px-2 py-1 border transition",
-                  activeCategory === catKey
-                    ? "bg-pink-50 border-pink-300 text-pink-700"
-                    : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50",
-                ].join(" ")}
-              >
-                {cat.label}
-              </button>
-            ))}
+          <div className="mb-3 border-b border-zinc-200/70">
+            <div className="flex flex-wrap gap-1 text-xs">
+              {(
+                Object.entries(FONT_CATEGORIES) as [
+                  FontCategory,
+                  (typeof FONT_CATEGORIES)[FontCategory],
+                ][]
+              ).map(([catKey, cat]) => (
+                <button
+                  key={catKey}
+                  type="button"
+                  onClick={() => setActiveCategory(catKey)}
+                  className={[
+                    "relative -mb-px rounded-t-lg border px-3 py-1.5 text-xs font-medium transition-all duration-200",
+                    activeCategory === catKey
+                      ? "border-zinc-300 border-b-white bg-white text-pink-500 shadow-[0_-1px_0_rgba(255,255,255,0.9),0_4px_12px_rgba(15,23,42,0.04)]"
+                      : "border-transparent bg-transparent text-zinc-500 hover:text-zinc-700 hover:bg-white/50",
+                  ].join(" ")}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <FontTab

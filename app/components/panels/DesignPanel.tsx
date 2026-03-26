@@ -88,27 +88,29 @@ export default function DesignPanel({
         desc="カードの背景デザインを選択します。"
       >
         {/* カテゴリタブ */}
-        <div className="mb-2 flex gap-2 text-xs">
-          {(
-            Object.entries(DESIGN_CATEGORIES) as [
-              DesignCategory,
-              (typeof DESIGN_CATEGORIES)[DesignCategory],
-            ][]
-          ).map(([catKey, cat]) => (
-            <button
-              key={catKey}
-              type="button"
-              onClick={() => setActiveCategory(catKey)}
-              className={[
-                "rounded-full px-2 py-1 border transition",
-                activeCategory === catKey
-                  ? "bg-pink-50 border-pink-300 text-pink-700"
-                  : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50",
-              ].join(" ")}
-            >
-              {cat.label}
-            </button>
-          ))}
+        <div className="mb-3 border-b border-zinc-200/70">
+          <div className="flex flex-wrap gap-1 text-xs">
+            {(
+              Object.entries(DESIGN_CATEGORIES) as [
+                DesignCategory,
+                (typeof DESIGN_CATEGORIES)[DesignCategory],
+              ][]
+            ).map(([catKey, cat]) => (
+              <button
+                key={catKey}
+                type="button"
+                onClick={() => setActiveCategory(catKey)}
+                className={[
+                  "relative -mb-px rounded-t-lg border px-3 py-1.5 text-xs font-medium transition-all duration-200",
+                  activeCategory === catKey
+                    ? "border-zinc-300 border-b-white bg-white text-pink-500 shadow-[0_-1px_0_rgba(255,255,255,0.95),0_4px_12px_rgba(15,23,42,0.04)]"
+                    : "border-transparent bg-transparent text-zinc-500 hover:bg-white/50 hover:text-zinc-700",
+                ].join(" ")}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <DesignTab
