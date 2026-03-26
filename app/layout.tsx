@@ -33,10 +33,18 @@ export default function RootLayout({
         {" "}
         {/* 共通ヘッダー */}
         <header
-          className="w-full border-b border-white/30"
+          className="w-full border-b border-white/25"
           style={{
-            background: "rgba(255,255,255,0.24)",
+            background: `
+              linear-gradient(
+                90deg,
+                rgba(103, 146, 235, 0.95) 0%,
+                rgba(140, 178, 245, 0.9) 42%,
+                rgba(188, 214, 255, 0.82) 100%
+              )
+            `,
             backdropFilter: "blur(10px)",
+            boxShadow: "0 8px 24px rgba(90, 130, 220, 0.12)",
           }}
         >
           {" "}
