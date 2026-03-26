@@ -63,8 +63,8 @@ export function Segmented<T extends string>({
   onChange,
   disabled,
 }: SegmentedProps<T>) {
- return (
-   <div className="inline-flex h-8 items-center rounded-full bg-white border px-1">
+  return (
+    <div className="inline-flex h-8 items-center rounded-full bg-white px-1">
       {options.map((opt) => {
         const active = opt.value === value;
         return (
