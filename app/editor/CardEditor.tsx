@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useMemo } from "react";
 import { saveEditorDraft } from "@/shared/editorDraftStorage";
 import { loadEditorDraft } from "@/shared/editorDraftStorage";
 import ModalPreview from "@/app/components/ModalPreview";
@@ -170,6 +170,7 @@ export default function CardEditor({ code }: Props) {
     setBlocks,
   });
 
+  const [isReady, setIsReady] = useState(false);
   const restoredCodeRef = useRef<string | null>(null);
   const isHydratingRef = useRef(false);
   const hasHydratedRef = useRef(false);
@@ -185,13 +186,23 @@ export default function CardEditor({ code }: Props) {
     setShowGuidesRef.current = actions.setShowGuides;
   }, [actions.setShowGuides]);
 
-  useEffect(() => {
-    if (!code) return;
-    if (restoredCodeRef.current === code) return;
+  useLayoutEffect(() => {
+    if (!code) {
+      hasHydratedRef.current = true;
+      isHydratingRef.current = false;
+      setIsReady(true);
+      return;
+    }
+
+    if (restoredCodeRef.current === code) {
+      setIsReady(true);
+      return;
+    }
 
     restoredCodeRef.current = code;
     isHydratingRef.current = true;
     hasHydratedRef.current = false;
+    setIsReady(false);
 
     const draft = loadEditorDraft(code);
 
@@ -202,11 +213,10 @@ export default function CardEditor({ code }: Props) {
       setShowGuidesRef.current?.(draft.showGuides ?? false);
     }
 
-    queueMicrotask(() => {
-      isHydratingRef.current = false;
-      hasHydratedRef.current = true;
-    });
-  }, [code, setBlocks, setImages, setDesign]);
+    isHydratingRef.current = false;
+    hasHydratedRef.current = true;
+    setIsReady(true);
+  }, [code, setBlocks, setDesign]);
 
   useEffect(() => {
     if (!code) return;
@@ -295,6 +305,16 @@ export default function CardEditor({ code }: Props) {
     onMoveLayerForward: handlers.onMoveLayerForward,
     onMoveLayerBackward: handlers.onMoveLayerBackward,
   });
+
+  if (!isReady) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center">
+        <div className="rounded-2xl border border-zinc-200 bg-white/70 px-4 py-3 text-sm text-zinc-500 shadow-sm">
+          ドラフトを読み込み中...
+        </div>
+      </div>
+    );
+  }
 
   // =========================
   // 🎨 2. レイアウト描画
