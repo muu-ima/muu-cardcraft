@@ -20,6 +20,9 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     centerWrapRef,
     scaleWrapRefDesktop,
     scaleDesktop,
+    zoomLabel,
+    onZoomIn,
+    onResetZoom,
     getBlocksFor,
     getImagesFor,
     moveImage,
@@ -171,11 +174,11 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
           <div className="flex-1 min-h-0">
             {" "}
             <CanvasArea innerRef={canvasAreaRef}>
-              <div onPointerDownCapture={onAnyPointerDownCapture}>
+              <div>
                 {/* CenterToolbar は常時表示 */}
                 <div
                   ref={centerWrapRef}
-                  className="relative z-50 mt-6 md:mt-10 xl:mt-14"
+                  className="relative z-50 mt-6 md:mt-8 xl:mt-10"
                 >
                   <CenterToolbar
                     value={centerToolbarValue}
@@ -200,12 +203,12 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                   />
                 </div>
 
-                <div className="flex w-full justify-center mt-6 md:mt-20 lg:mt-30">
+                <div className="flex w-full justify-center mt-6 md:mt-8 lg:mt-10">
                   {/* ✅ タブ開閉で max-width を変える箱 */}
                   <div
                     ref={scaleWrapRefDesktop}
                     className={clsx(
-                      "w-full min-w-0 px-3 transition-[max-width] duration-200",
+                      "w-full min-w-0 px-3 pr-6 transition-[max-width] duration-200",
                       isPanelOpen ? "max-w-[960px]" : "max-w-7xl",
                     )}
                   >
@@ -252,9 +255,9 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
             </CanvasArea>
           </div>
           <CanvasFooter
-            zoomLabel="100%"
-            onZoomIn={() => {}}
-            onResetZoom={() => {}}
+            zoomLabel={zoomLabel}
+            onZoomIn={onZoomIn}
+            onResetZoom={onResetZoom}
           />
         </div>
       </main>

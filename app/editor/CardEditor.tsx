@@ -37,6 +37,21 @@ export default function CardEditor({ code }: Props) {
   const [editing, setEditing] = useState<EditingState>(null);
   const [design, setDesign] = useState<DesignKey>("mint");
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
+  const ZOOM_STEPS = [100, 125, 150, 200] as const;
+  const [zoomPercent, setZoomPercent] =
+    useState<(typeof ZOOM_STEPS)[number]>(100);
+
+  const handleZoomIn = () => {
+    setZoomPercent((prev) => {
+      const index = ZOOM_STEPS.indexOf(prev);
+      if (index === -1) return 125;
+      return ZOOM_STEPS[Math.min(index + 1, ZOOM_STEPS.length - 1)];
+    });
+  };
+
+  const handleResetZoom = () => {
+    setZoomPercent(100);
+  };
 
   const setSelectedImageIdCompat = (id: string | null) => {
     setSelectedItem(id ? { kind: "image", id } : null);
@@ -65,6 +80,8 @@ export default function CardEditor({ code }: Props) {
     CARD_BASE_W,
     true,
   );
+
+  const zoomedScaleDesktop = scaleDesktop * (zoomPercent / 100);
 
   const {
     blocks: editableBlocks,
@@ -254,7 +271,7 @@ export default function CardEditor({ code }: Props) {
     centerWrapRef,
     scaleWrapRefDesktop,
     scaleWrapRefMobile,
-    scaleDesktop,
+    scaleDesktop: zoomedScaleDesktop,
     scaleMobile,
     getBlocksFor,
     getImagesFor,
@@ -304,6 +321,9 @@ export default function CardEditor({ code }: Props) {
     onDeleteLayer: handlers.onDeleteLayer,
     onMoveLayerForward: handlers.onMoveLayerForward,
     onMoveLayerBackward: handlers.onMoveLayerBackward,
+    zoomLabel: `${zoomPercent}%`,
+    onZoomIn: handleZoomIn,
+    onResetZoom: handleResetZoom,
   });
 
   // =========================

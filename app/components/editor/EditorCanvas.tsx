@@ -107,47 +107,63 @@ export default function EditorCanvas({
     });
 
   return (
-    <CanvasFrame
-      cardRef={cardRef}
-      scale={scale}
-      cardW={CARD_BASE_W}
-      cardH={CARD_BASE_H}
-      isPreview={isPreview}
-      showGuides={showGuides}
+    <div
+      className="h-full min-h-0 overflow-x-scroll overflow-y-scroll"
+      style={{ scrollbarGutter: "stable both-edges" }}
     >
-      <CardSurface
-        blocks={blocks}
-        images={images}
-        mixedLayers={mixedLayers}
-        onMoveImage={moveImage}
-        selectedImageId={selectedImageId}
-        onSelectImage={onSelectImage}
-        onResizeImageStart={onResizeStart}
-        onResizeBlockStart={onResizeBlockStart}
-        design={design}
-        side={side}
-        w={CARD_BASE_W}
-        h={CARD_BASE_H}
-        interactive={!isPreview}
-        onSurfacePointerDown={handleSurfacePointerDown}
-        onBlockPointerDown={handleBlockPointerDown}
-        onStartInlineEdit={onStartInlineEdit}
-        activeBlockId={editingBlockId ? undefined : activeBlockId}
-        editingBlockId={editingBlockId}
-        blockRefs={blockRefs}
-        snapGuide={snapGuide}
-        className={isPreview ? "shadow-lg" : ""}
-      />
+      <div className="flex min-h-full min-w-full items-start justify-center pt-0 pb-8">
+        {" "}
+        <div
+          style={{
+            width: CARD_BASE_W * scale,
+            height: CARD_BASE_H * scale,
+            position: "relative",
+          }}
+        >
+          <CanvasFrame
+            cardRef={cardRef}
+            scale={scale}
+            cardW={CARD_BASE_W}
+            cardH={CARD_BASE_H}
+            isPreview={isPreview}
+            showGuides={showGuides}
+          >
+            <CardSurface
+              blocks={blocks}
+              images={images}
+              mixedLayers={mixedLayers}
+              onMoveImage={moveImage}
+              selectedImageId={selectedImageId}
+              onSelectImage={onSelectImage}
+              onResizeImageStart={onResizeStart}
+              onResizeBlockStart={onResizeBlockStart}
+              design={design}
+              side={side}
+              w={CARD_BASE_W}
+              h={CARD_BASE_H}
+              interactive={!isPreview}
+              onSurfacePointerDown={handleSurfacePointerDown}
+              onBlockPointerDown={handleBlockPointerDown}
+              onStartInlineEdit={onStartInlineEdit}
+              activeBlockId={editingBlockId ? undefined : activeBlockId}
+              editingBlockId={editingBlockId}
+              blockRefs={blockRefs}
+              snapGuide={snapGuide}
+              className={isPreview ? "shadow-lg" : ""}
+            />
 
-      <TextEditingOverlayLayer
-        isPreview={isPreview}
-        blocks={blocks}
-        editingBlockId={editingBlockId}
-        editingText={editingText}
-        onChangeEditingText={onChangeEditingText}
-        onCommitText={onCommitText}
-        onStopEditing={onStopEditing}
-      />
-    </CanvasFrame>
+            <TextEditingOverlayLayer
+              isPreview={isPreview}
+              blocks={blocks}
+              editingBlockId={editingBlockId}
+              editingText={editingText}
+              onChangeEditingText={onChangeEditingText}
+              onCommitText={onCommitText}
+              onStopEditing={onStopEditing}
+            />
+          </CanvasFrame>
+        </div>
+      </div>
+    </div>
   );
 }

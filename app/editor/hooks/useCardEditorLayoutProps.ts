@@ -105,6 +105,9 @@ type UseCardEditorLayoutPropsParams = {
   onMoveLayerBackward: (layer: MixedLayerItem) => void;
   onDeleteLayer: (layer: MixedLayerItem) => void;
   mixedLayers: MixedLayerItem[];
+  zoomLabel: string;
+  onZoomIn: () => void;
+  onResetZoom: () => void;
 };
 
 export function useCardEditorLayoutProps({
@@ -170,6 +173,9 @@ export function useCardEditorLayoutProps({
   onMoveLayerForward,
   onMoveLayerBackward,
   onDeleteLayer,
+  zoomLabel,
+  onZoomIn,
+  onResetZoom,
 }: UseCardEditorLayoutPropsParams) {
   const layoutState: EditorStateForLayout = {
     activeTab: state.activeTab,
@@ -247,6 +253,9 @@ export function useCardEditorLayoutProps({
     onMoveLayerForward,
     onMoveLayerBackward,
     onDeleteLayer,
+    zoomLabel,
+    onZoomIn,
+    onResetZoom,
   };
 
   const mobileProps: CardEditorMobileProps = {

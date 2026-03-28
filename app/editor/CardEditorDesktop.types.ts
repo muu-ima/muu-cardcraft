@@ -33,6 +33,9 @@ export type CardEditorDesktopProps = {
   centerWrapRef: RefObject<HTMLDivElement | null>;
   scaleWrapRefDesktop: RefObject<HTMLDivElement | null>;
   scaleDesktop: number;
+  zoomLabel: string;
+  onZoomIn: () => void;
+  onResetZoom: () => void;
 
   // ---- blocks / デザイン
   getBlocksFor: (side: Side) => Block[];
