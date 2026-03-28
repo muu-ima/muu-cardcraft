@@ -4,6 +4,10 @@ import {
   Noto_Serif_JP,
   Zen_Maru_Gothic,
   Zen_Kaku_Gothic_New,
+  M_PLUS_1p,
+  Shippori_Mincho,
+  Kosugi_Maru,
+  Yusei_Magic,
   Parisienne,
   Dancing_Script,
   Lemon,
@@ -22,11 +26,28 @@ export const zenMaruGothic = Zen_Maru_Gothic({
   weight: ["400"],
   variable: "--font-zen-maru-gothic",
 });
-
 export const zenKakuGothicNew = Zen_Kaku_Gothic_New({
   subsets: ["latin"],
   weight: ["400"],
   variable: "--font-zen-kaku-gothic-new",
+});
+
+export const mPlus1p = M_PLUS_1p({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-m-plus-1p",
+});
+
+export const shipporiMincho = Shippori_Mincho({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-shippori-mincho",
+});
+
+export const kosugiMaru = Kosugi_Maru({
+  weight: ["400"],
+  subsets: ["latin"],
+  variable: "--font-kosugi-maru",
 });
 
 export const notoSerifJp = Noto_Serif_JP({
@@ -63,4 +84,10 @@ export const potta_one = Potta_One({
   subsets: ["latin"],
   weight: ["400"], // 必要なら ["400", "500", "600", "700"] に増やせる
   variable: "--font-potta_one",
+});
+
+export const yuseiMagic = Yusei_Magic({
+  weight: ["400"],
+  subsets: ["latin"],
+  variable: "--font-yusei-magic",
 });

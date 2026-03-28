@@ -27,7 +27,10 @@ const FONT_CATEGORIES: Record<
   FontCategory,
   { label: string; keys: FontKey[] }
 > = {
-  basic: { label: "ベーシック", keys: ["sans", "zenKaku", "maru", "serif"] },
+  basic: {
+    label: "ベーシック",
+    keys: ["sans", "maru", "zenKaku", "serif", "mplus", "kosugimaru"],
+  },
   script: {
     label: "筆記体",
     keys: ["script1", "script2", "script3"].filter(
@@ -36,7 +39,7 @@ const FONT_CATEGORIES: Record<
   },
   pop: {
     label: "ポップ",
-    keys: ["pop1", "pop2", "pop3"].filter(
+    keys: ["pop1", "pop2", "pop3", "yuseimagic"].filter(
       (k) => k in FONT_DEFINITIONS,
     ) as FontKey[],
   },

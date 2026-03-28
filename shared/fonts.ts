@@ -17,6 +17,18 @@ export const FONT_DEFINITIONS = {
     label: "明朝",
     css: "var(--font-noto-serif-jp), serif",
   },
+  mplus: {
+    label: "M PLUS",
+    css: "var(--font-m-plus-1p), sans-serif",
+  },
+  shippori: {
+    label: "しっぽり明朝",
+    css: "var(--font-shippori-mincho), serif",
+  },
+  kosugimaru: {
+    label: "こすぎ丸",
+    css: "var(--font-kosugi-maru), sans-serif",
+  },
   script1: {
     label: "筆記体（Parisienne / 英字のみ）",
     css: "var(--font-parisienne), cursive",
@@ -36,6 +48,10 @@ export const FONT_DEFINITIONS = {
   pop3: {
     label: "ポップ (Potta_One / 日本語)",
     css: "var(--font-potta_one), system-ui, sans-serif",
+  },
+  yuseimagic: {
+    label: "ポップ (yusei / 日本語)",
+    css: "var(--font-yusei-magic), cursive",
   },
 } as const;
 
