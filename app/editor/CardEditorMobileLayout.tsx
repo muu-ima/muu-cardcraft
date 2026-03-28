@@ -193,7 +193,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
             </div>
 
             <div className="flex w-full justify-center">
-              <div ref={scaleWrapRefMobile} className="w-full min-w-0 px-3">
+              <div ref={scaleWrapRefMobile} className="w-full min-w-0">
                 <EditorCanvas
                   blocks={getBlocksFor(state.side)}
                   images={getImagesFor(state.side)}
@@ -204,6 +204,7 @@ export function CardEditorMobileLayout(props: CardEditorMobileProps) {
                   design={design}
                   side={state.side}
                   scale={scaleMobile}
+                  isMobile
                   isPreview={state.isPreview}
                   showGuides={state.showGuides}
                   onPointerDown={

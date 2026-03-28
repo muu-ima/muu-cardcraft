@@ -40,6 +40,7 @@ type Props = {
   activeBlockId?: string;
   isPreview: boolean;
   showGuides: boolean;
+  isMobile?: boolean;
 
   snapGuide?: {
     type: "centerX" | "centerY" | "left" | "top";
@@ -99,6 +100,7 @@ export default function EditorCanvas({
   selectedImageId,
   onSelectImage,
   mixedLayers,
+  isMobile,
 }: Props) {
   const { onResizeStart, onResizeBlockStart } = useCanvasResize({
     scale,
@@ -116,6 +118,10 @@ export default function EditorCanvas({
     });
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollClass = isMobile
+    ? "relative h-full min-h-0 overflow-hidden"
+    : "relative h-full min-h-0 overflow-x-scroll overflow-y-scroll";
 
   const [scrollState, setScrollState] = useState<ScrollState>({
     left: 0,
@@ -181,10 +187,10 @@ export default function EditorCanvas({
   return (
     <div
       ref={scrollRef}
-      className="relative h-full min-h-0 overflow-x-scroll overflow-y-scroll"
-      style={{ scrollbarGutter: "stable both-edges" }}
+      className={scrollClass}
+      style={isMobile ? undefined : { scrollbarGutter: "stable both-edges" }}
     >
-      <pre className="absolute left-2 top-2 z-50 bg-black/70 p-2 text-xs text-white">
+      {/* <pre className="absolute left-2 top-2 z-50 bg-black/70 p-2 text-xs text-white">
         {JSON.stringify(
           {
             scrollState,
@@ -196,8 +202,8 @@ export default function EditorCanvas({
           null,
           2,
         )}
-      </pre>
-      {hasHorizontalScroll && (
+      </pre> */}
+      {!isMobile && hasHorizontalScroll && (
         <div
           className="pointer-events-none absolute bottom-6 left-1/2 z-40 -translate-x-1/2"
           style={{ width: horizontalTrackWidth }}
