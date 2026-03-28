@@ -2,24 +2,34 @@ import type { ReactNode } from "react";
 import {
   notoSansJp,
   zenMaruGothic,
+  zenKakuGothicNew,
   notoSerifJp,
   parisienne,
   dancingScript,
   lemon,
   chicle,
   potta_one,
+  mPlus1p,
+  shipporiMincho,
+  kosugiMaru,
+  yuseiMagic,
 } from "@/app/fonts";
 
 export default function EditorLayout({ children }: { children: ReactNode }) {
   const fontClasses = [
     notoSansJp.variable,
     zenMaruGothic.variable,
+    zenKakuGothicNew.variable,
     notoSerifJp.variable,
     parisienne.variable,
     dancingScript.variable,
     lemon.variable,
     chicle.variable,
     potta_one.variable,
+    mPlus1p.variable,
+    shipporiMincho.variable,
+    kosugiMaru.variable,
+    yuseiMagic.variable,
   ].join(" ");
 
   return (
