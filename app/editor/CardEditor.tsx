@@ -321,6 +321,13 @@ export default function CardEditor({ code }: Props) {
   // =========================
   return (
     <div className="relative h-dvh w-full">
+      {!isReady && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-sm">
+          <div className="rounded-2xl border border-zinc-200 bg-white/70 px-4 py-3 text-sm text-zinc-500 shadow-sm">
+            ドラフトを読み込み中...
+          </div>
+        </div>
+      )}
       {/* ---------- Mobile (<768px) ---------- */}
       <div className="md:hidden">
         <CardEditorMobileLayout {...mobileProps} />
