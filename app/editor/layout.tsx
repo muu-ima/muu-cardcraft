@@ -21,6 +21,7 @@ export default function EditorLayout({ children }: { children: ReactNode }) {
     zenMaruGothic.variable,
     zenKakuGothicNew.variable,
     notoSerifJp.variable,
+    zenKakuGothicNew.variable,
     parisienne.variable,
     dancingScript.variable,
     lemon.variable,
