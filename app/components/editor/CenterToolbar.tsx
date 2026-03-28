@@ -123,11 +123,9 @@ export default function CenterToolbar({
 
   return (
     <div
-      className={[
-        "sticky z-40 flex justify-center h-15 w-full",
-        className ?? "",
-      ].join(" ")}
-      style={{ top: topPx }}
+      className={["z-40 flex justify-center h-15 w-full", className ?? ""].join(
+        " ",
+      )}
     >
       <div
         className={[

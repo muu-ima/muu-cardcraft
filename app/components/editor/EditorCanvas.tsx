@@ -1,7 +1,7 @@
 // app/components/editor/EditorCanvas.tsx
 "use client";
 
-import React from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import CardSurface from "@/app/components/CardSurface";
 import TextEditingOverlayLayer from "@/app/components/editor/TextEditingOverlayLayer";
 import CanvasFrame from "@/app/components/editor/CanvasFrame";
@@ -17,6 +17,15 @@ type MixedLayer = {
   kind: "block" | "image";
   id: string;
   z: number;
+};
+
+type ScrollState = {
+  left: number;
+  top: number;
+  scrollWidth: number;
+  scrollHeight: number;
+  clientWidth: number;
+  clientHeight: number;
 };
 
 type Props = {
@@ -106,12 +115,107 @@ export default function EditorCanvas({
       onPointerDown,
     });
 
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  const [scrollState, setScrollState] = useState<ScrollState>({
+    left: 0,
+    top: 0,
+    scrollWidth: 0,
+    scrollHeight: 0,
+    clientWidth: 0,
+    clientHeight: 0,
+  });
+
+  const hasHorizontalScroll = scrollState.scrollWidth > scrollState.clientWidth;
+
+  const horizontalTrackWidth = 320;
+
+  const horizontalThumbWidth = hasHorizontalScroll
+    ? Math.max(
+        (scrollState.clientWidth / scrollState.scrollWidth) *
+          horizontalTrackWidth,
+        48,
+      )
+    : horizontalTrackWidth;
+
+  const horizontalThumbLeft =
+    hasHorizontalScroll && scrollState.scrollWidth > scrollState.clientWidth
+      ? (scrollState.left /
+          (scrollState.scrollWidth - scrollState.clientWidth)) *
+        (horizontalTrackWidth - horizontalThumbWidth)
+      : 0;
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    setScrollState({
+      left: el.scrollLeft,
+      top: el.scrollTop,
+      scrollWidth: el.scrollWidth,
+      scrollHeight: el.scrollHeight,
+      clientWidth: el.clientWidth,
+      clientHeight: el.clientHeight,
+    });
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    updateScrollState();
+
+    const handleScroll = () => {
+      updateScrollState();
+    };
+
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, [updateScrollState]);
+
   return (
     <div
-      className="h-full min-h-0 overflow-x-scroll overflow-y-scroll"
+      ref={scrollRef}
+      className="relative h-full min-h-0 overflow-x-scroll overflow-y-scroll"
       style={{ scrollbarGutter: "stable both-edges" }}
     >
-      <div className="flex min-h-full min-w-full items-start justify-center pt-0 pb-8">
+      <pre className="absolute left-2 top-2 z-50 bg-black/70 p-2 text-xs text-white">
+        {JSON.stringify(
+          {
+            scrollState,
+            hasHorizontalScroll,
+            horizontalTrackWidth,
+            horizontalThumbWidth,
+            horizontalThumbLeft,
+          },
+          null,
+          2,
+        )}
+      </pre>
+      {hasHorizontalScroll && (
+        <div
+          className="pointer-events-none absolute bottom-6 left-1/2 z-40 -translate-x-1/2"
+          style={{ width: horizontalTrackWidth }}
+        >
+          <div className="h-2 rounded-full bg-black/20 shadow-sm">
+            {" "}
+            <div
+              className="h-2 rounded-full bg-black/60 transition-[width,transform]"
+              style={{
+                width: `${horizontalThumbWidth}px`,
+                transform: `translateX(${horizontalThumbLeft}px)`,
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="flex min-h-full min-w-full items-start justify-center pt-0 pb-20">
         {" "}
         <div
           style={{
