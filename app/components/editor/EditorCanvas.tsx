@@ -5,7 +5,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import CardSurface from "@/app/components/CardSurface";
 import TextEditingOverlayLayer from "@/app/components/editor/TextEditingOverlayLayer";
 import CanvasFrame from "@/app/components/editor/CanvasFrame";
-import CanvasScrollbar from "@/app/components/editor/CanvasScroollbar";
 import { useEditorCanvasHandlers } from "@/app/components/editor/useEditorCanvasHandlers";
 import { useCanvasResize } from "@/app/components/editor/useCanvasResize";
 import type { Block } from "@/shared/blocks";
@@ -42,7 +41,7 @@ type Props = {
   isPreview: boolean;
   showGuides: boolean;
   isMobile?: boolean;
-
+  onScrollStateChange?: (state: ScrollState) => void;
   snapGuide?: {
     type: "centerX" | "centerY" | "left" | "top";
     pos: number;
@@ -102,6 +101,7 @@ export default function EditorCanvas({
   onSelectImage,
   mixedLayers,
   isMobile,
+  onScrollStateChange,
 }: Props) {
   const { onResizeStart, onResizeBlockStart } = useCanvasResize({
     scale,
@@ -122,7 +122,7 @@ export default function EditorCanvas({
 
   const scrollClass = isMobile
     ? "relative h-full min-h-0 overflow-hidden"
-    : "relative h-full min-h-0 overflow-x-scroll overflow-y-scroll";
+    : "relative h-full min-h-0 overflow-x-auto overflow-y-auto";
 
   const [scrollState, setScrollState] = useState<ScrollState>({
     left: 0,
@@ -156,15 +156,18 @@ export default function EditorCanvas({
     const el = scrollRef.current;
     if (!el) return;
 
-    setScrollState({
+    const nextState: ScrollState = {
       left: el.scrollLeft,
       top: el.scrollTop,
       scrollWidth: el.scrollWidth,
       scrollHeight: el.scrollHeight,
       clientWidth: el.clientWidth,
       clientHeight: el.clientHeight,
-    });
-  }, []);
+    };
+
+    setScrollState(nextState);
+    onScrollStateChange?.(nextState);
+  }, [onScrollStateChange]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -186,11 +189,7 @@ export default function EditorCanvas({
   }, [updateScrollState]);
 
   return (
-    <div
-      ref={scrollRef}
-      className={scrollClass}
-      style={isMobile ? undefined : { scrollbarGutter: "stable both-edges" }}
-    >
+    <div ref={scrollRef} className={scrollClass} style={undefined}>
       {/* <pre className="absolute left-2 top-2 z-50 bg-black/70 p-2 text-xs text-white">
         {JSON.stringify(
           {
@@ -204,12 +203,7 @@ export default function EditorCanvas({
           2,
         )}
       </pre> */}
-      <CanvasScrollbar
-        visible={!isMobile && hasHorizontalScroll}
-        trackWidth={horizontalTrackWidth}
-        thumbWidth={horizontalThumbWidth}
-        thumbLeft={horizontalThumbLeft}
-      />
+
       <div className="flex min-h-full min-w-full items-start justify-center pt-0 pb-20">
         {" "}
         <div

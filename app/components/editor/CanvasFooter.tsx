@@ -12,7 +12,7 @@ export default function CanvasFooter({
   onResetZoom,
 }: Props) {
   return (
-    <footer className="h-16 shrink-0 border-t border-white/40 bg-white/60 backdrop-blur">
+    <footer className="h-2 shrink-0 border-t border-white/40 bg-white/35 backdrop-blur">
       <div className="mx-auto flex h-full max-w-md items-center justify-center gap-3 px-4">
         <button
           type="button"

@@ -6,9 +6,11 @@ import CanvasArea from "@/app/components/editor/CanvasArea";
 import CenterToolbar from "@/app/components/editor/CenterToolbar";
 import EditorCanvas from "@/app/components/editor/EditorCanvas";
 import ToolPanel from "@/app/components/ToolPanel";
+import CanvasScrollbar from "@/app/components/editor/CanvasScrollbar";
 import CanvasFooter from "@/app/components/editor/CanvasFooter";
 import type { CardEditorDesktopProps } from "./CardEditorDesktop.types";
 import clsx from "clsx"; // 使ってなかったら追加（なくても三項演算子で書ける）
+import { useState } from "react";
 
 export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
   const {
@@ -80,6 +82,18 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
   const handleDeleteBlock = (id: string) => {
     actions.removeBlock(id);
   };
+
+  const [canvasScrollState, setCanvasScrollState] = useState({
+    left: 0,
+    top: 0,
+    scrollWidth: 0,
+    scrollHeight: 0,
+    clientWidth: 0,
+    clientHeight: 0,
+  });
+
+  const hasHorizontalScroll =
+    canvasScrollState.scrollWidth - canvasScrollState.clientWidth > 1;
 
   return (
     <div className="flex w-full h-[calc(100dvh-56px)] bg-transparent">
@@ -251,6 +265,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                         snapGuide={snapGuide}
                         cardRef={cardRef}
                         blockRefs={blockRefs}
+                        onScrollStateChange={setCanvasScrollState}
                       />
                     </div>
                   </div>
@@ -258,6 +273,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
               </div>
             </CanvasArea>
           </div>
+
           <CanvasFooter
             zoomLabel={zoomLabel}
             onZoomIn={onZoomIn}
