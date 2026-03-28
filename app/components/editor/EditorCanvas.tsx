@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import CardSurface from "@/app/components/CardSurface";
 import TextEditingOverlayLayer from "@/app/components/editor/TextEditingOverlayLayer";
 import CanvasFrame from "@/app/components/editor/CanvasFrame";
+import CanvasScrollbar from "@/app/components/editor/CanvasScroollbar";
 import { useEditorCanvasHandlers } from "@/app/components/editor/useEditorCanvasHandlers";
 import { useCanvasResize } from "@/app/components/editor/useCanvasResize";
 import type { Block } from "@/shared/blocks";
@@ -203,24 +204,12 @@ export default function EditorCanvas({
           2,
         )}
       </pre> */}
-      {!isMobile && hasHorizontalScroll && (
-        <div
-          className="pointer-events-none absolute bottom-6 left-1/2 z-40 -translate-x-1/2"
-          style={{ width: horizontalTrackWidth }}
-        >
-          <div className="h-2 rounded-full bg-black/20 shadow-sm">
-            {" "}
-            <div
-              className="h-2 rounded-full bg-black/60 transition-[width,transform]"
-              style={{
-                width: `${horizontalThumbWidth}px`,
-                transform: `translateX(${horizontalThumbLeft}px)`,
-              }}
-            />
-          </div>
-        </div>
-      )}
-
+      <CanvasScrollbar
+        visible={!isMobile && hasHorizontalScroll}
+        trackWidth={horizontalTrackWidth}
+        thumbWidth={horizontalThumbWidth}
+        thumbLeft={horizontalThumbLeft}
+      />
       <div className="flex min-h-full min-w-full items-start justify-center pt-0 pb-20">
         {" "}
         <div
