@@ -29,9 +29,7 @@ export default function CanvasArea({
       }}
     >
       <div className="min-h-full w-full">
-        <div ref={innerRef} className="w-full min-w-0">
-          {children}
-        </div>
+        <div className="w-full min-w-0">{children}</div>
       </div>
     </main>
   );
