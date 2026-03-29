@@ -1,7 +1,7 @@
 // app/components/editor/EditorCanvas.tsx
 "use client";
 
-import React from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import CardSurface from "@/app/components/CardSurface";
 import TextEditingOverlayLayer from "@/app/components/editor/TextEditingOverlayLayer";
 import CanvasFrame from "@/app/components/editor/CanvasFrame";
@@ -19,6 +19,15 @@ type MixedLayer = {
   z: number;
 };
 
+type ScrollState = {
+  left: number;
+  top: number;
+  scrollWidth: number;
+  scrollHeight: number;
+  clientWidth: number;
+  clientHeight: number;
+};
+
 type Props = {
   blocks: Block[];
   images: CardImage[];
@@ -31,7 +40,8 @@ type Props = {
   activeBlockId?: string;
   isPreview: boolean;
   showGuides: boolean;
-
+  isMobile?: boolean;
+  onScrollStateChange?: (state: ScrollState) => void;
   snapGuide?: {
     type: "centerX" | "centerY" | "left" | "top";
     pos: number;
@@ -90,6 +100,8 @@ export default function EditorCanvas({
   selectedImageId,
   onSelectImage,
   mixedLayers,
+  isMobile,
+  onScrollStateChange,
 }: Props) {
   const { onResizeStart, onResizeBlockStart } = useCanvasResize({
     scale,
@@ -106,48 +118,132 @@ export default function EditorCanvas({
       onPointerDown,
     });
 
-  return (
-    <CanvasFrame
-      cardRef={cardRef}
-      scale={scale}
-      cardW={CARD_BASE_W}
-      cardH={CARD_BASE_H}
-      isPreview={isPreview}
-      showGuides={showGuides}
-    >
-      <CardSurface
-        blocks={blocks}
-        images={images}
-        mixedLayers={mixedLayers}
-        onMoveImage={moveImage}
-        selectedImageId={selectedImageId}
-        onSelectImage={onSelectImage}
-        onResizeImageStart={onResizeStart}
-        onResizeBlockStart={onResizeBlockStart}
-        design={design}
-        side={side}
-        w={CARD_BASE_W}
-        h={CARD_BASE_H}
-        interactive={!isPreview}
-        onSurfacePointerDown={handleSurfacePointerDown}
-        onBlockPointerDown={handleBlockPointerDown}
-        onStartInlineEdit={onStartInlineEdit}
-        activeBlockId={editingBlockId ? undefined : activeBlockId}
-        editingBlockId={editingBlockId}
-        blockRefs={blockRefs}
-        snapGuide={snapGuide}
-        className={isPreview ? "shadow-lg" : ""}
-      />
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
-      <TextEditingOverlayLayer
-        isPreview={isPreview}
-        blocks={blocks}
-        editingBlockId={editingBlockId}
-        editingText={editingText}
-        onChangeEditingText={onChangeEditingText}
-        onCommitText={onCommitText}
-        onStopEditing={onStopEditing}
-      />
-    </CanvasFrame>
+  const scrollClass = isMobile
+    ? "relative h-full min-h-0 overflow-hidden"
+    : "relative min-h-0 overflow-x-auto overflow-y-visible";
+
+  const [scrollState, setScrollState] = useState<ScrollState>({
+    left: 0,
+    top: 0,
+    scrollWidth: 0,
+    scrollHeight: 0,
+    clientWidth: 0,
+    clientHeight: 0,
+  });
+
+  const hasHorizontalScroll = scrollState.scrollWidth > scrollState.clientWidth;
+
+  const horizontalTrackWidth = 320;
+
+  const horizontalThumbWidth = hasHorizontalScroll
+    ? Math.max(
+        (scrollState.clientWidth / scrollState.scrollWidth) *
+          horizontalTrackWidth,
+        48,
+      )
+    : horizontalTrackWidth;
+
+  const horizontalThumbLeft =
+    hasHorizontalScroll && scrollState.scrollWidth > scrollState.clientWidth
+      ? (scrollState.left /
+          (scrollState.scrollWidth - scrollState.clientWidth)) *
+        (horizontalTrackWidth - horizontalThumbWidth)
+      : 0;
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const nextState: ScrollState = {
+      left: el.scrollLeft,
+      top: el.scrollTop,
+      scrollWidth: el.scrollWidth,
+      scrollHeight: el.scrollHeight,
+      clientWidth: el.clientWidth,
+      clientHeight: el.clientHeight,
+    };
+
+    setScrollState(nextState);
+    onScrollStateChange?.(nextState);
+  }, [onScrollStateChange]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    updateScrollState();
+
+    const handleScroll = () => {
+      updateScrollState();
+    };
+
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, [updateScrollState]);
+
+  return (
+    <div ref={scrollRef} className={scrollClass}>
+      <div className="flex min-h-full min-w-full items-center justify-center py-10">
+        {" "}
+        <div
+          style={{
+            width: CARD_BASE_W * scale,
+            height: CARD_BASE_H * scale,
+            position: "relative",
+          }}
+        >
+          <CanvasFrame
+            cardRef={cardRef}
+            scale={scale}
+            cardW={CARD_BASE_W}
+            cardH={CARD_BASE_H}
+            isPreview={isPreview}
+            showGuides={showGuides}
+            origin="top-left"
+          >
+            <CardSurface
+              blocks={blocks}
+              images={images}
+              mixedLayers={mixedLayers}
+              onMoveImage={moveImage}
+              selectedImageId={selectedImageId}
+              onSelectImage={onSelectImage}
+              onResizeImageStart={onResizeStart}
+              onResizeBlockStart={onResizeBlockStart}
+              design={design}
+              side={side}
+              w={CARD_BASE_W}
+              h={CARD_BASE_H}
+              interactive={!isPreview}
+              onSurfacePointerDown={handleSurfacePointerDown}
+              onBlockPointerDown={handleBlockPointerDown}
+              onStartInlineEdit={onStartInlineEdit}
+              activeBlockId={editingBlockId ? undefined : activeBlockId}
+              editingBlockId={editingBlockId}
+              blockRefs={blockRefs}
+              snapGuide={snapGuide}
+              className={isPreview ? "shadow-lg" : ""}
+            />
+
+            <TextEditingOverlayLayer
+              isPreview={isPreview}
+              blocks={blocks}
+              editingBlockId={editingBlockId}
+              editingText={editingText}
+              onChangeEditingText={onChangeEditingText}
+              onCommitText={onCommitText}
+              onStopEditing={onStopEditing}
+            />
+          </CanvasFrame>
+        </div>
+      </div>
+    </div>
   );
 }
