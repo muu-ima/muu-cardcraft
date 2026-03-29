@@ -98,7 +98,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
 
   const desktopCanvasLaneWidth = Math.round(CARD_BASE_W * scaleDesktop) + 96;
   const desktopCanvasLaneMinHeight =
-    Math.round(CARD_BASE_H * scaleDesktop) + 280;
+    Math.round(CARD_BASE_H * scaleDesktop) + 220;
 
   const shouldPinCanvasLeft = isPanelOpen || scaleDesktop > 1;
 
@@ -302,7 +302,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
             </CanvasArea>
           </div>
 
-          <div className="mt-0 px-4">
+          <div className="px-4 pb-4">
             <div className="mx-auto w-full max-w-[720px]">
               <CanvasFooter
                 zoomLabel={zoomLabel}
