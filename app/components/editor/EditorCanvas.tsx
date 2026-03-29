@@ -28,6 +28,10 @@ type ScrollState = {
   clientHeight: number;
 };
 
+// scale は現在2つの責務を兼ねている:
+// - displayScale: CanvasFrame / wrapper size
+// - interactionScale: pointer / resize 補正
+
 type Props = {
   blocks: Block[];
   images: CardImage[];

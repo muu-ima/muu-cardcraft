@@ -1,3 +1,4 @@
+// app/components/ediotr/useCanvasResize.ts
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,6 +10,7 @@ import {
   clamp,
 } from "@/shared/images";
 
+// scale はポインタ移動量や実表示幅を編集座標へ戻す interactionScale
 type UseCanvasResizeArgs = {
   scale: number;
   resizeImage: (id: string, w: number, h: number) => void;

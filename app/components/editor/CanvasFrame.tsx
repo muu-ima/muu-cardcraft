@@ -3,6 +3,7 @@
 import React from "react";
 import PrintGuides from "@/app/components/editor/PrintGuides";
 
+// scale は表示サイズと transform を担う displayScale
 type Props = {
   cardRef: React.RefObject<HTMLDivElement | null>;
   scale: number;

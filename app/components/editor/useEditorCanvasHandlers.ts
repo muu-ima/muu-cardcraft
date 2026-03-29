@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 
+// scale は block pointer down 時に下流へ渡す interactionScale
 type Args = {
   scale: number;
   onSurfacePointerDown?: () => void;
