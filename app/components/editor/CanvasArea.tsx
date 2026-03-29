@@ -21,7 +21,8 @@ export default function CanvasArea({
       className={[
         "flex-1 min-w-0 min-h-0",
         "canvas-area-scroll overflow-y-auto overflow-x-auto",
-        "px-3 sm:px-6 lg:px-10 py-6",
+        "px-3 md:px-2 lg:px-0",
+        "py-6",
         "pb-24 xl:pb-0",
       ].join(" ")}
       onPointerDown={(e) => {

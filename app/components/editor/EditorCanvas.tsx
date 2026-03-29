@@ -194,7 +194,7 @@ export default function EditorCanvas({
 
   return (
     <div ref={scrollRef} className={scrollClass}>
-      <div className="flex min-h-full min-w-full items-center justify-center py-10">
+      <div className="flex min-h-full min-w-full items-start justify-center pt-10">
         {" "}
         <div
           style={{

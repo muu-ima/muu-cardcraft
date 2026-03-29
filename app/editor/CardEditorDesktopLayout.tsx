@@ -93,9 +93,8 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
   const hasHorizontalScroll =
     canvasScrollState.scrollWidth - canvasScrollState.clientWidth > 1;
 
-  const desktopCanvasLaneWidth = Math.round(CARD_BASE_W * scaleDesktop) + 96;
-  const desktopCanvasLaneMinHeight =
-    Math.round(CARD_BASE_H * scaleDesktop) + 160;
+  const desktopCanvasLaneWidth = Math.round(CARD_BASE_W * scaleDesktop);
+  const desktopCanvasLaneMinHeight = Math.round(CARD_BASE_H * scaleDesktop);
 
   const shouldPinCanvasLeft = isPanelOpen || scaleDesktop > 1;
 
@@ -245,7 +244,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                     className="min-h-full min-w-full"
                     style={{ minHeight: `${desktopCanvasLaneMinHeight}px` }}
                   >
-                    <div className="flex min-h-full min-w-full w-max items-start justify-center pt-[56px] md:pt-[64px] lg:pt-[72px] px-6">
+                    <div className="flex min-h-full w-max min-w-full items-start justify-center pt-[56px] md:pt-[64px] lg:pt-[72px] px-6">
                       <div
                         ref={scaleWrapRefDesktop}
                         className="shrink-0"
