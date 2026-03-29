@@ -198,8 +198,6 @@ export default function EditorCanvas({
         {" "}
         <div
           style={{
-            width: CARD_BASE_W * scale,
-            height: CARD_BASE_H * scale,
             position: "relative",
           }}
         >
