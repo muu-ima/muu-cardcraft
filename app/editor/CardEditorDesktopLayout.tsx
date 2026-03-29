@@ -248,7 +248,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                     className="min-h-full min-w-full"
                     style={{ minHeight: `${desktopCanvasLaneMinHeight}px` }}
                   >
-                    <div className="flex min-h-full min-w-full w-max items-start justify-center pt-[64px] md:pt-[72px] lg:pt-[80px] px-6">
+                    <div className="flex min-h-full min-w-full w-max items-start justify-center pt-[56px] md:pt-[64px] lg:pt-[72px] px-6">
                       <div
                         ref={scaleWrapRefDesktop}
                         className="shrink-0"
@@ -302,7 +302,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
             </CanvasArea>
           </div>
 
-          <div className="mt-4 px-4 pb-4">
+          <div className="mt-0 px-4">
             <div className="mx-auto w-full max-w-[720px]">
               <CanvasFooter
                 zoomLabel={zoomLabel}
