@@ -98,7 +98,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
 
   const desktopCanvasLaneWidth = Math.round(CARD_BASE_W * scaleDesktop) + 96;
   const desktopCanvasLaneMinHeight =
-    Math.round(CARD_BASE_H * scaleDesktop) + 220;
+    Math.round(CARD_BASE_H * scaleDesktop) + 200;
 
   const shouldPinCanvasLeft = isPanelOpen || scaleDesktop > 1;
 

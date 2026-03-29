@@ -20,7 +20,7 @@ export default function CanvasArea({
       ref={innerRef}
       className={[
         "flex-1 min-w-0 min-h-0",
-        "canvas-area-scroll overflow-y-auto overflow-x-auto",
+        "canvas-area-scroll overflow-y-hidden overflow-x-auto",
         "px-3 sm:px-6 lg:px-10 py-6",
         "pb-24 xl:pb-0",
       ].join(" ")}
