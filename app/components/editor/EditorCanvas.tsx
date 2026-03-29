@@ -122,7 +122,7 @@ export default function EditorCanvas({
 
   const scrollClass = isMobile
     ? "relative h-full min-h-0 overflow-hidden"
-    : "relative h-full min-h-0 overflow-x-auto overflow-y-auto";
+    : "relative min-h-0 overflow-x-auto overflow-y-visible";
 
   const [scrollState, setScrollState] = useState<ScrollState>({
     left: 0,
@@ -189,22 +189,8 @@ export default function EditorCanvas({
   }, [updateScrollState]);
 
   return (
-    <div ref={scrollRef} className={scrollClass} style={undefined}>
-      {/* <pre className="absolute left-2 top-2 z-50 bg-black/70 p-2 text-xs text-white">
-        {JSON.stringify(
-          {
-            scrollState,
-            hasHorizontalScroll,
-            horizontalTrackWidth,
-            horizontalThumbWidth,
-            horizontalThumbLeft,
-          },
-          null,
-          2,
-        )}
-      </pre> */}
-
-      <div className="flex min-h-full min-w-full items-start justify-center pt-0 pb-20">
+    <div ref={scrollRef} className={scrollClass}>
+      <div className="flex min-h-full min-w-full items-center justify-center py-10">
         {" "}
         <div
           style={{
@@ -220,6 +206,7 @@ export default function EditorCanvas({
             cardH={CARD_BASE_H}
             isPreview={isPreview}
             showGuides={showGuides}
+            origin="top-left"
           >
             <CardSurface
               blocks={blocks}

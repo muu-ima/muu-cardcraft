@@ -11,6 +11,7 @@ type Props = {
   isPreview: boolean;
   showGuides?: boolean;
   children: React.ReactNode;
+  origin?: "top-left" | "center";
 };
 
 export default function CanvasFrame({
@@ -21,6 +22,7 @@ export default function CanvasFrame({
   isPreview,
   showGuides = false,
   children,
+  origin = "top-left",
 }: Props) {
   return (
     <section className="flex flex-col items-center gap-3">
@@ -42,7 +44,8 @@ export default function CanvasFrame({
               width: cardW,
               height: cardH,
               transform: `scale(${scale})`,
-              transformOrigin: "top left",
+              transformOrigin:
+                origin === "center" ? "center center" : "top left",
             }}
           >
             {children}

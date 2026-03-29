@@ -17,27 +17,18 @@ export default function CanvasArea({
 }: Props) {
   return (
     <main
+      ref={innerRef}
       className={[
-        // ✅ 親が flex のとき「残り領域」を担当できる
         "flex-1 min-w-0 min-h-0",
-
-        // ✅ スクロールはここに集約（画面に収まらないときだけ）
-        "overflow-y-auto overflow-x-hidden",
-
-        // ✅ 余白（見た目）
+        "canvas-area-scroll overflow-y-auto overflow-x-auto",
         "px-3 sm:px-6 lg:px-10 py-6",
         "pb-24 xl:pb-0",
-
-        // ✅ 中央寄せ
-        "flex justify-center",
       ].join(" ")}
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onBackgroundPointerDown?.(e);
       }}
     >
-      {/* viewport（可変） */}
-      <div className="w-full flex justify-center">
-        {/* scaleの基準になる“入れ物”。親レイアウト次第で幅が変わる */}
+      <div className="min-h-full w-full">
         <div ref={innerRef} className="w-full min-w-0">
           {children}
         </div>

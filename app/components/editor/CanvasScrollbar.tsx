@@ -1,3 +1,4 @@
+//app/components/editor/CanvasScroolbar.tsx
 "use client";
 
 type Props = {

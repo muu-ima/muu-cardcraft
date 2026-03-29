@@ -10,7 +10,8 @@ import CanvasScrollbar from "@/app/components/editor/CanvasScrollbar";
 import CanvasFooter from "@/app/components/editor/CanvasFooter";
 import type { CardEditorDesktopProps } from "./CardEditorDesktop.types";
 import clsx from "clsx"; // 使ってなかったら追加（なくても三項演算子で書ける）
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { CARD_BASE_H, CARD_BASE_W } from "@/shared/print";
 
 export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
   const {
@@ -94,6 +95,30 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
 
   const hasHorizontalScroll =
     canvasScrollState.scrollWidth - canvasScrollState.clientWidth > 1;
+
+  const desktopCanvasLaneWidth = Math.round(CARD_BASE_W * scaleDesktop) + 96;
+  const desktopCanvasLaneMinHeight =
+    Math.round(CARD_BASE_H * scaleDesktop) + 280;
+
+  const shouldPinCanvasLeft = isPanelOpen || scaleDesktop > 1;
+
+  useEffect(() => {
+    const el = canvasAreaRef.current;
+    if (!el) return;
+
+    const logSizes = () => {
+      console.log("[CanvasArea]", {
+        clientWidth: el.clientWidth,
+        clientHeight: el.clientHeight,
+        scrollWidth: el.scrollWidth,
+        scrollHeight: el.scrollHeight,
+      });
+    };
+
+    logSizes();
+    window.addEventListener("resize", logSizes);
+    return () => window.removeEventListener("resize", logSizes);
+  }, [canvasAreaRef, scaleDesktop, isPanelOpen, state.side]);
 
   return (
     <div className="flex w-full h-[calc(100dvh-56px)] bg-transparent">
@@ -185,11 +210,11 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
       {/* 右：キャンバス領域 */}
       <main className="flex-1 min-w-0 min-h-0 lg:px-8">
         <div className="flex h-full min-h-0 flex-col">
-          <div className="flex-1 min-h-0">
+          <div className="flex flex-1 min-h-0 flex-col">
             {" "}
             <CanvasArea innerRef={canvasAreaRef}>
               <div className="relative">
-                <div className="h-full min-h-0">
+                <div className="min-h-full">
                   {/* CenterToolbar は常時表示 */}
                   <div
                     ref={centerWrapRef}
@@ -220,14 +245,21 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
                     </div>
                   </div>
 
-                  <div className="flex w-full justify-center pt-[64px] md:pt-[72px] lg:pt-[80px]">
+                  <div
+                    className={clsx(
+                      "flex w-full pt-[64px] md:pt-[72px] lg:pt-[80px]",
+                      shouldPinCanvasLeft ? "justify-start" : "justify-center",
+                    )}
+                    style={{ minHeight: `${desktopCanvasLaneMinHeight}px` }}
+                  >
+                    {" "}
                     {/* ✅ タブ開閉で max-width を変える箱 */}
                     <div
                       ref={scaleWrapRefDesktop}
-                      className={clsx(
-                        "w-full min-w-0 px-3 pr-6 transition-[max-width] duration-200",
-                        isPanelOpen ? "max-w-[960px]" : "max-w-7xl",
-                      )}
+                      className="min-w-0 px-6"
+                      style={{
+                        minWidth: `${desktopCanvasLaneWidth}px`,
+                      }}
                     >
                       <EditorCanvas
                         blocks={getBlocksFor(state.side)}
@@ -274,11 +306,15 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
             </CanvasArea>
           </div>
 
-          <CanvasFooter
-            zoomLabel={zoomLabel}
-            onZoomIn={onZoomIn}
-            onResetZoom={onResetZoom}
-          />
+          <div className="mt-4 px-4 pb-4">
+            <div className="mx-auto w-full max-w-[720px]">
+              <CanvasFooter
+                zoomLabel={zoomLabel}
+                onZoomIn={onZoomIn}
+                onResetZoom={onResetZoom}
+              />
+            </div>
+          </div>
         </div>
       </main>
     </div>
