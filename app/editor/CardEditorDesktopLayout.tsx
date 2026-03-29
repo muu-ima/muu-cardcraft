@@ -6,7 +6,6 @@ import CanvasArea from "@/app/components/editor/CanvasArea";
 import CenterToolbar from "@/app/components/editor/CenterToolbar";
 import EditorCanvas from "@/app/components/editor/EditorCanvas";
 import ToolPanel from "@/app/components/ToolPanel";
-import CanvasScrollbar from "@/app/components/editor/CanvasScrollbar";
 import CanvasFooter from "@/app/components/editor/CanvasFooter";
 import type { CardEditorDesktopProps } from "./CardEditorDesktop.types";
 import clsx from "clsx"; // 使ってなかったら追加（なくても三項演算子で書ける）
@@ -31,7 +30,6 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     moveImage,
     mixedLayers,
     resizeImage,
-    setBlockWidth,
     addBlock: onAddBlock,
     onUploadedImage,
     onChangeText,
@@ -46,7 +44,6 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
     currentImageCount,
     maxImageCount,
     onDeleteImage,
-    onAnyPointerDownCapture,
     centerToolbarValue,
     centerVisible,
     handleBlockPointerDown,
@@ -98,7 +95,7 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
 
   const desktopCanvasLaneWidth = Math.round(CARD_BASE_W * scaleDesktop) + 96;
   const desktopCanvasLaneMinHeight =
-    Math.round(CARD_BASE_H * scaleDesktop) + 200;
+    Math.round(CARD_BASE_H * scaleDesktop) + 160;
 
   const shouldPinCanvasLeft = isPanelOpen || scaleDesktop > 1;
 
