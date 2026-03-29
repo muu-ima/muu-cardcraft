@@ -208,97 +208,93 @@ export function CardEditorDesktopLayout(props: CardEditorDesktopProps) {
         </aside>
       )}
       {/* 右：キャンバス領域 */}
-      <main className="flex-1 min-w-0 min-h-0 lg:px-8">
+      <main className="relative flex-1 min-w-0 min-h-0 lg:px-8">
+        {/* CenterToolbar は常時表示 */}
+        <div
+          ref={centerWrapRef}
+          className="pointer-events-none absolute top-4 left-1/2 z-50 w-full -translate-x-1/2"
+        >
+          <div className="pointer-events-auto flex justify-center">
+            <CenterToolbar
+              value={centerToolbarValue}
+              activeTab={state.activeTab}
+              onOpenTab={openTab}
+              onChangeFontSize={actions.onChangeFontSize}
+              onToggleBold={actions.onToggleBold}
+              onChangeAlign={actions.onChangeAlign}
+              side={state.side}
+              onChangeSide={actions.setSide}
+              showGuides={state.showGuides}
+              selectedItem={selectedItem}
+              onBringSelectedImageFront={onBringSelectedImageToFront}
+              onSendSelectedImageToBack={onSendSelectedImageToBack}
+              onDeleteSelectedImage={() => {
+                if (selectedImageId) onDeleteImage(selectedImageId);
+              }}
+              onToggleGuides={() => actions.setShowGuides((v) => !v)}
+              disabled={state.isPreview || state.side !== "front"}
+              visible={centerVisible}
+              sidePanelOpen={isPanelOpen}
+            />
+          </div>
+        </div>
         <div className="flex h-full min-h-0 flex-col">
           <div className="flex flex-1 min-h-0 flex-col">
             {" "}
             <CanvasArea innerRef={canvasAreaRef}>
               <div className="relative">
                 <div className="min-h-full">
-                  {/* CenterToolbar は常時表示 */}
                   <div
-                    ref={centerWrapRef}
-                    className="pointer-events-none absolute top-4 left-1/2 z-50 w-full -translate-x-1/2"
-                  >
-                    <div className="pointer-events-auto flex justify-center">
-                      <CenterToolbar
-                        value={centerToolbarValue}
-                        activeTab={state.activeTab}
-                        onOpenTab={openTab}
-                        onChangeFontSize={actions.onChangeFontSize}
-                        onToggleBold={actions.onToggleBold}
-                        onChangeAlign={actions.onChangeAlign}
-                        side={state.side}
-                        onChangeSide={actions.setSide}
-                        showGuides={state.showGuides}
-                        selectedItem={selectedItem}
-                        onBringSelectedImageFront={onBringSelectedImageToFront}
-                        onSendSelectedImageToBack={onSendSelectedImageToBack}
-                        onDeleteSelectedImage={() => {
-                          if (selectedImageId) onDeleteImage(selectedImageId);
-                        }}
-                        onToggleGuides={() => actions.setShowGuides((v) => !v)}
-                        disabled={state.isPreview || state.side !== "front"}
-                        visible={centerVisible}
-                        sidePanelOpen={isPanelOpen}
-                      />
-                    </div>
-                  </div>
-
-                  <div
-                    className={clsx(
-                      "flex w-full pt-[64px] md:pt-[72px] lg:pt-[80px]",
-                      shouldPinCanvasLeft ? "justify-start" : "justify-center",
-                    )}
+                    className="min-h-full min-w-full"
                     style={{ minHeight: `${desktopCanvasLaneMinHeight}px` }}
                   >
-                    {" "}
-                    {/* ✅ タブ開閉で max-width を変える箱 */}
-                    <div
-                      ref={scaleWrapRefDesktop}
-                      className="min-w-0 px-6"
-                      style={{
-                        minWidth: `${desktopCanvasLaneWidth}px`,
-                      }}
-                    >
-                      <EditorCanvas
-                        blocks={getBlocksFor(state.side)}
-                        images={getImagesFor(state.side)}
-                        moveImage={moveImage}
-                        resizeImage={resizeImage}
-                        onChangeWidth={onChangeWidth}
-                        mixedLayers={mixedLayers}
-                        design={design}
-                        side={state.side}
-                        scale={scaleDesktop}
-                        isPreview={state.isPreview}
-                        showGuides={state.showGuides}
-                        onPointerDown={
-                          state.side === "front"
-                            ? handleBlockPointerDown
-                            : undefined
-                        }
-                        selectedImageId={selectedImageId}
-                        onSelectImage={onSelectImage}
-                        onStartInlineEdit={(blockId) => {
-                          const block = blocksForSide.find(
-                            (b) => b.id === blockId,
-                          );
-                          if (!block || block.type !== "text") return;
-                          // ✅ startEditing が (id, text) を受け取るのでここで変換
-                          startEditing(block.id, block.text);
+                    <div className="flex min-h-full min-w-full w-max items-start justify-center pt-[64px] md:pt-[72px] lg:pt-[80px] px-6">
+                      <div
+                        ref={scaleWrapRefDesktop}
+                        className="shrink-0"
+                        style={{
+                          width: `${desktopCanvasLaneWidth}px`,
                         }}
-                        editingBlockId={editingBlockId}
-                        editingText={editingText}
-                        onChangeEditingText={setEditingText}
-                        onStopEditing={stopEditing}
-                        onCommitText={onCommitText}
-                        activeBlockId={state.activeBlockId}
-                        snapGuide={snapGuide}
-                        cardRef={cardRef}
-                        blockRefs={blockRefs}
-                        onScrollStateChange={setCanvasScrollState}
-                      />
+                      >
+                        <EditorCanvas
+                          blocks={getBlocksFor(state.side)}
+                          images={getImagesFor(state.side)}
+                          moveImage={moveImage}
+                          resizeImage={resizeImage}
+                          onChangeWidth={onChangeWidth}
+                          mixedLayers={mixedLayers}
+                          design={design}
+                          side={state.side}
+                          scale={scaleDesktop}
+                          isPreview={state.isPreview}
+                          showGuides={state.showGuides}
+                          onPointerDown={
+                            state.side === "front"
+                              ? handleBlockPointerDown
+                              : undefined
+                          }
+                          selectedImageId={selectedImageId}
+                          onSelectImage={onSelectImage}
+                          onStartInlineEdit={(blockId) => {
+                            const block = blocksForSide.find(
+                              (b) => b.id === blockId,
+                            );
+                            if (!block || block.type !== "text") return;
+                            // ✅ startEditing が (id, text) を受け取るのでここで変換
+                            startEditing(block.id, block.text);
+                          }}
+                          editingBlockId={editingBlockId}
+                          editingText={editingText}
+                          onChangeEditingText={setEditingText}
+                          onStopEditing={stopEditing}
+                          onCommitText={onCommitText}
+                          activeBlockId={state.activeBlockId}
+                          snapGuide={snapGuide}
+                          cardRef={cardRef}
+                          blockRefs={blockRefs}
+                          onScrollStateChange={setCanvasScrollState}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
